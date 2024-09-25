@@ -2,7 +2,10 @@
 
 import * as React from "react";
 import * as DateFns from "date-fns";
+import * as Core__Int from "@rescript/core/src/Core__Int.res.mjs";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
+import * as Color from "@texel/color";
+import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function allDays() {
@@ -16,47 +19,87 @@ function allDays() {
             });
 }
 
+function hsv(h, s, v) {
+  return Color.RGBToHex(Color.convert([
+                  h,
+                  s,
+                  v
+                ], Color.OKHSV, Color.sRGB));
+}
+
+function weekColor(weekInt) {
+  var weekPercent = weekInt / 53;
+  return hsv(weekPercent * 360, 1.0, 1.0);
+}
+
+function monthColor(monthInt) {
+  var monthPercent = monthInt / 12;
+  return hsv(monthPercent * 360, 1.0, 1.0);
+}
+
 function App(props) {
   return JsxRuntime.jsx("div", {
-              children: allDays().map(function (d) {
-                    var beginningOfWeek = d.getDay() === 0;
-                    var beginningOfMonth = d.getDate() === 1;
-                    return JsxRuntime.jsxs(React.Fragment, {
-                                children: [
-                                  beginningOfMonth ? JsxRuntime.jsx("div", {
-                                          className: "border border-t border-cyan-900"
-                                        }) : null,
-                                  beginningOfWeek ? JsxRuntime.jsx("div", {
-                                          className: "border border-t border-neutral-900"
-                                        }) : null,
-                                  true && beginningOfWeek ? JsxRuntime.jsx("div", {
-                                          children: JsxRuntime.jsx("div", {
-                                                children: "Week " + DateFns.format(d, "w"),
-                                                className: "text-sm absolute text-neutral-500 bg-black px-4 right-0 -translate-y-1/2 overflow-visible text-nowrap text-end "
-                                              }),
-                                          className: "relative h-0 bg-pink-500"
-                                        }) : null,
-                                  true && beginningOfMonth ? JsxRuntime.jsx("div", {
-                                          children: JsxRuntime.jsx("div", {
-                                                children: DateFns.format(d, "MMMM"),
-                                                className: "text-sm absolute text-cyan-500 bg-black px-4 right-1/4 -translate-y-1/2 overflow-visible text-nowrap "
-                                              }),
-                                          className: "relative h-0 bg-pink-500"
-                                        }) : null,
-                                  JsxRuntime.jsxs("div", {
-                                        children: [
-                                          JsxRuntime.jsx("div", {
-                                                children: DateFns.format(d, "y-MM-dd")
-                                              }),
-                                          JsxRuntime.jsx("div", {
-                                                children: DateFns.format(d, "eee"),
-                                                className: "text-neutral-500"
-                                              })
-                                        ],
-                                        className: "flex flex-row gap-2 pl-6"
-                                      })
-                                ]
-                              });
+              children: JsxRuntime.jsx("div", {
+                    children: allDays().map(function (d) {
+                          var beginningOfWeek = d.getDay() === 0;
+                          var beginningOfMonth = d.getDate() === 1;
+                          var hasEntry = Math.random() > 0.5;
+                          return JsxRuntime.jsxs(React.Fragment, {
+                                      children: [
+                                        beginningOfMonth ? JsxRuntime.jsx("div", {
+                                                children: JsxRuntime.jsx("div", {
+                                                      className: "h-px w-full bg-amber-500 -translate-y-1/2"
+                                                    }),
+                                                className: "relative h-0 ml-4"
+                                              }) : null,
+                                        beginningOfWeek ? JsxRuntime.jsx("div", {
+                                                children: JsxRuntime.jsx("div", {
+                                                      className: "h-px w-full bg-neutral-700 -translate-y-1/2"
+                                                    }),
+                                                className: "relative h-0 ml-4"
+                                              }) : null,
+                                        true && beginningOfWeek ? JsxRuntime.jsx("div", {
+                                                children: JsxRuntime.jsx("div", {
+                                                      children: "Week " + DateFns.format(d, "w"),
+                                                      className: "text-sm absolute text-neutral-500 bg-black px-4 right-0 -translate-y-1/2 overflow-visible text-nowrap text-end "
+                                                    }),
+                                                className: "relative h-0 bg-pink-500"
+                                              }) : null,
+                                        true && beginningOfMonth ? JsxRuntime.jsx("div", {
+                                                children: JsxRuntime.jsx("div", {
+                                                      children: DateFns.format(d, "MMMM"),
+                                                      className: "text-sm absolute text-amber-500 bg-black px-4 right-1/4 -translate-y-1/2 overflow-visible text-nowrap "
+                                                    }),
+                                                className: "relative h-0 bg-pink-500"
+                                              }) : null,
+                                        JsxRuntime.jsxs("div", {
+                                              children: [
+                                                JsxRuntime.jsx("div", {
+                                                      className: ["w-1 h-6 "].join(" "),
+                                                      style: {
+                                                        backgroundColor: monthColor(Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0))
+                                                      }
+                                                    }),
+                                                JsxRuntime.jsx("div", {
+                                                      className: ["w-1 h-6 "].join(" "),
+                                                      style: {
+                                                        backgroundColor: weekColor(Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "w"), undefined), 0))
+                                                      }
+                                                    }),
+                                                JsxRuntime.jsx("div", {
+                                                      children: DateFns.format(d, "y-MM-dd eee"),
+                                                      className: [
+                                                          hasEntry ? "text-neutral-300" : "text-neutral-700",
+                                                          "px-2"
+                                                        ].join(" ")
+                                                    })
+                                              ],
+                                              className: "flex flex-row items-center gap-1"
+                                            })
+                                      ]
+                                    });
+                        }),
+                    className: "w-96"
                   }),
               className: "p-6 font-mono"
             });
