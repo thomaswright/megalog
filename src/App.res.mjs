@@ -19,22 +19,16 @@ function allDays() {
             });
 }
 
-function hsv(h, s, v) {
+function monthColor(monthInt) {
+  var monthPercent = monthInt / 12;
+  var h = monthInt % 2 === 0 ? (monthPercent * 360 + 180) % 360 : monthPercent * 360;
+  var s = 1.0;
+  var v = 1.0;
   return Color.RGBToHex(Color.convert([
                   h,
                   s,
                   v
                 ], Color.OKHSV, Color.sRGB));
-}
-
-function weekColor(weekInt) {
-  var weekPercent = weekInt / 53;
-  return hsv(weekPercent * 360, 1.0, 1.0);
-}
-
-function monthColor(monthInt) {
-  var monthPercent = monthInt / 12;
-  return hsv(monthPercent * 360, 1.0, 1.0);
 }
 
 function App(props) {
@@ -44,46 +38,47 @@ function App(props) {
                           var beginningOfWeek = d.getDay() === 0;
                           var beginningOfMonth = d.getDate() === 1;
                           var hasEntry = Math.random() > 0.5;
+                          var monthColor$1 = monthColor(Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0));
                           return JsxRuntime.jsxs(React.Fragment, {
                                       children: [
-                                        beginningOfMonth ? JsxRuntime.jsx("div", {
-                                                children: JsxRuntime.jsx("div", {
-                                                      className: "h-px w-full bg-amber-500 -translate-y-1/2"
-                                                    }),
-                                                className: "relative h-0 ml-4"
-                                              }) : null,
                                         beginningOfWeek ? JsxRuntime.jsx("div", {
                                                 children: JsxRuntime.jsx("div", {
                                                       className: "h-px w-full bg-neutral-700 -translate-y-1/2"
                                                     }),
                                                 className: "relative h-0 ml-4"
                                               }) : null,
+                                        beginningOfMonth ? JsxRuntime.jsx("div", {
+                                                children: JsxRuntime.jsx("div", {
+                                                      className: ["h-px w-full -translate-y-1/2"].join(" "),
+                                                      style: {
+                                                        backgroundColor: monthColor$1
+                                                      }
+                                                    }),
+                                                className: "relative h-0 "
+                                              }) : null,
                                         true && beginningOfWeek ? JsxRuntime.jsx("div", {
                                                 children: JsxRuntime.jsx("div", {
                                                       children: "Week " + DateFns.format(d, "w"),
                                                       className: "text-sm absolute text-neutral-500 bg-black px-4 right-0 -translate-y-1/2 overflow-visible text-nowrap text-end "
                                                     }),
-                                                className: "relative h-0 bg-pink-500"
+                                                className: "relative h-0"
                                               }) : null,
                                         true && beginningOfMonth ? JsxRuntime.jsx("div", {
                                                 children: JsxRuntime.jsx("div", {
                                                       children: DateFns.format(d, "MMMM"),
-                                                      className: "text-sm absolute text-amber-500 bg-black px-4 right-1/4 -translate-y-1/2 overflow-visible text-nowrap "
+                                                      className: "text-sm absolute  bg-black px-4 right-1/4 -translate-y-1/2 overflow-visible text-nowrap ",
+                                                      style: {
+                                                        color: monthColor$1
+                                                      }
                                                     }),
-                                                className: "relative h-0 bg-pink-500"
+                                                className: "relative h-0"
                                               }) : null,
                                         JsxRuntime.jsxs("div", {
                                               children: [
                                                 JsxRuntime.jsx("div", {
-                                                      className: ["w-1 h-6 "].join(" "),
+                                                      className: ["w-px h-6 "].join(" "),
                                                       style: {
-                                                        backgroundColor: monthColor(Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0))
-                                                      }
-                                                    }),
-                                                JsxRuntime.jsx("div", {
-                                                      className: ["w-1 h-6 "].join(" "),
-                                                      style: {
-                                                        backgroundColor: weekColor(Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "w"), undefined), 0))
+                                                        backgroundColor: monthColor$1
                                                       }
                                                     }),
                                                 JsxRuntime.jsx("div", {
