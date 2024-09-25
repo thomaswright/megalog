@@ -1,8 +1,8 @@
 let day_of_ms = 1000 * 60 * 60 * 24
 
 let allDays = () => {
-  let start = Date.makeWithYMD(~year=2022, ~month=0, ~date=1)
-  let end = Date.makeWithYMD(~year=2023, ~month=0, ~date=1)
+  let start = Date.makeWithYMD(~year=2020, ~month=0, ~date=1)
+  let end = Date.makeWithYMD(~year=2024, ~month=0, ~date=1)
 
   let dayDiff =
     Math.floor((end->Date.getTime -. start->Date.getTime) /. day_of_ms->Int.toFloat)->Float.toInt
@@ -14,6 +14,7 @@ let allDays = () => {
 }
 
 let hsv = (h, s, v) => Texel.convert((h, s, v), Texel.okhsv, Texel.srgb)->Texel.rgbToHex
+let hsl = (h, s, l) => Texel.convert((h, s, l), Texel.okhsl, Texel.srgb)->Texel.rgbToHex
 
 // let customMonthColor = monthInt => {
 //   switch monthInt {
@@ -33,18 +34,52 @@ let hsv = (h, s, v) => Texel.convert((h, s, v), Texel.okhsv, Texel.srgb)->Texel.
 //   }
 // }
 
+let customMonthHue = (monthInt, _) => {
+  switch monthInt {
+  | 1 => 210.
+  | 2 => 0.
+  | 3 => 270.
+  | 4 => 120.
+  | 5 => 330.
+  | 6 => 180.
+  | 7 => 30.
+  | 8 => 240.
+  | 9 => 90.
+  | 10 => 300.
+  | 11 => 60.
+  | 12 => 150.
+  | _ => 0.
+  }
+}
+
 let weekColor = weekInt => {
   let weekPercent = weekInt->Int.toFloat /. 53.
   hsv(weekPercent *. 360., 1.0, 1.0)
 }
 
-let monthColor = monthInt => {
-  let monthPercent = monthInt->Int.toFloat /. 12.
-  hsv(
-    mod(monthInt, 2) == 0 ? Float.mod(monthPercent *. 360. +. 180., 360.) : monthPercent *. 360.,
-    1.0,
-    1.0,
-  )
+// let monthHue = monthInt => {
+//   let monthPercent = monthInt->Int.toFloat /. 12.
+
+//   mod(monthInt, 2) == 0 ? Float.mod(monthPercent *. 360. +. 180., 360.) : monthPercent *. 360.
+// }
+
+// let monthHue = (monthInt, year) => {
+//   let phi = 1.618034
+
+//   Float.mod(360. /. phi *. (monthInt + year * 12)->Int.toFloat, 360.0)
+// }
+
+let monthHue = (monthInt, _) => {
+  Float.mod(360. /. 12. *. (monthInt * 7)->Int.toFloat, 360.0)
+}
+
+let monthColor = (monthInt, year) => {
+  Console.log2(monthInt, monthHue(monthInt, year))
+  hsl(monthHue(monthInt, year), 1.0, 0.7)
+}
+
+let monthColorDim = (monthInt, year) => {
+  hsl(monthHue(monthInt, year), 1.0, 0.3)
 }
 
 @react.component
@@ -58,11 +93,15 @@ let make = () => {
         let beginningOfWeek = d->Date.getDay == 0
         let beginningOfMonth = d->Date.getDate == 1
         let hasEntry = Math.random() > 0.5
-        let monthColor = monthColor(d->DateFns.format("M")->Int.fromString->Option.getOr(0))
+        let year = d->Date.getFullYear
+        let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
+        let monthColor = monthColor(month, year)
+        let monthColorDim = monthColorDim(month, year)
+
         <React.Fragment>
           {beginningOfWeek
             ? <div className="relative h-0 ml-4">
-                <div className="h-px w-full bg-neutral-700 -translate-y-1/2" />
+                <div className="h-px w-1/3 right-0 absolute bg-neutral-700 -translate-y-1/2" />
               </div>
             : React.null}
           {beginningOfMonth
@@ -104,9 +143,10 @@ let make = () => {
             //   }}
             // />
             <div
-              className={[hasEntry ? "text-neutral-300" : "text-neutral-700", "px-2"]->Array.join(
-                " ",
-              )}>
+              style={{
+                color: hasEntry ? monthColor : monthColorDim,
+              }}
+              className={["px-2"]->Array.join(" ")}>
               {d->DateFns.format("y-MM-dd eee")->React.string}
             </div>
           </div>

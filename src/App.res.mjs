@@ -9,8 +9,8 @@ import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
 function allDays() {
-  var start = new Date(2022, 0, 1);
-  var end = new Date(2023, 0, 1);
+  var start = new Date(2020, 0, 1);
+  var end = new Date(2024, 0, 1);
   var dayDiff = Math.floor((end.getTime() - start.getTime()) / 86400000) | 0;
   return Core__Array.make(dayDiff, false).map(function (param, i) {
               var result = new Date(start.getTime());
@@ -19,16 +19,25 @@ function allDays() {
             });
 }
 
-function monthColor(monthInt) {
-  var monthPercent = monthInt / 12;
-  var h = monthInt % 2 === 0 ? (monthPercent * 360 + 180) % 360 : monthPercent * 360;
-  var s = 1.0;
-  var v = 1.0;
+function hsl(h, s, l) {
   return Color.RGBToHex(Color.convert([
                   h,
                   s,
-                  v
-                ], Color.OKHSV, Color.sRGB));
+                  l
+                ], Color.OKHSL, Color.sRGB));
+}
+
+function monthHue(monthInt, param) {
+  return 360 / 12 * Math.imul(monthInt, 7) % 360.0;
+}
+
+function monthColor(monthInt, year) {
+  console.log(monthInt, monthHue(monthInt, year));
+  return hsl(monthHue(monthInt, year), 1.0, 0.7);
+}
+
+function monthColorDim(monthInt, year) {
+  return hsl(monthHue(monthInt, year), 1.0, 0.3);
 }
 
 function App(props) {
@@ -38,12 +47,15 @@ function App(props) {
                           var beginningOfWeek = d.getDay() === 0;
                           var beginningOfMonth = d.getDate() === 1;
                           var hasEntry = Math.random() > 0.5;
-                          var monthColor$1 = monthColor(Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0));
+                          var year = d.getFullYear();
+                          var month = Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0);
+                          var monthColor$1 = monthColor(month, year);
+                          var monthColorDim$1 = monthColorDim(month, year);
                           return JsxRuntime.jsxs(React.Fragment, {
                                       children: [
                                         beginningOfWeek ? JsxRuntime.jsx("div", {
                                                 children: JsxRuntime.jsx("div", {
-                                                      className: "h-px w-full bg-neutral-700 -translate-y-1/2"
+                                                      className: "h-px w-1/3 right-0 absolute bg-neutral-700 -translate-y-1/2"
                                                     }),
                                                 className: "relative h-0 ml-4"
                                               }) : null,
@@ -83,10 +95,10 @@ function App(props) {
                                                     }),
                                                 JsxRuntime.jsx("div", {
                                                       children: DateFns.format(d, "y-MM-dd eee"),
-                                                      className: [
-                                                          hasEntry ? "text-neutral-300" : "text-neutral-700",
-                                                          "px-2"
-                                                        ].join(" ")
+                                                      className: ["px-2"].join(" "),
+                                                      style: {
+                                                        color: hasEntry ? monthColor$1 : monthColorDim$1
+                                                      }
                                                     })
                                               ],
                                               className: "flex flex-row items-center gap-1"
