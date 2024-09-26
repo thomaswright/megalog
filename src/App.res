@@ -109,7 +109,7 @@ let monthColorDim = (monthInt, year) => {
 module Months = {
   @react.component
   let make = (~start, ~end) => {
-    <div className="p-2 bg-black h-full flex-none overflow-y-scroll flex flex-col gap-2">
+    <div className="p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full">
       {allDays(start, end)
       ->Array.map(d => {
         let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
@@ -125,7 +125,7 @@ module Months = {
         let hasQ3Entry = Math.random() > 0.7
         let hasQ4Entry = Math.random() > 0.7
 
-        let entryCheck = x => x ? `text-black bg-cyan-400` : "text-neutral-200 bg-black"
+        let entryCheck = x => x ? `text-lime-100 bg-lime-900` : "text-neutral-400 bg-black"
 
         let year = d->Date.getFullYear
 
@@ -133,11 +133,11 @@ module Months = {
           ? <React.Fragment>
               {beginningOfYear
                 ? <div
-                    className="gap-px text-xs bg-white border border-white"
+                    className="gap-px text-xs bg-neutral-800 border border-neutral-600"
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "1rem 1.25rem 1.25rem 2rem 2rem 2rem ",
-                      gridTemplateRows: " repeat(4, 1.0rem)",
+                      gridTemplateColumns: "1fr 1.25fr 1.25fr 2fr 2fr 2fr ",
+                      gridTemplateRows: " repeat(4, 1.0fr)",
                       gridTemplateAreas: `
                     "year h1 q1 m1 m2 m3"
                     "year h1 q2 m4 m5 m6"
@@ -246,6 +246,57 @@ module Months = {
   }
 }
 
+//  {false && beginningOfMonth
+//   ? <div
+//       style={{color: monthColor}}
+//       className="text-left text-xs overflow-visible text-nowrap p-1">
+//       {("" ++ d->DateFns.format("MMM"))->React.string}
+//     </div>
+//   : React.null}
+// {false && beginningOfYear
+//   ? <div className="text-xs text-white text-left  overflow-visible text-nowrap p-1">
+//       {("" ++ d->DateFns.format("y"))->React.string}
+//     </div>
+//   : React.null}
+// {false && month == 3 && monthDay == 1
+//   ? <Icons.Flower
+//       className="m-1"
+//       style={{
+//         color: monthColor,
+//       }}
+//     />
+//   : React.null}
+//   {false && beginningOfMonth
+//     ? <div className="relative h-0 ">
+//         <div
+//           style={{backgroundColor: monthColor}}
+//           className={["h-px w-full -translate-y-1/2"]->Array.join(" ")}
+//         />
+//       </div>
+//     : React.null}
+//   {false && beginningOfWeek
+//     ? <div className="relative h-0">
+//         <div
+//           className="text-sm absolute text-neutral-500 bg-black px-4 right-0 -translate-y-1/2 overflow-visible text-nowrap text-end ">
+//           {("Week " ++ d->DateFns.format("w"))->React.string}
+//         </div>
+//       </div>
+//     : React.null}
+//   {false && beginningOfMonth
+//     ? <div className="relative h-0">
+//         <div
+//           style={{color: monthColor}}
+//           className="text-sm absolute  bg-black px-4 right-1/4 -translate-y-1/2 overflow-visible text-nowrap ">
+//           {d->DateFns.format("MMMM")->React.string}
+//         </div>
+//       </div>
+//     : React.null}
+// <div
+//   className={["w-1 h-6 "]->Array.join(" ")}
+//   style={{
+//     backgroundColor: weekColor(d->DateFns.format("w")->Int.fromString->Option.getOr(0)),
+//   }}
+// />
 module Days = {
   @react.component
   let make = (~start, ~end, ~entries) => {
@@ -263,7 +314,7 @@ module Days = {
       ->Array.keepSome
       ->Set.fromArray
 
-    <div className="w-fit flex-none p-2 h-full overflow-y-scroll ">
+    <div className="w-full flex-2 p-2 overflow-y-scroll ">
       {allDays(start, end)
       ->Array.map(d => {
         let beginningOfWeek = d->Date.getDay == 0
@@ -287,80 +338,32 @@ module Days = {
                 />
               </div>
             : React.null}
-          {false && beginningOfMonth
-            ? <div className="relative h-0 ">
-                <div
-                  style={{backgroundColor: monthColor}}
-                  className={["h-px w-full -translate-y-1/2"]->Array.join(" ")}
-                />
-              </div>
-            : React.null}
-          {false && beginningOfWeek
-            ? <div className="relative h-0">
-                <div
-                  className="text-sm absolute text-neutral-500 bg-black px-4 right-0 -translate-y-1/2 overflow-visible text-nowrap text-end ">
-                  {("Week " ++ d->DateFns.format("w"))->React.string}
-                </div>
-              </div>
-            : React.null}
-          {false && beginningOfMonth
-            ? <div className="relative h-0">
-                <div
-                  style={{color: monthColor}}
-                  className="text-sm absolute  bg-black px-4 right-1/4 -translate-y-1/2 overflow-visible text-nowrap ">
-                  {d->DateFns.format("MMMM")->React.string}
-                </div>
-              </div>
-            : React.null}
-          <div className="flex flex-row items-center gap-1 text-sm">
-            <div className=" h-6 w-5 flex flex-row">
+          <div
+            className="flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden">
+            <div className=" h-6 w-5 flex flex-row flex-none">
               {true && beginningOfWeek
                 ? <div
                     className="text-xs text-neutral-200 text-left  overflow-visible text-nowrap p-1">
                     {("" ++ d->DateFns.format("w"))->React.string}
                   </div>
                 : React.null}
-              {false && beginningOfMonth
-                ? <div
-                    style={{color: monthColor}}
-                    className="text-left text-xs overflow-visible text-nowrap p-1">
-                    {("" ++ d->DateFns.format("MMM"))->React.string}
-                  </div>
-                : React.null}
-              {false && beginningOfYear
-                ? <div className="text-xs text-white text-left  overflow-visible text-nowrap p-1">
-                    {("" ++ d->DateFns.format("y"))->React.string}
-                  </div>
-                : React.null}
-              {false && month == 3 && monthDay == 1
-                ? <Icons.Flower
-                    className="m-1"
-                    style={{
-                      color: monthColor,
-                    }}
-                  />
-                : React.null}
             </div>
             <div
-              className={["w-1 h-6 "]->Array.join(" ")}
+              className={["w-1 h-6 flex-none"]->Array.join(" ")}
               style={{
                 backgroundColor: monthColor,
               }}
             />
-            // <div
-            //   className={["w-1 h-6 "]->Array.join(" ")}
-            //   style={{
-            //     backgroundColor: weekColor(d->DateFns.format("w")->Int.fromString->Option.getOr(0)),
-            //   }}
-            // />
             <div
               style={{
                 color: hasEntry ? monthColor : monthColorDim,
               }}
-              className={["px-2", isToday ? "border-r-4 border-white" : ""]->Array.join(" ")}>
+              className={["px-2 flex-none", isToday ? "border-r-4 border-white" : ""]->Array.join(
+                " ",
+              )}>
               {d->DateFns.format("y-MM-dd eee")->React.string}
             </div>
-            <div className="text-neutral-500"> {"Singapore"->React.string} </div>
+            <div className="text-neutral-500 flex-none"> {"Singapore"->React.string} </div>
           </div>
         </React.Fragment>
       })
@@ -538,8 +541,10 @@ let make = () => {
   }
   <div className="font-mono h-dvh">
     <div className="flex flex-row h-full">
-      // <Months />
-      <Days start={startOfCal} end={endOfCal} entries={importData} />
+      <div className="flex flex-col h-full flex-none w-64">
+        <Days start={startOfCal} end={endOfCal} entries={importData} />
+        <Months start={startOfCal} end={endOfCal} />
+      </div>
       <Entries entries={importData} updateEntry={updateEntry} />
     </div>
   </div>

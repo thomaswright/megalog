@@ -7,7 +7,6 @@ import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import MonacoJsx from "./Monaco.jsx";
 import * as Color from "@texel/color";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
-import * as Lu from "react-icons/lu";
 import * as JsxRuntime from "react/jsx-runtime";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
@@ -41,6 +40,153 @@ function monthColorDim(monthInt, year) {
   return hsl(monthHue(monthInt, year), 1.0, 0.3);
 }
 
+function App$Months(props) {
+  return JsxRuntime.jsx("div", {
+              children: allDays(props.start, props.end).map(function (d) {
+                    Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0);
+                    var beginningOfMonth = d.getDate() === 1;
+                    var beginningOfYear = DateFns.getDayOfYear(d) === 1;
+                    var hasYearEntry = Math.random() > 0.7;
+                    var hasH1Entry = Math.random() > 0.7;
+                    var hasH2Entry = Math.random() > 0.7;
+                    var hasQ1Entry = Math.random() > 0.7;
+                    var hasQ2Entry = Math.random() > 0.7;
+                    var hasQ3Entry = Math.random() > 0.7;
+                    var hasQ4Entry = Math.random() > 0.7;
+                    var year = d.getFullYear();
+                    if (beginningOfMonth) {
+                      return JsxRuntime.jsx(React.Fragment, {
+                                  children: beginningOfYear ? JsxRuntime.jsxs("div", {
+                                          children: [
+                                            JsxRuntime.jsx("div", {
+                                                  children: JsxRuntime.jsx("div", {
+                                                        children: DateFns.format(d, "y"),
+                                                        className: "-rotate-90"
+                                                      }),
+                                                  className: [
+                                                      " flex flex-row items-center justify-center",
+                                                      hasYearEntry ? "text-lime-100 bg-lime-900" : "text-neutral-400 bg-black"
+                                                    ].join(" "),
+                                                  style: {
+                                                    gridArea: "year"
+                                                  }
+                                                }),
+                                            JsxRuntime.jsx("div", {
+                                                  children: JsxRuntime.jsx("div", {
+                                                        children: "H1",
+                                                        className: ""
+                                                      }),
+                                                  className: [
+                                                      " flex flex-row items-center justify-center",
+                                                      hasH1Entry ? "text-lime-100 bg-lime-900" : "text-neutral-400 bg-black"
+                                                    ].join(" "),
+                                                  style: {
+                                                    gridArea: "h1"
+                                                  }
+                                                }),
+                                            JsxRuntime.jsx("div", {
+                                                  children: JsxRuntime.jsx("div", {
+                                                        children: "H2",
+                                                        className: ""
+                                                      }),
+                                                  className: [
+                                                      " flex flex-row items-center justify-center",
+                                                      hasH2Entry ? "text-lime-100 bg-lime-900" : "text-neutral-400 bg-black"
+                                                    ].join(" "),
+                                                  style: {
+                                                    gridArea: "h2"
+                                                  }
+                                                }),
+                                            JsxRuntime.jsx("div", {
+                                                  children: JsxRuntime.jsx("div", {
+                                                        children: "Q1",
+                                                        className: ""
+                                                      }),
+                                                  className: [
+                                                      " flex flex-row items-center justify-center",
+                                                      hasQ1Entry ? "text-lime-100 bg-lime-900" : "text-neutral-400 bg-black"
+                                                    ].join(" "),
+                                                  style: {
+                                                    gridArea: "q1"
+                                                  }
+                                                }),
+                                            JsxRuntime.jsx("div", {
+                                                  children: JsxRuntime.jsx("div", {
+                                                        children: "Q2",
+                                                        className: ""
+                                                      }),
+                                                  className: [
+                                                      " flex flex-row items-center justify-center",
+                                                      hasQ2Entry ? "text-lime-100 bg-lime-900" : "text-neutral-400 bg-black"
+                                                    ].join(" "),
+                                                  style: {
+                                                    gridArea: "q2"
+                                                  }
+                                                }),
+                                            JsxRuntime.jsx("div", {
+                                                  children: JsxRuntime.jsx("div", {
+                                                        children: "Q3",
+                                                        className: ""
+                                                      }),
+                                                  className: [
+                                                      " flex flex-row items-center justify-center",
+                                                      hasQ3Entry ? "text-lime-100 bg-lime-900" : "text-neutral-400 bg-black"
+                                                    ].join(" "),
+                                                  style: {
+                                                    gridArea: "q3"
+                                                  }
+                                                }),
+                                            JsxRuntime.jsx("div", {
+                                                  children: JsxRuntime.jsx("div", {
+                                                        children: "Q4",
+                                                        className: ""
+                                                      }),
+                                                  className: [
+                                                      " flex flex-row items-center justify-center",
+                                                      hasQ4Entry ? "text-lime-100 bg-lime-900" : "text-neutral-400 bg-black"
+                                                    ].join(" "),
+                                                  style: {
+                                                    gridArea: "q4"
+                                                  }
+                                                }),
+                                            Core__Array.make(12, false).map(function (v, i) {
+                                                  var monthNum = (i + 1 | 0).toString();
+                                                  monthColorDim(i + 1 | 0, year);
+                                                  monthColor(i + 1 | 0, year);
+                                                  var hasEntry = Math.random() > 0.7;
+                                                  var monthDate = new Date(year, i);
+                                                  return JsxRuntime.jsx("div", {
+                                                              children: JsxRuntime.jsx("div", {
+                                                                    children: DateFns.format(monthDate, "MMM"),
+                                                                    className: ""
+                                                                  }),
+                                                              className: [
+                                                                  " flex flex-row items-center justify-center ",
+                                                                  hasEntry ? "text-lime-100 bg-lime-900" : "text-neutral-400 bg-black"
+                                                                ].join(" "),
+                                                              style: {
+                                                                gridArea: "m" + monthNum
+                                                              }
+                                                            });
+                                                })
+                                          ],
+                                          className: "gap-px text-xs bg-neutral-800 border border-neutral-600",
+                                          style: {
+                                            display: "grid",
+                                            gridTemplateAreas: "\n                    \"year h1 q1 m1 m2 m3\"\n                    \"year h1 q2 m4 m5 m6\"\n                    \"year h2 q3 m7 m8 m9\"\n                    \"year h2 q4 m10 m11 m12\"\n                  \n                    ",
+                                            gridTemplateColumns: "1fr 1.25fr 1.25fr 2fr 2fr 2fr ",
+                                            gridTemplateRows: " repeat(4, 1.0fr)"
+                                          }
+                                        }) : null
+                                });
+                    } else {
+                      return null;
+                    }
+                  }),
+              className: "p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full"
+            });
+}
+
 function App$Days(props) {
   var dateSet = new Set(Core__Array.keepSome(Core__Array.keepSome(Core__Option.getOr(props.entries, []).map(function (entry) {
                       return entry.date;
@@ -53,12 +199,12 @@ function App$Days(props) {
   return JsxRuntime.jsx("div", {
               children: allDays(props.start, props.end).map(function (d) {
                     var beginningOfWeek = d.getDay() === 0;
-                    var beginningOfMonth = d.getDate() === 1;
-                    var beginningOfYear = DateFns.getDayOfYear(d) === 1;
+                    d.getDate() === 1;
+                    DateFns.getDayOfYear(d) === 1;
                     var hasEntry = dateSet.has(DateFns.format(d, "y-MM-dd"));
                     var year = d.getFullYear();
                     var month = Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0);
-                    var monthDay = Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "dd"), undefined), 0);
+                    Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "dd"), undefined), 0);
                     var monthColor$1 = monthColor(month, year);
                     var monthColorDim$1 = monthColorDim(month, year);
                     var isToday = DateFns.isSameDay(new Date(), d);
@@ -73,62 +219,17 @@ function App$Days(props) {
                                               }),
                                           className: "relative h-0 ml-px"
                                         }) : null,
-                                  false && beginningOfMonth ? JsxRuntime.jsx("div", {
-                                          children: JsxRuntime.jsx("div", {
-                                                className: ["h-px w-full -translate-y-1/2"].join(" "),
-                                                style: {
-                                                  backgroundColor: monthColor$1
-                                                }
-                                              }),
-                                          className: "relative h-0 "
-                                        }) : null,
-                                  false && beginningOfWeek ? JsxRuntime.jsx("div", {
-                                          children: JsxRuntime.jsx("div", {
-                                                children: "Week " + DateFns.format(d, "w"),
-                                                className: "text-sm absolute text-neutral-500 bg-black px-4 right-0 -translate-y-1/2 overflow-visible text-nowrap text-end "
-                                              }),
-                                          className: "relative h-0"
-                                        }) : null,
-                                  false && beginningOfMonth ? JsxRuntime.jsx("div", {
-                                          children: JsxRuntime.jsx("div", {
-                                                children: DateFns.format(d, "MMMM"),
-                                                className: "text-sm absolute  bg-black px-4 right-1/4 -translate-y-1/2 overflow-visible text-nowrap ",
-                                                style: {
-                                                  color: monthColor$1
-                                                }
-                                              }),
-                                          className: "relative h-0"
-                                        }) : null,
                                   JsxRuntime.jsxs("div", {
                                         children: [
-                                          JsxRuntime.jsxs("div", {
-                                                children: [
-                                                  true && beginningOfWeek ? JsxRuntime.jsx("div", {
-                                                          children: DateFns.format(d, "w"),
-                                                          className: "text-xs text-neutral-200 text-left  overflow-visible text-nowrap p-1"
-                                                        }) : null,
-                                                  false && beginningOfMonth ? JsxRuntime.jsx("div", {
-                                                          children: DateFns.format(d, "MMM"),
-                                                          className: "text-left text-xs overflow-visible text-nowrap p-1",
-                                                          style: {
-                                                            color: monthColor$1
-                                                          }
-                                                        }) : null,
-                                                  false && beginningOfYear ? JsxRuntime.jsx("div", {
-                                                          children: DateFns.format(d, "y"),
-                                                          className: "text-xs text-white text-left  overflow-visible text-nowrap p-1"
-                                                        }) : null,
-                                                  false && month === 3 && monthDay === 1 ? JsxRuntime.jsx(Lu.LuFlower, {
-                                                          className: "m-1",
-                                                          style: {
-                                                            color: monthColor$1
-                                                          }
-                                                        }) : null
-                                                ],
-                                                className: " h-6 w-5 flex flex-row"
+                                          JsxRuntime.jsx("div", {
+                                                children: true && beginningOfWeek ? JsxRuntime.jsx("div", {
+                                                        children: DateFns.format(d, "w"),
+                                                        className: "text-xs text-neutral-200 text-left  overflow-visible text-nowrap p-1"
+                                                      }) : null,
+                                                className: " h-6 w-5 flex flex-row flex-none"
                                               }),
                                           JsxRuntime.jsx("div", {
-                                                className: ["w-1 h-6 "].join(" "),
+                                                className: ["w-1 h-6 flex-none"].join(" "),
                                                 style: {
                                                   backgroundColor: monthColor$1
                                                 }
@@ -136,7 +237,7 @@ function App$Days(props) {
                                           JsxRuntime.jsx("div", {
                                                 children: DateFns.format(d, "y-MM-dd eee"),
                                                 className: [
-                                                    "px-2",
+                                                    "px-2 flex-none",
                                                     isToday ? "border-r-4 border-white" : ""
                                                   ].join(" "),
                                                 style: {
@@ -145,15 +246,15 @@ function App$Days(props) {
                                               }),
                                           JsxRuntime.jsx("div", {
                                                 children: "Singapore",
-                                                className: "text-neutral-500"
+                                                className: "text-neutral-500 flex-none"
                                               })
                                         ],
-                                        className: "flex flex-row items-center gap-1 text-sm"
+                                        className: "flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden"
                                       })
                                 ]
                               }, DateFns.format(d, "y-MM-dd"));
                   }),
-              className: "w-fit flex-none p-2 h-full overflow-y-scroll "
+              className: "w-full flex-2 p-2 overflow-y-scroll "
             });
 }
 
@@ -293,10 +394,19 @@ function App(props) {
   return JsxRuntime.jsx("div", {
               children: JsxRuntime.jsxs("div", {
                     children: [
-                      JsxRuntime.jsx(App$Days, {
-                            start: startOfCal,
-                            end: endOfCal,
-                            entries: importData
+                      JsxRuntime.jsxs("div", {
+                            children: [
+                              JsxRuntime.jsx(App$Days, {
+                                    start: startOfCal,
+                                    end: endOfCal,
+                                    entries: importData
+                                  }),
+                              JsxRuntime.jsx(App$Months, {
+                                    start: startOfCal,
+                                    end: endOfCal
+                                  })
+                            ],
+                            className: "flex flex-col h-full flex-none w-64"
                           }),
                       JsxRuntime.jsx(App$Entries, {
                             entries: importData,
