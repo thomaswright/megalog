@@ -95,7 +95,7 @@ let make = () => {
   let showMonthNumber = false
   <div className="p-6 font-mono">
     <div className="flex flex-row">
-      <div className="w-20">
+      <div className="">
         {allDays()
         ->Array.map(d => {
           let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
@@ -103,24 +103,132 @@ let make = () => {
           let beginningOfYear = d->DateFns.getDayOfYear == 1
           let beginningOfQuarter = mod(month, 3) == 1
           let beginningOfHalf = mod(month, 6) == 1
+          let hasYearEntry = Math.random() > 0.7
+          let hasH1Entry = Math.random() > 0.7
+          let hasH2Entry = Math.random() > 0.7
+          let hasQ1Entry = Math.random() > 0.7
+          let hasQ2Entry = Math.random() > 0.7
+          let hasQ3Entry = Math.random() > 0.7
+          let hasQ4Entry = Math.random() > 0.7
+
+          let entryCheck = x => x ? `text-white bg-cyan-800` : "text-neutral-200 bg-black"
 
           let year = d->Date.getFullYear
-          let monthColor = monthColor(month, year)
-          let monthColorDim = monthColorDim(month, year)
           beginningOfMonth
             ? <React.Fragment>
                 {beginningOfYear
-                  ? <div className="text-red-500"> {d->DateFns.format("y")->React.string} </div>
+                  ? <div
+                      className="gap-px pb-px text-xs bg-neutral-500"
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(4, 1.5rem)",
+                        gridTemplateRows: " repeat(12, 1.0rem)",
+                        gridTemplateAreas: `
+                    "year h1 q1 m1"
+                    "year h1 q1 m2"
+                    "year h1 q1 m3"
+                    "year h1 q2 m4"
+                    "year h1 q2 m5"
+                    "year h1 q2 m6"
+                    "year h2 q3 m7"
+                    "year h2 q3 m8"
+                    "year h2 q3 m9"
+                    "year h2 q4 m10"
+                    "year h2 q4 m11"
+                    "year h2 q4 m12"
+                    `,
+                      }}>
+                      <div
+                        className={[
+                          " flex flex-row items-center justify-center",
+                          hasYearEntry->entryCheck,
+                        ]->Array.join(" ")}
+                        style={{
+                          gridArea: "year",
+                        }}>
+                        <div className="-rotate-90"> {d->DateFns.format("y")->React.string} </div>
+                      </div>
+                      <div
+                        className={[
+                          " flex flex-row items-center justify-center",
+                          hasH1Entry->entryCheck,
+                        ]->Array.join(" ")}
+                        style={{
+                          gridArea: "h1",
+                        }}>
+                        <div className="-rotate-90"> {"H1"->React.string} </div>
+                      </div>
+                      <div
+                        className={[
+                          " flex flex-row items-center justify-center",
+                          hasH2Entry->entryCheck,
+                        ]->Array.join(" ")}
+                        style={{
+                          gridArea: "h2",
+                        }}>
+                        <div className="-rotate-90"> {"H2"->React.string} </div>
+                      </div>
+                      <div
+                        className={[
+                          " flex flex-row items-center justify-center",
+                          hasQ1Entry->entryCheck,
+                        ]->Array.join(" ")}
+                        style={{
+                          gridArea: "q1",
+                        }}>
+                        <div className="-rotate-90"> {"Q1"->React.string} </div>
+                      </div>
+                      <div
+                        className={[
+                          " flex flex-row items-center justify-center",
+                          hasQ2Entry->entryCheck,
+                        ]->Array.join(" ")}
+                        style={{
+                          gridArea: "q2",
+                        }}>
+                        <div className="-rotate-90"> {"Q2"->React.string} </div>
+                      </div>
+                      <div
+                        className={[
+                          " flex flex-row items-center justify-center",
+                          hasQ3Entry->entryCheck,
+                        ]->Array.join(" ")}
+                        style={{
+                          gridArea: "q3",
+                        }}>
+                        <div className="-rotate-90"> {"Q3"->React.string} </div>
+                      </div>
+                      <div
+                        className={[
+                          " flex flex-row items-center justify-center",
+                          hasQ4Entry->entryCheck,
+                        ]->Array.join(" ")}
+                        style={{
+                          gridArea: "q4",
+                        }}>
+                        <div className="-rotate-90"> {"Q4"->React.string} </div>
+                      </div>
+                      {Array.make(~length=12, false)
+                      ->Array.mapWithIndex((v, i) => {
+                        let monthNum = (i + 1)->Int.toString
+                        let monthColorDim = monthColorDim(i + 1, year)
+                        let monthColor = monthColor(i + 1, year)
+                        let hasEntry = Math.random() > 0.7
+
+                        <div
+                          className={[
+                            " flex flex-row items-center justify-center",
+                            hasEntry->entryCheck,
+                          ]->Array.join(" ")}
+                          style={{
+                            gridArea: "m" ++ monthNum,
+                          }}>
+                          <div className=""> {monthNum->React.string} </div>
+                        </div>
+                      })
+                      ->React.array}
+                    </div>
                   : React.null}
-                <div className="flex flex-row h-4 text-sm gap-1">
-                  <div className=""> {d->DateFns.format("MMM")->React.string} </div>
-                  {beginningOfQuarter
-                    ? <div> {("Q" ++ d->DateFns.format("q"))->React.string} </div>
-                    : React.null}
-                  {beginningOfHalf
-                    ? <div> {(month == 1 ? "H1" : month == 7 ? "H2" : "")->React.string} </div>
-                    : React.null}
-                </div>
               </React.Fragment>
             : React.null
         })

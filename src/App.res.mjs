@@ -47,45 +47,146 @@ function App(props) {
                     children: [
                       JsxRuntime.jsx("div", {
                             children: allDays().map(function (d) {
-                                  var month = Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0);
+                                  Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0);
                                   var beginningOfMonth = d.getDate() === 1;
                                   var beginningOfYear = DateFns.getDayOfYear(d) === 1;
-                                  var beginningOfQuarter = month % 3 === 1;
-                                  var beginningOfHalf = month % 6 === 1;
+                                  var hasYearEntry = Math.random() > 0.7;
+                                  var hasH1Entry = Math.random() > 0.7;
+                                  var hasH2Entry = Math.random() > 0.7;
+                                  var hasQ1Entry = Math.random() > 0.7;
+                                  var hasQ2Entry = Math.random() > 0.7;
+                                  var hasQ3Entry = Math.random() > 0.7;
+                                  var hasQ4Entry = Math.random() > 0.7;
                                   var year = d.getFullYear();
-                                  monthColor(month, year);
-                                  monthColorDim(month, year);
                                   if (beginningOfMonth) {
-                                    return JsxRuntime.jsxs(React.Fragment, {
-                                                children: [
-                                                  beginningOfYear ? JsxRuntime.jsx("div", {
-                                                          children: DateFns.format(d, "y"),
-                                                          className: "text-red-500"
-                                                        }) : null,
-                                                  JsxRuntime.jsxs("div", {
+                                    return JsxRuntime.jsx(React.Fragment, {
+                                                children: beginningOfYear ? JsxRuntime.jsxs("div", {
                                                         children: [
                                                           JsxRuntime.jsx("div", {
-                                                                children: DateFns.format(d, "MMM"),
-                                                                className: ""
+                                                                children: JsxRuntime.jsx("div", {
+                                                                      children: DateFns.format(d, "y"),
+                                                                      className: "-rotate-90"
+                                                                    }),
+                                                                className: [
+                                                                    " flex flex-row items-center justify-center",
+                                                                    hasYearEntry ? "text-white bg-cyan-800" : "text-neutral-200 bg-black"
+                                                                  ].join(" "),
+                                                                style: {
+                                                                  gridArea: "year"
+                                                                }
                                                               }),
-                                                          beginningOfQuarter ? JsxRuntime.jsx("div", {
-                                                                  children: "Q" + DateFns.format(d, "q")
-                                                                }) : null,
-                                                          beginningOfHalf ? JsxRuntime.jsx("div", {
-                                                                  children: month === 1 ? "H1" : (
-                                                                      month === 7 ? "H2" : ""
-                                                                    )
-                                                                }) : null
+                                                          JsxRuntime.jsx("div", {
+                                                                children: JsxRuntime.jsx("div", {
+                                                                      children: "H1",
+                                                                      className: "-rotate-90"
+                                                                    }),
+                                                                className: [
+                                                                    " flex flex-row items-center justify-center",
+                                                                    hasH1Entry ? "text-white bg-cyan-800" : "text-neutral-200 bg-black"
+                                                                  ].join(" "),
+                                                                style: {
+                                                                  gridArea: "h1"
+                                                                }
+                                                              }),
+                                                          JsxRuntime.jsx("div", {
+                                                                children: JsxRuntime.jsx("div", {
+                                                                      children: "H2",
+                                                                      className: "-rotate-90"
+                                                                    }),
+                                                                className: [
+                                                                    " flex flex-row items-center justify-center",
+                                                                    hasH2Entry ? "text-white bg-cyan-800" : "text-neutral-200 bg-black"
+                                                                  ].join(" "),
+                                                                style: {
+                                                                  gridArea: "h2"
+                                                                }
+                                                              }),
+                                                          JsxRuntime.jsx("div", {
+                                                                children: JsxRuntime.jsx("div", {
+                                                                      children: "Q1",
+                                                                      className: "-rotate-90"
+                                                                    }),
+                                                                className: [
+                                                                    " flex flex-row items-center justify-center",
+                                                                    hasQ1Entry ? "text-white bg-cyan-800" : "text-neutral-200 bg-black"
+                                                                  ].join(" "),
+                                                                style: {
+                                                                  gridArea: "q1"
+                                                                }
+                                                              }),
+                                                          JsxRuntime.jsx("div", {
+                                                                children: JsxRuntime.jsx("div", {
+                                                                      children: "Q2",
+                                                                      className: "-rotate-90"
+                                                                    }),
+                                                                className: [
+                                                                    " flex flex-row items-center justify-center",
+                                                                    hasQ2Entry ? "text-white bg-cyan-800" : "text-neutral-200 bg-black"
+                                                                  ].join(" "),
+                                                                style: {
+                                                                  gridArea: "q2"
+                                                                }
+                                                              }),
+                                                          JsxRuntime.jsx("div", {
+                                                                children: JsxRuntime.jsx("div", {
+                                                                      children: "Q3",
+                                                                      className: "-rotate-90"
+                                                                    }),
+                                                                className: [
+                                                                    " flex flex-row items-center justify-center",
+                                                                    hasQ3Entry ? "text-white bg-cyan-800" : "text-neutral-200 bg-black"
+                                                                  ].join(" "),
+                                                                style: {
+                                                                  gridArea: "q3"
+                                                                }
+                                                              }),
+                                                          JsxRuntime.jsx("div", {
+                                                                children: JsxRuntime.jsx("div", {
+                                                                      children: "Q4",
+                                                                      className: "-rotate-90"
+                                                                    }),
+                                                                className: [
+                                                                    " flex flex-row items-center justify-center",
+                                                                    hasQ4Entry ? "text-white bg-cyan-800" : "text-neutral-200 bg-black"
+                                                                  ].join(" "),
+                                                                style: {
+                                                                  gridArea: "q4"
+                                                                }
+                                                              }),
+                                                          Core__Array.make(12, false).map(function (v, i) {
+                                                                var monthNum = (i + 1 | 0).toString();
+                                                                monthColorDim(i + 1 | 0, year);
+                                                                monthColor(i + 1 | 0, year);
+                                                                var hasEntry = Math.random() > 0.7;
+                                                                return JsxRuntime.jsx("div", {
+                                                                            children: JsxRuntime.jsx("div", {
+                                                                                  children: monthNum,
+                                                                                  className: ""
+                                                                                }),
+                                                                            className: [
+                                                                                " flex flex-row items-center justify-center",
+                                                                                hasEntry ? "text-white bg-cyan-800" : "text-neutral-200 bg-black"
+                                                                              ].join(" "),
+                                                                            style: {
+                                                                              gridArea: "m" + monthNum
+                                                                            }
+                                                                          });
+                                                              })
                                                         ],
-                                                        className: "flex flex-row h-4 text-sm gap-1"
-                                                      })
-                                                ]
+                                                        className: "gap-px pb-px text-xs bg-neutral-500",
+                                                        style: {
+                                                          display: "grid",
+                                                          gridTemplateAreas: "\n                    \"year h1 q1 m1\"\n                    \"year h1 q1 m2\"\n                    \"year h1 q1 m3\"\n                    \"year h1 q2 m4\"\n                    \"year h1 q2 m5\"\n                    \"year h1 q2 m6\"\n                    \"year h2 q3 m7\"\n                    \"year h2 q3 m8\"\n                    \"year h2 q3 m9\"\n                    \"year h2 q4 m10\"\n                    \"year h2 q4 m11\"\n                    \"year h2 q4 m12\"\n                    ",
+                                                          gridTemplateColumns: "repeat(4, 1.5rem)",
+                                                          gridTemplateRows: " repeat(12, 1.0rem)"
+                                                        }
+                                                      }) : null
                                               });
                                   } else {
                                     return null;
                                   }
                                 }),
-                            className: "w-20"
+                            className: ""
                           }),
                       JsxRuntime.jsx("div", {
                             children: allDays().map(function (d) {
