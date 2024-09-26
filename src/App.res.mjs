@@ -42,12 +42,20 @@ function monthColorDim(monthInt, year) {
 }
 
 function App$Days(props) {
+  var dateSet = new Set(Core__Array.keepSome(Core__Array.keepSome(Core__Option.getOr(props.entries, []).map(function (entry) {
+                      return entry.date;
+                    })).map(function (date) {
+                if (date.TAG === "Date") {
+                  return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd");
+                }
+                
+              })));
   return JsxRuntime.jsx("div", {
               children: allDays(props.start, props.end).map(function (d) {
                     var beginningOfWeek = d.getDay() === 0;
                     var beginningOfMonth = d.getDate() === 1;
                     var beginningOfYear = DateFns.getDayOfYear(d) === 1;
-                    var hasEntry = Math.random() > 0.5;
+                    var hasEntry = dateSet.has(DateFns.format(d, "y-MM-dd"));
                     var year = d.getFullYear();
                     var month = Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0);
                     var monthDay = Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "dd"), undefined), 0);

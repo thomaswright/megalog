@@ -15,6 +15,8 @@ type entry = {
 
 let format = DateFns.format
 
+let ymdDate = (year, month, date) => Date.makeWithYMD(~year, ~month, ~date)
+
 let day_of_ms = 1000 * 60 * 60 * 24
 
 let allDays = (start, end) => {
@@ -247,13 +249,29 @@ module Months = {
 module Days = {
   @react.component
   let make = (~start, ~end, ~entries) => {
+    let dateSet =
+      entries
+      ->Option.getOr([])
+      ->Array.map(entry => entry.date)
+      ->Array.keepSome
+      ->Array.map(date =>
+        switch date {
+        | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd")->Some
+        | _ => None
+        }
+      )
+      ->Array.keepSome
+      ->Set.fromArray
+
     <div className="w-fit flex-none p-2 h-full overflow-y-scroll ">
       {allDays(start, end)
       ->Array.map(d => {
         let beginningOfWeek = d->Date.getDay == 0
         let beginningOfMonth = d->Date.getDate == 1
         let beginningOfYear = d->DateFns.getDayOfYear == 1
-        let hasEntry = Math.random() > 0.5
+
+        let hasEntry = dateSet->Set.has(d->format("y-MM-dd"))
+
         let year = d->Date.getFullYear
         let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
         let monthDay = d->DateFns.format("dd")->Int.fromString->Option.getOr(0)
@@ -415,8 +433,7 @@ module Entries = {
           let dateDisplay = entry.date->Option.flatMap(
             date => {
               switch date {
-              | Date(y, m, d) =>
-                Date.makeWithYMD(~year=y, ~month=m - 1, ~date=d)->format("y-MM-dd")->Some
+              | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd")->Some
               | _ => None
               }
             },
