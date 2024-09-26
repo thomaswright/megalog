@@ -33,8 +33,20 @@ let allDays = (start, end) => {
 
 module Icons = {
   module Flower = {
+    @react.component @module("react-icons/pi")
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "PiFlowerTulip"
+  }
+  module Snowflake = {
+    @react.component @module("react-icons/tb")
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbSnowflake"
+  }
+  module Leaf = {
     @react.component @module("react-icons/lu")
-    external make: (~className: string=?, ~style: JsxDOM.style) => React.element = "LuFlower"
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "LuLeafyGreen"
+  }
+  module Umbrella = {
+    @react.component @module("react-icons/tb")
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbBeach"
   }
 }
 
@@ -136,13 +148,13 @@ module Months = {
                     className="gap-px text-xs bg-neutral-800 border border-neutral-600"
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "1fr 1.25fr 1.25fr 2fr 2fr 2fr ",
+                      gridTemplateColumns: "1fr 1.25fr 2fr 2fr 2fr ",
                       gridTemplateRows: " repeat(4, 1.0fr)",
                       gridTemplateAreas: `
-                    "year h1 q1 m1 m2 m3"
-                    "year h1 q2 m4 m5 m6"
-                    "year h2 q3 m7 m8 m9"
-                    "year h2 q4 m10 m11 m12"
+                    "year q1 m1 m2 m3"
+                    "year q2 m4 m5 m6"
+                    "year q3 m7 m8 m9"
+                    "year q4 m10 m11 m12"
                   
                     `,
                     }}>
@@ -159,32 +171,13 @@ module Months = {
                     <div
                       className={[
                         " flex flex-row items-center justify-center",
-                        hasH1Entry->entryCheck,
-                      ]->Array.join(" ")}
-                      style={{
-                        gridArea: "h1",
-                      }}>
-                      <div className=""> {"H1"->React.string} </div>
-                    </div>
-                    <div
-                      className={[
-                        " flex flex-row items-center justify-center",
-                        hasH2Entry->entryCheck,
-                      ]->Array.join(" ")}
-                      style={{
-                        gridArea: "h2",
-                      }}>
-                      <div className=""> {"H2"->React.string} </div>
-                    </div>
-                    <div
-                      className={[
-                        " flex flex-row items-center justify-center",
                         hasQ1Entry->entryCheck,
                       ]->Array.join(" ")}
                       style={{
                         gridArea: "q1",
                       }}>
                       <div className=""> {"Q1"->React.string} </div>
+                      // <Icons.Snowflake />
                     </div>
                     <div
                       className={[
@@ -195,6 +188,7 @@ module Months = {
                         gridArea: "q2",
                       }}>
                       <div className=""> {"Q2"->React.string} </div>
+                      // <Icons.Flower />
                     </div>
                     <div
                       className={[
@@ -205,6 +199,7 @@ module Months = {
                         gridArea: "q3",
                       }}>
                       <div className=""> {"Q3"->React.string} </div>
+                      // <Icons.Umbrella />
                     </div>
                     <div
                       className={[
@@ -215,6 +210,7 @@ module Months = {
                         gridArea: "q4",
                       }}>
                       <div className=""> {"Q4"->React.string} </div>
+                      // <Icons.Leaf />
                     </div>
                     {Array.make(~length=12, false)
                     ->Array.mapWithIndex((v, i) => {

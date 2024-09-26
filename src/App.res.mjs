@@ -47,8 +47,8 @@ function App$Months(props) {
                     var beginningOfMonth = d.getDate() === 1;
                     var beginningOfYear = DateFns.getDayOfYear(d) === 1;
                     var hasYearEntry = Math.random() > 0.7;
-                    var hasH1Entry = Math.random() > 0.7;
-                    var hasH2Entry = Math.random() > 0.7;
+                    Math.random() > 0.7;
+                    Math.random() > 0.7;
                     var hasQ1Entry = Math.random() > 0.7;
                     var hasQ2Entry = Math.random() > 0.7;
                     var hasQ3Entry = Math.random() > 0.7;
@@ -69,32 +69,6 @@ function App$Months(props) {
                                                     ].join(" "),
                                                   style: {
                                                     gridArea: "year"
-                                                  }
-                                                }),
-                                            JsxRuntime.jsx("div", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: "H1",
-                                                        className: ""
-                                                      }),
-                                                  className: [
-                                                      " flex flex-row items-center justify-center",
-                                                      hasH1Entry ? "text-lime-100 bg-lime-900" : "text-neutral-400 bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "h1"
-                                                  }
-                                                }),
-                                            JsxRuntime.jsx("div", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: "H2",
-                                                        className: ""
-                                                      }),
-                                                  className: [
-                                                      " flex flex-row items-center justify-center",
-                                                      hasH2Entry ? "text-lime-100 bg-lime-900" : "text-neutral-400 bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "h2"
                                                   }
                                                 }),
                                             JsxRuntime.jsx("div", {
@@ -173,8 +147,8 @@ function App$Months(props) {
                                           className: "gap-px text-xs bg-neutral-800 border border-neutral-600",
                                           style: {
                                             display: "grid",
-                                            gridTemplateAreas: "\n                    \"year h1 q1 m1 m2 m3\"\n                    \"year h1 q2 m4 m5 m6\"\n                    \"year h2 q3 m7 m8 m9\"\n                    \"year h2 q4 m10 m11 m12\"\n                  \n                    ",
-                                            gridTemplateColumns: "1fr 1.25fr 1.25fr 2fr 2fr 2fr ",
+                                            gridTemplateAreas: "\n                    \"year q1 m1 m2 m3\"\n                    \"year q2 m4 m5 m6\"\n                    \"year q3 m7 m8 m9\"\n                    \"year q4 m10 m11 m12\"\n                  \n                    ",
+                                            gridTemplateColumns: "1fr 1.25fr 2fr 2fr 2fr ",
                                             gridTemplateRows: " repeat(4, 1.0fr)"
                                           }
                                         }) : null
