@@ -95,7 +95,7 @@ let make = () => {
   let showMonthNumber = false
   <div className="p-6 font-mono">
     <div className="flex flex-row">
-      <div className="">
+      <div className="p-px bg-black h-fit flex flex-col gap-2">
         {allDays()
         ->Array.map(d => {
           let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
@@ -111,31 +111,25 @@ let make = () => {
           let hasQ3Entry = Math.random() > 0.7
           let hasQ4Entry = Math.random() > 0.7
 
-          let entryCheck = x => x ? `text-white bg-cyan-800` : "text-neutral-200 bg-black"
+          let entryCheck = x => x ? `text-black bg-cyan-400` : "text-neutral-200 bg-black"
 
           let year = d->Date.getFullYear
+
           beginningOfMonth
             ? <React.Fragment>
                 {beginningOfYear
                   ? <div
-                      className="gap-px pb-px text-xs bg-neutral-500"
+                      className="gap-px text-xs bg-white border border-white"
                       style={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(4, 1.5rem)",
-                        gridTemplateRows: " repeat(12, 1.0rem)",
+                        gridTemplateColumns: "1rem 1.25rem 1.25rem 2rem 2rem 2rem ",
+                        gridTemplateRows: " repeat(4, 1.0rem)",
                         gridTemplateAreas: `
-                    "year h1 q1 m1"
-                    "year h1 q1 m2"
-                    "year h1 q1 m3"
-                    "year h1 q2 m4"
-                    "year h1 q2 m5"
-                    "year h1 q2 m6"
-                    "year h2 q3 m7"
-                    "year h2 q3 m8"
-                    "year h2 q3 m9"
-                    "year h2 q4 m10"
-                    "year h2 q4 m11"
-                    "year h2 q4 m12"
+                    "year h1 q1 m1 m2 m3"
+                    "year h1 q2 m4 m5 m6"
+                    "year h2 q3 m7 m8 m9"
+                    "year h2 q4 m10 m11 m12"
+                  
                     `,
                       }}>
                       <div
@@ -156,7 +150,7 @@ let make = () => {
                         style={{
                           gridArea: "h1",
                         }}>
-                        <div className="-rotate-90"> {"H1"->React.string} </div>
+                        <div className=""> {"H1"->React.string} </div>
                       </div>
                       <div
                         className={[
@@ -166,7 +160,7 @@ let make = () => {
                         style={{
                           gridArea: "h2",
                         }}>
-                        <div className="-rotate-90"> {"H2"->React.string} </div>
+                        <div className=""> {"H2"->React.string} </div>
                       </div>
                       <div
                         className={[
@@ -176,7 +170,7 @@ let make = () => {
                         style={{
                           gridArea: "q1",
                         }}>
-                        <div className="-rotate-90"> {"Q1"->React.string} </div>
+                        <div className=""> {"Q1"->React.string} </div>
                       </div>
                       <div
                         className={[
@@ -186,7 +180,7 @@ let make = () => {
                         style={{
                           gridArea: "q2",
                         }}>
-                        <div className="-rotate-90"> {"Q2"->React.string} </div>
+                        <div className=""> {"Q2"->React.string} </div>
                       </div>
                       <div
                         className={[
@@ -196,7 +190,7 @@ let make = () => {
                         style={{
                           gridArea: "q3",
                         }}>
-                        <div className="-rotate-90"> {"Q3"->React.string} </div>
+                        <div className=""> {"Q3"->React.string} </div>
                       </div>
                       <div
                         className={[
@@ -206,7 +200,7 @@ let make = () => {
                         style={{
                           gridArea: "q4",
                         }}>
-                        <div className="-rotate-90"> {"Q4"->React.string} </div>
+                        <div className=""> {"Q4"->React.string} </div>
                       </div>
                       {Array.make(~length=12, false)
                       ->Array.mapWithIndex((v, i) => {
@@ -214,16 +208,17 @@ let make = () => {
                         let monthColorDim = monthColorDim(i + 1, year)
                         let monthColor = monthColor(i + 1, year)
                         let hasEntry = Math.random() > 0.7
+                        let monthDate = Date.makeWithYM(~year, ~month=i)
 
                         <div
                           className={[
-                            " flex flex-row items-center justify-center",
+                            " flex flex-row items-center justify-center ",
                             hasEntry->entryCheck,
                           ]->Array.join(" ")}
                           style={{
                             gridArea: "m" ++ monthNum,
                           }}>
-                          <div className=""> {monthNum->React.string} </div>
+                          <div className=""> {monthDate->DateFns.format("MMM")->React.string} </div>
                         </div>
                       })
                       ->React.array}
