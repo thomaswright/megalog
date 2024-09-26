@@ -4,18 +4,19 @@ import * as React from "react";
 import * as DateFns from "date-fns";
 import * as Core__Int from "@rescript/core/src/Core__Int.res.mjs";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
+import MonacoJsx from "./Monaco.jsx";
 import * as Color from "@texel/color";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as Lu from "react-icons/lu";
 import * as JsxRuntime from "react/jsx-runtime";
+import ReactTextareaAutosize from "react-textarea-autosize";
 
-function allDays() {
-  var start = new Date(2020, 0, 1);
-  var end = new Date(2025, 0, 1);
-  var dayDiff = Math.floor((end.getTime() - start.getTime()) / 86400000) | 0;
+function allDays(start, end) {
+  var inc = new Date(start.getTime());
+  var dayDiff = Math.floor((end.getTime() - inc.getTime()) / 86400000) | 0;
   return Core__Array.make(dayDiff, false).map(function (param, i) {
-              var result = new Date(start.getTime());
-              start.setDate(start.getDate() + 1 | 0);
+              var result = new Date(inc.getTime());
+              inc.setDate(inc.getDate() + 1 | 0);
               return result;
             });
 }
@@ -29,11 +30,10 @@ function hsl(h, s, l) {
 }
 
 function monthHue(monthInt, param) {
-  return 360 / 12 * Math.imul(monthInt, 7) % 360.0;
+  return 360 / 12 * Math.imul(monthInt - 3 | 0, 5) % 360.0;
 }
 
 function monthColor(monthInt, year) {
-  console.log(monthInt, monthHue(monthInt, year));
   return hsl(monthHue(monthInt, year), 1.0, 0.7);
 }
 
@@ -41,156 +41,9 @@ function monthColorDim(monthInt, year) {
   return hsl(monthHue(monthInt, year), 1.0, 0.3);
 }
 
-function App$Months(props) {
-  return JsxRuntime.jsx("div", {
-              children: allDays().map(function (d) {
-                    Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0);
-                    var beginningOfMonth = d.getDate() === 1;
-                    var beginningOfYear = DateFns.getDayOfYear(d) === 1;
-                    var hasYearEntry = Math.random() > 0.7;
-                    var hasH1Entry = Math.random() > 0.7;
-                    var hasH2Entry = Math.random() > 0.7;
-                    var hasQ1Entry = Math.random() > 0.7;
-                    var hasQ2Entry = Math.random() > 0.7;
-                    var hasQ3Entry = Math.random() > 0.7;
-                    var hasQ4Entry = Math.random() > 0.7;
-                    var year = d.getFullYear();
-                    if (beginningOfMonth) {
-                      return JsxRuntime.jsx(React.Fragment, {
-                                  children: beginningOfYear ? JsxRuntime.jsxs("div", {
-                                          children: [
-                                            JsxRuntime.jsx("div", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: DateFns.format(d, "y"),
-                                                        className: "-rotate-90"
-                                                      }),
-                                                  className: [
-                                                      " flex flex-row items-center justify-center",
-                                                      hasYearEntry ? "text-black bg-cyan-400" : "text-neutral-200 bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "year"
-                                                  }
-                                                }),
-                                            JsxRuntime.jsx("div", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: "H1",
-                                                        className: ""
-                                                      }),
-                                                  className: [
-                                                      " flex flex-row items-center justify-center",
-                                                      hasH1Entry ? "text-black bg-cyan-400" : "text-neutral-200 bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "h1"
-                                                  }
-                                                }),
-                                            JsxRuntime.jsx("div", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: "H2",
-                                                        className: ""
-                                                      }),
-                                                  className: [
-                                                      " flex flex-row items-center justify-center",
-                                                      hasH2Entry ? "text-black bg-cyan-400" : "text-neutral-200 bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "h2"
-                                                  }
-                                                }),
-                                            JsxRuntime.jsx("div", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: "Q1",
-                                                        className: ""
-                                                      }),
-                                                  className: [
-                                                      " flex flex-row items-center justify-center",
-                                                      hasQ1Entry ? "text-black bg-cyan-400" : "text-neutral-200 bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "q1"
-                                                  }
-                                                }),
-                                            JsxRuntime.jsx("div", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: "Q2",
-                                                        className: ""
-                                                      }),
-                                                  className: [
-                                                      " flex flex-row items-center justify-center",
-                                                      hasQ2Entry ? "text-black bg-cyan-400" : "text-neutral-200 bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "q2"
-                                                  }
-                                                }),
-                                            JsxRuntime.jsx("div", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: "Q3",
-                                                        className: ""
-                                                      }),
-                                                  className: [
-                                                      " flex flex-row items-center justify-center",
-                                                      hasQ3Entry ? "text-black bg-cyan-400" : "text-neutral-200 bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "q3"
-                                                  }
-                                                }),
-                                            JsxRuntime.jsx("div", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: "Q4",
-                                                        className: ""
-                                                      }),
-                                                  className: [
-                                                      " flex flex-row items-center justify-center",
-                                                      hasQ4Entry ? "text-black bg-cyan-400" : "text-neutral-200 bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "q4"
-                                                  }
-                                                }),
-                                            Core__Array.make(12, false).map(function (v, i) {
-                                                  var monthNum = (i + 1 | 0).toString();
-                                                  monthColorDim(i + 1 | 0, year);
-                                                  monthColor(i + 1 | 0, year);
-                                                  var hasEntry = Math.random() > 0.7;
-                                                  var monthDate = new Date(year, i);
-                                                  return JsxRuntime.jsx("div", {
-                                                              children: JsxRuntime.jsx("div", {
-                                                                    children: DateFns.format(monthDate, "MMM"),
-                                                                    className: ""
-                                                                  }),
-                                                              className: [
-                                                                  " flex flex-row items-center justify-center ",
-                                                                  hasEntry ? "text-black bg-cyan-400" : "text-neutral-200 bg-black"
-                                                                ].join(" "),
-                                                              style: {
-                                                                gridArea: "m" + monthNum
-                                                              }
-                                                            });
-                                                })
-                                          ],
-                                          className: "gap-px text-xs bg-white border border-white",
-                                          style: {
-                                            display: "grid",
-                                            gridTemplateAreas: "\n                    \"year h1 q1 m1 m2 m3\"\n                    \"year h1 q2 m4 m5 m6\"\n                    \"year h2 q3 m7 m8 m9\"\n                    \"year h2 q4 m10 m11 m12\"\n                  \n                    ",
-                                            gridTemplateColumns: "1rem 1.25rem 1.25rem 2rem 2rem 2rem ",
-                                            gridTemplateRows: " repeat(4, 1.0rem)"
-                                          }
-                                        }) : null
-                                });
-                    } else {
-                      return null;
-                    }
-                  }),
-              className: "p-px bg-black h-fit flex flex-col gap-2"
-            });
-}
-
 function App$Days(props) {
   return JsxRuntime.jsx("div", {
-              children: allDays().map(function (d) {
+              children: allDays(props.start, props.end).map(function (d) {
                     var beginningOfWeek = d.getDay() === 0;
                     var beginningOfMonth = d.getDate() === 1;
                     var beginningOfYear = DateFns.getDayOfYear(d) === 1;
@@ -267,7 +120,7 @@ function App$Days(props) {
                                                 className: " h-6 w-5 flex flex-row"
                                               }),
                                           JsxRuntime.jsx("div", {
-                                                className: ["w-3 h-6 "].join(" "),
+                                                className: ["w-1 h-6 "].join(" "),
                                                 style: {
                                                   backgroundColor: monthColor$1
                                                 }
@@ -287,25 +140,164 @@ function App$Days(props) {
                                                 className: "text-neutral-500"
                                               })
                                         ],
-                                        className: "flex flex-row items-center gap-1"
+                                        className: "flex flex-row items-center gap-1 text-sm"
                                       })
                                 ]
-                              });
+                              }, DateFns.format(d, "y-MM-dd"));
                   }),
-              className: "w-fit"
+              className: "w-fit flex-none p-2 h-full overflow-y-scroll "
+            });
+}
+
+function App$TextArea(props) {
+  var onChange = props.onChange;
+  return JsxRuntime.jsx(ReactTextareaAutosize, {
+              value: props.content,
+              className: "bg-black w-full",
+              onChange: (function (e) {
+                  var value = e.target.value;
+                  onChange(value);
+                })
+            });
+}
+
+function App$Entries(props) {
+  var updateEntry = props.updateEntry;
+  return JsxRuntime.jsx("div", {
+              children: Core__Option.mapOr(props.entries, null, (function (entries_) {
+                      return entries_.map(function (entry) {
+                                  var monthColor$1 = Core__Option.mapOr(entry.date, "#fff", (function (date) {
+                                          if (date.TAG === "Date") {
+                                            return monthColor(date._1, 2000);
+                                          } else {
+                                            return "#fff";
+                                          }
+                                        }));
+                                  var dateDisplay = Core__Option.flatMap(entry.date, (function (date) {
+                                          if (date.TAG === "Date") {
+                                            return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd");
+                                          }
+                                          
+                                        }));
+                                  return JsxRuntime.jsxs("div", {
+                                              children: [
+                                                JsxRuntime.jsxs("div", {
+                                                      children: [
+                                                        Core__Option.mapOr(dateDisplay, null, (function (dateDisplay_) {
+                                                                return JsxRuntime.jsx("span", {
+                                                                            children: dateDisplay_,
+                                                                            className: "pr-2"
+                                                                          });
+                                                              })),
+                                                        JsxRuntime.jsx("span", {
+                                                              children: entry.title,
+                                                              className: " text-white"
+                                                            })
+                                                      ],
+                                                      className: " py-2 border-b ",
+                                                      style: {
+                                                        borderColor: monthColor$1,
+                                                        color: monthColor$1
+                                                      }
+                                                    }),
+                                                JsxRuntime.jsx("div", {
+                                                      children: JsxRuntime.jsx("div", {
+                                                            children: JsxRuntime.jsx(App$TextArea, {
+                                                                  content: entry.content,
+                                                                  onChange: (function (newValue) {
+                                                                      updateEntry(entry.id, newValue);
+                                                                    })
+                                                                }),
+                                                            className: "rounded overflow-hidden"
+                                                          }),
+                                                      className: "py-2"
+                                                    })
+                                              ]
+                                            }, entry.id);
+                                });
+                    })),
+              className: "text-xs leading-none flex-1 h-full overflow-y-scroll"
             });
 }
 
 function App(props) {
+  var match = React.useState(function () {
+        
+      });
+  var setImportData = match[1];
+  var importData = match[0];
+  var startOfCal = new Date(2010, 0, 1);
+  var endOfCal = new Date(2030, 0, 1);
+  var getDate = function (name) {
+    var date = DateFns.parse(name.substring(0, 10), "y-MM-dd", 0);
+    if (isNaN(date)) {
+      return ;
+    }
+    var match = Core__Int.fromString(DateFns.format(date, "y"), undefined);
+    var match$1 = Core__Int.fromString(DateFns.format(date, "MM"), undefined);
+    var match$2 = Core__Int.fromString(DateFns.format(date, "dd"), undefined);
+    if (match !== undefined && match$1 !== undefined && match$2 !== undefined) {
+      return {
+              TAG: "Date",
+              _0: match,
+              _1: match$1,
+              _2: match$2
+            };
+    }
+    
+  };
+  React.useEffect((function () {
+          fetch("../testData/test.json").then(function (response) {
+                  return response.json();
+                }).then(function (json) {
+                setImportData(function (param) {
+                      return json.map(function (param, i) {
+                                  var name = param[0];
+                                  return {
+                                          id: i.toString(),
+                                          date: getDate(name),
+                                          title: name,
+                                          content: param[1]
+                                        };
+                                });
+                    });
+                return Promise.resolve();
+              });
+        }), []);
+  var updateEntry = function (id, newValue) {
+    setImportData(function (v) {
+          return Core__Option.map(v, (function (v_) {
+                        return v_.map(function (entry) {
+                                    if (entry.id === id) {
+                                      return {
+                                              id: entry.id,
+                                              date: entry.date,
+                                              title: entry.title,
+                                              content: newValue
+                                            };
+                                    } else {
+                                      return entry;
+                                    }
+                                  });
+                      }));
+        });
+  };
   return JsxRuntime.jsx("div", {
               children: JsxRuntime.jsxs("div", {
                     children: [
-                      JsxRuntime.jsx(App$Days, {}),
-                      JsxRuntime.jsx(App$Months, {})
+                      JsxRuntime.jsx(App$Days, {
+                            start: startOfCal,
+                            end: endOfCal,
+                            entries: importData
+                          }),
+                      JsxRuntime.jsx(App$Entries, {
+                            entries: importData,
+                            updateEntry: updateEntry
+                          })
                     ],
-                    className: "flex flex-row"
+                    className: "flex flex-row h-full"
                   }),
-              className: "p-6 font-mono"
+              className: "font-mono h-dvh"
             });
 }
 
@@ -314,4 +306,4 @@ var make = App;
 export {
   make ,
 }
-/* react Not a pure module */
+/*  Not a pure module */

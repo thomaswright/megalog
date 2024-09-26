@@ -1,14 +1,30 @@
+type entryDate =
+  | Year(int)
+  | Half(int, int)
+  | Quarter(int, int)
+  | Month(int, int)
+  | Week(int, int)
+  | Date(int, int, int)
+
+type entry = {
+  id: string,
+  date: option<entryDate>,
+  title: string,
+  content: string,
+}
+
+let format = DateFns.format
+
 let day_of_ms = 1000 * 60 * 60 * 24
 
-let allDays = () => {
-  let start = Date.makeWithYMD(~year=2020, ~month=0, ~date=1)
-  let end = Date.makeWithYMD(~year=2025, ~month=0, ~date=1)
+let allDays = (start, end) => {
+  let inc = start->Date.getTime->Date.fromTime
 
   let dayDiff =
-    Math.floor((end->Date.getTime -. start->Date.getTime) /. day_of_ms->Int.toFloat)->Float.toInt
+    Math.floor((end->Date.getTime -. inc->Date.getTime) /. day_of_ms->Int.toFloat)->Float.toInt
   Array.make(~length=dayDiff, false)->Array.mapWithIndex((_, i) => {
-    let result = start->Date.getTime->Date.fromTime
-    start->Date.setDate(start->Date.getDate + 1)
+    let result = inc->Date.getTime->Date.fromTime
+    inc->Date.setDate(inc->Date.getDate + 1)
     result
   })
 }
@@ -47,13 +63,13 @@ let customMonthHue = (monthInt, _) => {
   | 2 => 0.
   | 3 => 270.
   | 4 => 120.
-  | 5 => 330.
-  | 6 => 180.
-  | 7 => 30.
+  | 5 => 240.
+  | 6 => 80.
+  | 7 => 40.
   | 8 => 240.
-  | 9 => 90.
-  | 10 => 300.
-  | 11 => 60.
+  | 9 => 180.
+  | 10 => 60.
+  | 11 => 340.
   | 12 => 150.
   | _ => 0.
   }
@@ -77,11 +93,10 @@ let weekColor = weekInt => {
 // }
 
 let monthHue = (monthInt, _) => {
-  Float.mod(360. /. 12. *. (monthInt * 7)->Int.toFloat, 360.0)
+  Float.mod(360. /. 12. *. ((monthInt - 3) * 5)->Int.toFloat, 360.0)
 }
 
 let monthColor = (monthInt, year) => {
-  Console.log2(monthInt, monthHue(monthInt, year))
   hsl(monthHue(monthInt, year), 1.0, 0.7)
 }
 
@@ -91,9 +106,9 @@ let monthColorDim = (monthInt, year) => {
 
 module Months = {
   @react.component
-  let make = () => {
-    <div className="p-px bg-black h-fit flex flex-col gap-2">
-      {allDays()
+  let make = (~start, ~end) => {
+    <div className="p-2 bg-black h-full flex-none overflow-y-scroll flex flex-col gap-2">
+      {allDays(start, end)
       ->Array.map(d => {
         let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
         let beginningOfMonth = d->Date.getDate == 1
@@ -231,9 +246,9 @@ module Months = {
 
 module Days = {
   @react.component
-  let make = () => {
-    <div className="w-fit">
-      {allDays()
+  let make = (~start, ~end, ~entries) => {
+    <div className="w-fit flex-none p-2 h-full overflow-y-scroll ">
+      {allDays(start, end)
       ->Array.map(d => {
         let beginningOfWeek = d->Date.getDay == 0
         let beginningOfMonth = d->Date.getDate == 1
@@ -246,7 +261,7 @@ module Days = {
         let monthColorDim = monthColorDim(month, year)
         let isToday = DateFns.isSameDay(Date.make(), d)
 
-        <React.Fragment>
+        <React.Fragment key={d->format("y-MM-dd")}>
           {true && beginningOfWeek
             ? <div className="relative h-0 ml-px">
                 <div
@@ -279,7 +294,7 @@ module Days = {
                 </div>
               </div>
             : React.null}
-          <div className="flex flex-row items-center gap-1">
+          <div className="flex flex-row items-center gap-1 text-sm">
             <div className=" h-6 w-5 flex flex-row">
               {true && beginningOfWeek
                 ? <div
@@ -309,7 +324,7 @@ module Days = {
                 : React.null}
             </div>
             <div
-              className={["w-3 h-6 "]->Array.join(" ")}
+              className={["w-1 h-6 "]->Array.join(" ")}
               style={{
                 backgroundColor: monthColor,
               }}
@@ -336,14 +351,179 @@ module Days = {
   }
 }
 
+type importData = array<(string, string)>
+
+type response
+
+@send external json: response => promise<importData> = "json"
+
+@val
+external fetch: string => promise<response> = "fetch"
+
+@module("marked") external parseMd: string => string = "parse"
+
+module Monaco = {
+  @react.component @module("./Monaco.jsx")
+  external make: (~content: string) => React.element = "default"
+}
+
+module TextareaAutosize = {
+  @react.component @module("react-textarea-autosize")
+  external make: (
+    ~value: string,
+    ~className: string,
+    ~onChange: ReactEvent.Form.t => unit,
+  ) => React.element = "default"
+}
+
+module TextArea = {
+  @react.component
+  let make = (~content: string, ~onChange: string => unit) => {
+    <TextareaAutosize
+      className="bg-black w-full"
+      value={content}
+      onChange={e => {
+        let value = (e->ReactEvent.Form.target)["value"]
+        onChange(value)
+      }}
+    />
+  }
+}
+
+module Editor = TextArea
+
+@val external isInvalidDate: Date.t => bool = "isNaN"
+
+module Entries = {
+  @react.component
+  let make = (~entries: option<array<entry>>, ~updateEntry: (string, string) => unit) => {
+    <div className="text-xs leading-none flex-1 h-full overflow-y-scroll">
+      {entries->Option.mapOr(React.null, entries_ => {
+        entries_
+        // ->Array.filterWithIndex((_, i) => i > 20 && i < 30)
+        ->Array.map(entry => {
+          let monthColor = entry.date->Option.mapOr(
+            "#fff",
+            date => {
+              switch date {
+              | Date(y, m, d) => monthColor(m, 2000)
+              | _ => "#fff"
+              }
+            },
+          )
+
+          let dateDisplay = entry.date->Option.flatMap(
+            date => {
+              switch date {
+              | Date(y, m, d) =>
+                Date.makeWithYMD(~year=y, ~month=m - 1, ~date=d)->format("y-MM-dd")->Some
+              | _ => None
+              }
+            },
+          )
+
+          <div key={entry.id}>
+            <div
+              className=" py-2 border-b "
+              style={{
+                color: monthColor,
+                borderColor: monthColor,
+              }}>
+              {dateDisplay->Option.mapOr(
+                React.null,
+                dateDisplay_ => {
+                  <span className="pr-2"> {dateDisplay_->React.string} </span>
+                },
+              )}
+              <span className=" text-white"> {entry.title->React.string} </span>
+            </div>
+            <div className="py-2">
+              <div className="rounded overflow-hidden">
+                <Editor
+                  content={entry.content} onChange={newValue => updateEntry(entry.id, newValue)}
+                />
+              </div>
+            </div>
+          </div>
+        })
+        ->React.array
+      })}
+    </div>
+  }
+}
+
 @react.component
 let make = () => {
+  let (importData, setImportData) = React.useState(() => None)
+
+  let startOfCal = Date.makeWithYMD(~year=2010, ~month=0, ~date=1)
+  let endOfCal = Date.makeWithYMD(~year=2030, ~month=0, ~date=1)
+
+  let getDate = name => {
+    let date =
+      name
+      ->String.substring(~start=0, ~end=10)
+      ->DateFns.parse("y-MM-dd", 0)
+
+    date->isInvalidDate
+      ? None
+      : switch (
+          date->DateFns.format("y")->Int.fromString,
+          date->DateFns.format("MM")->Int.fromString,
+          date->DateFns.format("dd")->Int.fromString,
+        ) {
+        | (Some(y), Some(m), Some(d)) => Some(Date(y, m, d))
+        | _ => None
+        }
+  }
+
+  React.useEffect0(() => {
+    fetch("../testData/test.json")
+    ->Promise.then(response => {
+      json(response)
+    })
+    ->Promise.then(json => {
+      setImportData(
+        _ => Some(
+          json->Array.mapWithIndex(
+            ((name, content), i) => {
+              id: i->Int.toString,
+              date: getDate(name),
+              title: name,
+              content,
+            },
+          ),
+        ),
+      )
+      Promise.resolve()
+    })
+    ->ignore
+    None
+  })
+
   let showWeekNumber = false
   let showMonthNumber = false
-  <div className="p-6 font-mono">
-    <div className="flex flex-row">
-      <Days />
-      <Months />
+
+  let updateEntry = (id, newValue) => {
+    setImportData(v =>
+      v->Option.map(v_ => {
+        v_->Array.map(
+          entry =>
+            entry.id == id
+              ? {
+                  ...entry,
+                  content: newValue,
+                }
+              : entry,
+        )
+      })
+    )
+  }
+  <div className="font-mono h-dvh">
+    <div className="flex flex-row h-full">
+      // <Months />
+      <Days start={startOfCal} end={endOfCal} entries={importData} />
+      <Entries entries={importData} updateEntry={updateEntry} />
     </div>
   </div>
 }
