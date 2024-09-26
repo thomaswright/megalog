@@ -63,6 +63,9 @@ external startOfQuarter: Js.Date.t => Js.Date.t = "startOfQuarter"
 @module("date-fns")
 external startOfYear: Js.Date.t => Js.Date.t = "startOfYear"
 
+@module("date-fns")
+external getDayOfYear: Js.Date.t => int = "getDayOfYear"
+
 let isAfterOrEqual = (x, y) => isAfter(x, y) || isEqual(x, y)
 
 let isBeforeOrEqual = (x, y) => isBefore(x, y) || isEqual(x, y)
