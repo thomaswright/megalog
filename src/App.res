@@ -137,7 +137,7 @@ module Months = {
         let hasQ3Entry = Math.random() > 0.7
         let hasQ4Entry = Math.random() > 0.7
 
-        let entryCheck = x => x ? `text-lime-100 bg-lime-900` : "text-neutral-400 bg-black"
+        let entryCheck = x => x ? `text-lime-500 bg-black` : "text-neutral-600 bg-black"
 
         let year = d->Date.getFullYear
 
@@ -145,7 +145,7 @@ module Months = {
           ? <React.Fragment>
               {beginningOfYear
                 ? <div
-                    className="gap-px text-xs bg-neutral-800 border border-neutral-600"
+                    className="gap-px text-xs bg-neutral-800 border border-neutral-800"
                     style={{
                       display: "grid",
                       gridTemplateColumns: "1fr 1.25fr 2fr 2fr 2fr ",
@@ -161,7 +161,7 @@ module Months = {
                     <div
                       className={[
                         " flex flex-row items-center justify-center",
-                        hasYearEntry->entryCheck,
+                        hasYearEntry ? `text-lime-500 bg-black` : "text-neutral-300 bg-black",
                       ]->Array.join(" ")}
                       style={{
                         gridArea: "year",
