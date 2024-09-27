@@ -204,11 +204,20 @@ function App$Days(props) {
   return JsxRuntime.jsx("div", {
               children: allDays(props.start, props.end).map(function (d) {
                     var beginningOfWeek = d.getDay() === 0;
-                    var hasEntry = dateSet.has(DateFns.format(d, "y-MM-dd"));
+                    var week = DateFns.format(d, "w");
                     var year = d.getFullYear();
+                    var hasEntry = dateSet.has(DateFns.format(d, "y-MM-dd"));
+                    var hasWeekEntry = Core__Option.mapOr(Core__Int.fromString(week, undefined), false, (function (weekNum) {
+                            return dateSet.has(entryDateString({
+                                            TAG: "Week",
+                                            _0: year,
+                                            _1: weekNum
+                                          }));
+                          }));
+                    var year$1 = d.getFullYear();
                     var month = Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0);
-                    var monthColor$1 = monthColor(month, year);
-                    var monthColorDim$1 = monthColorDim(month, year);
+                    var monthColor$1 = monthColor(month, year$1);
+                    var monthColorDim$1 = monthColorDim(month, year$1);
                     var isToday = DateFns.isSameDay(new Date(), d);
                     return JsxRuntime.jsxs(React.Fragment, {
                                 children: [
@@ -225,8 +234,11 @@ function App$Days(props) {
                                         children: [
                                           JsxRuntime.jsx("div", {
                                                 children: true && beginningOfWeek ? JsxRuntime.jsx("div", {
-                                                        children: DateFns.format(d, "w"),
-                                                        className: "text-xs text-neutral-200 text-left  overflow-visible text-nowrap p-1"
+                                                        children: week,
+                                                        className: "text-xs text-left  overflow-visible text-nowrap p-1",
+                                                        style: {
+                                                          color: hasWeekEntry ? monthColor$1 : "#ddd"
+                                                        }
                                                       }) : null,
                                                 className: " h-6 w-5 flex flex-row flex-none"
                                               }),

@@ -315,8 +315,14 @@ module Days = {
         let beginningOfWeek = d->Date.getDay == 0
         // let beginningOfMonth = d->Date.getDate == 1
         // let beginningOfYear = d->DateFns.getDayOfYear == 1
+        let week = d->DateFns.format("w")
+        let year = d->Date.getFullYear
 
         let hasEntry = dateSet->Set.has(d->format("y-MM-dd"))
+        let hasWeekEntry =
+          week
+          ->Int.fromString
+          ->Option.mapOr(false, weekNum => dateSet->Set.has(Week(year, weekNum)->entryDateString))
 
         let year = d->Date.getFullYear
         let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
@@ -338,8 +344,11 @@ module Days = {
             <div className=" h-6 w-5 flex flex-row flex-none">
               {true && beginningOfWeek
                 ? <div
-                    className="text-xs text-neutral-200 text-left  overflow-visible text-nowrap p-1">
-                    {("" ++ d->DateFns.format("w"))->React.string}
+                    style={{
+                      color: hasWeekEntry ? monthColor : "#ddd",
+                    }}
+                    className="text-xs text-left  overflow-visible text-nowrap p-1">
+                    {("" ++ week)->React.string}
                   </div>
                 : React.null}
             </div>
