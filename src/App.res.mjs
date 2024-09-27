@@ -12,6 +12,30 @@ import * as JsxRuntime from "react/jsx-runtime";
 import UseLocalStorageJs from "./useLocalStorage.js";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
+function App$TextArea(props) {
+  var onChange = props.onChange;
+  return JsxRuntime.jsx(ReactTextareaAutosize, {
+              value: props.content,
+              className: "bg-black w-full",
+              onChange: (function (e) {
+                  var value = e.target.value;
+                  onChange(value);
+                })
+            });
+}
+
+function getMonthForWeekOfYear(weekNumber, year) {
+  var firstDayOfYear = new Date(year, 0, 1);
+  var dayOfWeek = firstDayOfYear.getDay();
+  if (dayOfWeek !== 1) {
+    var offset = dayOfWeek === 0 ? 1 : 8 - dayOfWeek | 0;
+    firstDayOfYear.setDate(firstDayOfYear.getDate() + offset | 0);
+  }
+  var dateOfWeek = new Date(firstDayOfYear.getTime());
+  dateOfWeek.setDate(firstDayOfYear.getDate() + Math.imul(weekNumber - 1 | 0, 7) | 0);
+  return dateOfWeek.getMonth() + 1 | 0;
+}
+
 function useStateWithGetter(initial) {
   var match = React.useState(initial);
   var state = match[0];
@@ -400,28 +424,14 @@ var make$1 = React.memo(App$Days, (function (a, b) {
         }
       }));
 
-function App$TextArea(props) {
-  var onChange = props.onChange;
-  return JsxRuntime.jsx(ReactTextareaAutosize, {
-              value: props.content,
-              className: "bg-black w-full",
-              onChange: (function (e) {
-                  var value = e.target.value;
-                  onChange(value);
-                })
-            });
-}
-
-function getMonthForWeekOfYear(weekNumber, year) {
-  var firstDayOfYear = new Date(year, 0, 1);
-  var dayOfWeek = firstDayOfYear.getDay();
-  if (dayOfWeek !== 1) {
-    var offset = dayOfWeek === 0 ? 1 : 8 - dayOfWeek | 0;
-    firstDayOfYear.setDate(firstDayOfYear.getDate() + offset | 0);
-  }
-  var dateOfWeek = new Date(firstDayOfYear.getTime());
-  dateOfWeek.setDate(firstDayOfYear.getDate() + Math.imul(weekNumber - 1 | 0, 7) | 0);
-  return dateOfWeek.getMonth() + 1 | 0;
+function entryClassNameId(entryDate) {
+  return Core__Option.mapOr(entryDate, "", (function (date) {
+                if (date.TAG === "Date") {
+                  return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd");
+                } else {
+                  return "";
+                }
+              }));
 }
 
 function App$Entry(props) {
@@ -497,7 +507,10 @@ function App$Entry(props) {
                                 })
                             })
                       ],
-                      className: " py-2 border-b ",
+                      className: [
+                          " py-2 border-b ",
+                          entryClassNameId(entry.date)
+                        ].join(" "),
                       style: {
                         borderColor: monthColor$1,
                         color: monthColor$1
@@ -520,7 +533,15 @@ function App$Entry(props) {
 }
 
 var make$2 = React.memo(App$Entry, (function (a, b) {
-        return false;
+        var match = a.entry.date;
+        var match$1 = b.entry.date;
+        if (match !== undefined ? (
+              match$1 !== undefined ? entryDateString(match) === entryDateString(match$1) : false
+            ) : match$1 === undefined) {
+          return a.entry.content === b.entry.content;
+        } else {
+          return false;
+        }
       }));
 
 function App$Entries(props) {
@@ -581,10 +602,15 @@ function App(props) {
                                     start: startOfCal,
                                     end: endOfCal,
                                     dateSet: dateSet,
-                                    setEntryToSet: setEntryToSet,
-                                    entryToSet: entryToSet,
                                     onClick: (function (entryDate) {
-                                        Core__Option.mapOr(getEntryToSet(), undefined, (function (entryId) {
+                                        Core__Option.mapOr(getEntryToSet(), Core__Option.mapOr(Core__Option.flatMap(document.getElementsByClassName(entryClassNameId(entryDate)), (function (v) {
+                                                        return v[0];
+                                                      })), undefined, (function (v) {
+                                                    v.scrollIntoView({
+                                                          behavior: "smooth",
+                                                          block: "center"
+                                                        });
+                                                  })), (function (entryId) {
                                                 updateEntry(entryId, (function (e) {
                                                         return {
                                                                 id: e.id,
@@ -603,8 +629,6 @@ function App(props) {
                                     start: startOfCal,
                                     end: endOfCal,
                                     dateSet: dateSet,
-                                    setEntryToSet: setEntryToSet,
-                                    entryToSet: entryToSet,
                                     onClick: (function (entryDate) {
                                         Core__Option.mapOr(entryToSet, undefined, (function (entryId) {
                                                 updateEntry(entryId, (function (e) {
@@ -651,4 +675,4 @@ var make$3 = App;
 export {
   make$3 as make,
 }
-/* monthColors Not a pure module */
+/*  Not a pure module */

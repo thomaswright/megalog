@@ -1,3 +1,79 @@
+@val @scope("document") external getElementById: string => option<Dom.element> = "getElementById"
+
+@val @scope("document")
+external getElementsByClassName: string => option<array<Dom.element>> = "getElementsByClassName"
+
+@send
+external scrollIntoView: (Dom.element, {"behavior": string, "block": string}) => unit =
+  "scrollIntoView"
+
+module Icons = {
+  module Flower = {
+    @react.component @module("react-icons/pi")
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "PiFlowerTulip"
+  }
+  module Snowflake = {
+    @react.component @module("react-icons/tb")
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbSnowflake"
+  }
+  module Leaf = {
+    @react.component @module("react-icons/lu")
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "LuLeafyGreen"
+  }
+  module Umbrella = {
+    @react.component @module("react-icons/tb")
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbBeach"
+  }
+}
+
+type importData = array<(string, string)>
+
+type response
+
+@send external json: response => promise<importData> = "json"
+
+@val
+external fetch: string => promise<response> = "fetch"
+
+@module("marked") external parseMd: string => string = "parse"
+
+module Monaco = {
+  @react.component @module("./Monaco.jsx")
+  external make: (~content: string) => React.element = "default"
+}
+
+module TextareaAutosize = {
+  @react.component @module("react-textarea-autosize")
+  external make: (
+    ~value: string,
+    ~className: string,
+    ~onChange: ReactEvent.Form.t => unit,
+  ) => React.element = "default"
+}
+
+module TextArea = {
+  @react.component
+  let make = (~content: string, ~onChange: string => unit) => {
+    <TextareaAutosize
+      className="bg-black w-full"
+      value={content}
+      onChange={e => {
+        let value = (e->ReactEvent.Form.target)["value"]
+        onChange(value)
+      }}
+    />
+  }
+}
+
+module Editor = TextArea
+
+@val external isInvalidDate: Date.t => bool = "isNaN"
+
+@module("./useLocalStorage.js")
+external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "default"
+// @module("@uidotdev/usehooks")
+// external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "useLocalStorage"
+
 type entryDate =
   | Year(int)
   | Half(int, int)
@@ -11,6 +87,23 @@ type entry = {
   date: option<entryDate>,
   title: string,
   content: string,
+}
+
+let getMonthForWeekOfYear = (weekNumber, year) => {
+  let firstDayOfYear = Date.makeWithYMD(~year, ~month=0, ~date=1)
+
+  let dayOfWeek = firstDayOfYear->Date.getDay
+  let firstMondayOfYear = firstDayOfYear
+
+  if dayOfWeek != 1 {
+    let offset = dayOfWeek == 0 ? 1 : 8 - dayOfWeek
+    firstMondayOfYear->Date.setDate(firstDayOfYear->Date.getDate + offset)
+  }
+
+  let dateOfWeek = firstMondayOfYear->Date.getTime->Date.fromTime
+  dateOfWeek->Date.setDate(firstMondayOfYear->Date.getDate + (weekNumber - 1) * 7)
+
+  dateOfWeek->Date.getMonth + 1
 }
 
 let useStateWithGetter = initial => {
@@ -54,25 +147,6 @@ let allDays = (start, end) => {
     inc->Date.setDate(inc->Date.getDate + 1)
     result
   })
-}
-
-module Icons = {
-  module Flower = {
-    @react.component @module("react-icons/pi")
-    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "PiFlowerTulip"
-  }
-  module Snowflake = {
-    @react.component @module("react-icons/tb")
-    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbSnowflake"
-  }
-  module Leaf = {
-    @react.component @module("react-icons/lu")
-    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "LuLeafyGreen"
-  }
-  module Umbrella = {
-    @react.component @module("react-icons/tb")
-    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbBeach"
-  }
 }
 
 let hsv = (h, s, v) => Texel.convert((h, s, v), Texel.okhsv, Texel.srgb)->Texel.rgbToHex
@@ -150,7 +224,7 @@ let monthColorDim = monthInt => {
 
 module Months = {
   @react.component
-  let make = (~start, ~end, ~dateSet, ~setEntryToSet, ~entryToSet, ~onClick) => {
+  let make = (~start, ~end, ~dateSet, ~onClick) => {
     <div className="p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full">
       {allDays(start, end)
       ->Array.map(d => {
@@ -280,58 +354,6 @@ module Months = {
   }
 }
 
-//  {false && beginningOfMonth
-//   ? <div
-//       style={{color: monthColor}}
-//       className="text-left text-xs overflow-visible text-nowrap p-1">
-//       {("" ++ d->DateFns.format("MMM"))->React.string}
-//     </div>
-//   : React.null}
-// {false && beginningOfYear
-//   ? <div className="text-xs text-white text-left  overflow-visible text-nowrap p-1">
-//       {("" ++ d->DateFns.format("y"))->React.string}
-//     </div>
-//   : React.null}
-// {false && month == 3 && monthDay == 1
-//   ? <Icons.Flower
-//       className="m-1"
-//       style={{
-//         color: monthColor,
-//       }}
-//     />
-//   : React.null}
-//   {false && beginningOfMonth
-//     ? <div className="relative h-0 ">
-//         <div
-//           style={{backgroundColor: monthColor}}
-//           className={["h-px w-full -translate-y-1/2"]->Array.join(" ")}
-//         />
-//       </div>
-//     : React.null}
-//   {false && beginningOfWeek
-//     ? <div className="relative h-0">
-//         <div
-//           className="text-sm absolute text-neutral-500 bg-black px-4 right-0 -translate-y-1/2 overflow-visible text-nowrap text-end ">
-//           {("Week " ++ d->DateFns.format("w"))->React.string}
-//         </div>
-//       </div>
-//     : React.null}
-//   {false && beginningOfMonth
-//     ? <div className="relative h-0">
-//         <div
-//           style={{color: monthColor}}
-//           className="text-sm absolute  bg-black px-4 right-1/4 -translate-y-1/2 overflow-visible text-nowrap ">
-//           {d->DateFns.format("MMMM")->React.string}
-//         </div>
-//       </div>
-//     : React.null}
-// <div
-//   className={["w-1 h-6 "]->Array.join(" ")}
-//   style={{
-//     backgroundColor: weekColor(d->DateFns.format("w")->Int.fromString->Option.getOr(0)),
-//   }}
-// />
-
 module Day = {
   @react.component
   let make = (~d, ~dateSet, ~onClick, ~hasEntry) => {
@@ -407,7 +429,7 @@ module Day = {
 
 module Days = {
   @react.component
-  let make = (~start, ~end, ~dateSet, ~setEntryToSet, ~entryToSet, ~onClick) => {
+  let make = (~start, ~end, ~dateSet, ~onClick) => {
     <div className="w-full flex-2 p-2 overflow-y-scroll ">
       {allDays(start, end)
       ->Array.map(d => {
@@ -433,70 +455,14 @@ module Days = {
   })
 }
 
-type importData = array<(string, string)>
-
-type response
-
-@send external json: response => promise<importData> = "json"
-
-@val
-external fetch: string => promise<response> = "fetch"
-
-@module("marked") external parseMd: string => string = "parse"
-
-module Monaco = {
-  @react.component @module("./Monaco.jsx")
-  external make: (~content: string) => React.element = "default"
+let entryClassNameId = entryDate => {
+  entryDate->Option.mapOr("", date => {
+    switch date {
+    | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd")
+    | _ => ""
+    }
+  })
 }
-
-module TextareaAutosize = {
-  @react.component @module("react-textarea-autosize")
-  external make: (
-    ~value: string,
-    ~className: string,
-    ~onChange: ReactEvent.Form.t => unit,
-  ) => React.element = "default"
-}
-
-module TextArea = {
-  @react.component
-  let make = (~content: string, ~onChange: string => unit) => {
-    <TextareaAutosize
-      className="bg-black w-full"
-      value={content}
-      onChange={e => {
-        let value = (e->ReactEvent.Form.target)["value"]
-        onChange(value)
-      }}
-    />
-  }
-}
-
-module Editor = TextArea
-
-@val external isInvalidDate: Date.t => bool = "isNaN"
-
-let getMonthForWeekOfYear = (weekNumber, year) => {
-  let firstDayOfYear = ymdDate(year, 0, 1)
-
-  let dayOfWeek = firstDayOfYear->Date.getDay
-  let firstMondayOfYear = firstDayOfYear
-
-  if dayOfWeek != 1 {
-    let offset = dayOfWeek == 0 ? 1 : 8 - dayOfWeek
-    firstMondayOfYear->Date.setDate(firstDayOfYear->Date.getDate + offset)
-  }
-
-  let dateOfWeek = firstMondayOfYear->Date.getTime->Date.fromTime
-  dateOfWeek->Date.setDate(firstMondayOfYear->Date.getDate + (weekNumber - 1) * 7)
-
-  dateOfWeek->Date.getMonth + 1
-}
-
-@val @scope("document") external getElementById: string => option<Dom.element> = "getElementById"
-@send
-external scrollIntoView: (Dom.element, {"behavior": string, "block": string}) => unit =
-  "scrollIntoView"
 
 module Entry = {
   @react.component
@@ -516,10 +482,12 @@ module Entry = {
       | x => x->entryDateString->Some
       }
     })
+
     let isSelectedForSet = entryToSet->Option.mapOr(false, v => v == entry.id)
+
     <div key={entry.id}>
       <div
-        className=" py-2 border-b "
+        className={[" py-2 border-b ", entry.date->entryClassNameId]->Array.join(" ")}
         style={{
           color: monthColor,
           borderColor: monthColor,
@@ -559,13 +527,13 @@ module Entry = {
   }
 
   let make = React.memoCustomCompareProps(make, (a, b) => {
-    false
-    // switch (a.entry.date, b.entry.date) {
-    // | (Some(x), Some(y)) => x->entryDateString == y->entryDateString
-    // | (None, None) => true
-    // | _ => false
-    // } &&
-    // a.entry.content == b.entry.content
+    // false
+    switch (a.entry.date, b.entry.date) {
+    | (Some(x), Some(y)) => x->entryDateString == y->entryDateString
+    | (None, None) => true
+    | _ => false
+    } &&
+    a.entry.content == b.entry.content
   })
 }
 
@@ -589,11 +557,6 @@ module Entries = {
   }
 }
 
-@module("./useLocalStorage.js")
-external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "default"
-// @module("@uidotdev/usehooks")
-// external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "useLocalStorage"
-
 @react.component
 let make = () => {
   let (importData, setImportData) = useLocalStorage("data", None)
@@ -602,23 +565,23 @@ let make = () => {
   let startOfCal = Date.makeWithYMD(~year=2010, ~month=0, ~date=1)
   let endOfCal = Date.makeWithYMD(~year=2030, ~month=0, ~date=1)
 
-  let getDate = name => {
-    let date =
-      name
-      ->String.substring(~start=0, ~end=10)
-      ->DateFns.parse("y-MM-dd", 0)
+  // let getDate = name => {
+  //   let date =
+  //     name
+  //     ->String.substring(~start=0, ~end=10)
+  //     ->DateFns.parse("y-MM-dd", 0)
 
-    date->isInvalidDate
-      ? None
-      : switch (
-          date->DateFns.format("y")->Int.fromString,
-          date->DateFns.format("MM")->Int.fromString,
-          date->DateFns.format("dd")->Int.fromString,
-        ) {
-        | (Some(y), Some(m), Some(d)) => Some(Date(y, m, d))
-        | _ => None
-        }
-  }
+  //   date->isInvalidDate
+  //     ? None
+  //     : switch (
+  //         date->DateFns.format("y")->Int.fromString,
+  //         date->DateFns.format("MM")->Int.fromString,
+  //         date->DateFns.format("dd")->Int.fromString,
+  //       ) {
+  //       | (Some(y), Some(m), Some(d)) => Some(Date(y, m, d))
+  //       | _ => None
+  //       }
+  // }
 
   // React.useEffect0(() => {
   //   fetch("../testData/test.json")
@@ -643,9 +606,6 @@ let make = () => {
   //   ->ignore
   //   None
   // })
-
-  let showWeekNumber = false
-  let showMonthNumber = false
 
   let updateEntry = React.useCallback0((id, f) => {
     setImportData(v =>
@@ -674,24 +634,32 @@ let make = () => {
           start={startOfCal}
           end={endOfCal}
           dateSet={dateSet}
-          setEntryToSet
-          entryToSet
           onClick={entryDate => {
-            getEntryToSet()->Option.mapOr((), entryId => {
-              updateEntry(entryId, e => {
-                ...e,
-                date: Some(entryDate),
-              })
-              setEntryToSet(_ => None)
-            })
+            getEntryToSet()->Option.mapOr(
+              {
+                getElementsByClassName(entryDate->Some->entryClassNameId)
+                ->Option.flatMap(v => v->Array.get(0))
+                ->Option.mapOr((), v => {
+                  v->scrollIntoView({
+                    "behavior": "smooth",
+                    "block": "center",
+                  })
+                })
+              },
+              entryId => {
+                updateEntry(entryId, e => {
+                  ...e,
+                  date: Some(entryDate),
+                })
+                setEntryToSet(_ => None)
+              },
+            )
           }}
         />
         <Months
           start={startOfCal}
           end={endOfCal}
           dateSet={dateSet}
-          setEntryToSet
-          entryToSet
           onClick={entryDate => {
             entryToSet->Option.mapOr((), entryId => {
               updateEntry(entryId, e => {
