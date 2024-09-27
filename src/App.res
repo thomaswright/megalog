@@ -7,6 +7,12 @@ external getElementsByClassName: string => option<array<Dom.element>> = "getElem
 external scrollIntoView: (Dom.element, {"behavior": string, "block": string}) => unit =
   "scrollIntoView"
 
+let scrollIntoView = x =>
+  x->scrollIntoView({
+    "behavior": "smooth",
+    "block": "center",
+  })
+
 module Icons = {
   module Flower = {
     @react.component @module("react-icons/pi")
@@ -73,6 +79,12 @@ module Editor = TextArea
 external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "default"
 // @module("@uidotdev/usehooks")
 // external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "useLocalStorage"
+
+let concatArray = x => {
+  x->Array.reduce([], (a, c) => {
+    Array.concat(a, c)
+  })
+}
 
 type entryDate =
   | Year(int)
@@ -471,16 +483,22 @@ module Days = {
   })
 }
 
-let entryClassNameIds = entryDate => {
-  entryDate->Option.mapOr([], date => {
-    switch date {
-    | Date(y, m, d) => ["entry-" ++ ymdDate(y, m - 1, d)->format("y-MM-dd")]
-    | Week(y, w) =>
-      getDaysOfWeek(w, y)
-      ->Array.map(date => date->format("y-MM-dd"))
-      ->Array.map(v => "entry-" ++ v)
-    | _ => []
-    }
+// let entryClassNameIds = entryDate => {
+//   entryDate->Option.mapOr([], date => {
+//     switch date {
+//     | Date(y, m, d) => ["entry-" ++ ymdDate(y, m - 1, d)->format("y-MM-dd")]
+//     | Week(y, w) =>
+//       getDaysOfWeek(w, y)
+//       ->Array.map(date => date->format("y-MM-dd"))
+//       ->Array.map(v => "entry-" ++ v)
+//     | _ => []
+//     }
+//   })
+// }
+
+let entryClassNameId = entryDate => {
+  entryDate->Option.mapOr("", date => {
+    "entry-" ++ date->entryDateString
   })
 }
 
@@ -507,9 +525,7 @@ module Entry = {
 
     <div key={entry.id}>
       <div
-        className={[" py-2 border-b ", entry.date->entryClassNameIds->Array.join(" ")]->Array.join(
-          " ",
-        )}
+        className={[" py-2 border-b ", entry.date->entryClassNameId]->Array.join(" ")}
         style={{
           color: monthColor,
           borderColor: monthColor,
@@ -531,10 +547,7 @@ module Entry = {
           onClick={_ =>
             entry.date->Option.mapOr((), entryDate => {
               getElementById(`day-${entryDate->entryDateString}`)->Option.mapOr((), element => {
-                element->scrollIntoView({
-                  "behavior": "smooth",
-                  "block": "center",
-                })
+                element->scrollIntoView
               })
             })}>
           {"Go to date"->React.string}
@@ -641,12 +654,6 @@ let make = () => {
 
   let entries = importData
 
-  let concatArray = x => {
-    x->Array.reduce([], (a, c) => {
-      Array.concat(a, c)
-    })
-  }
-
   let dateSet =
     entries
     ->Option.getOr([])
@@ -667,18 +674,12 @@ let make = () => {
               {
                 entryDate
                 ->Some
-                ->entryClassNameIds
-                ->Array.map(v => {
-                  getElementsByClassName(v)->Option.flatMap(x => x->Array.get(0))
-                })
-                ->Array.keepSome
-                ->Array.get(0)
+                ->entryClassNameId
+                ->getElementsByClassName
+                ->Option.flatMap(x => x->Array.get(0))
                 ->Option.mapOr((), v => {
                   Console.log(v)
-                  v->scrollIntoView({
-                    "behavior": "smooth",
-                    "block": "center",
-                  })
+                  v->scrollIntoView
                 })
               },
               entryId => {
@@ -696,13 +697,26 @@ let make = () => {
           end={endOfCal}
           dateSet={dateSet}
           onClick={entryDate => {
-            entryToSet->Option.mapOr((), entryId => {
-              updateEntry(entryId, e => {
-                ...e,
-                date: Some(entryDate),
-              })
-              setEntryToSet(_ => None)
-            })
+            entryToSet->Option.mapOr(
+              {
+                entryDate
+                ->Some
+                ->entryClassNameId
+                ->getElementsByClassName
+                ->Option.flatMap(x => x->Array.get(0))
+                ->Option.mapOr((), v => {
+                  Console.log(v)
+                  v->scrollIntoView
+                })
+              },
+              entryId => {
+                updateEntry(entryId, e => {
+                  ...e,
+                  date: Some(entryDate),
+                })
+                setEntryToSet(_ => None)
+              },
+            )
           }}
         />
       </div>
