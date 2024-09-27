@@ -42,7 +42,7 @@ export default function useLocalStorage(key, initialValue) {
   }, [store, initialValue]);
 
   const setState = React.useCallback(
-    (f) => {
+    (v) => {
       try {
         const nextState =
           typeof v === "function" ? v(JSON.parse(getSnapshot())) : v;

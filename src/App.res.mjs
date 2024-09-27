@@ -8,7 +8,7 @@ import MonacoJsx from "./Monaco.jsx";
 import * as Color from "@texel/color";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
-import * as Usehooks from "@uidotdev/usehooks";
+import UseLocalStorageJs from "./useLocalStorage.js";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
 function entryDateString(date) {
@@ -358,7 +358,7 @@ function App$Entries(props) {
 }
 
 function App(props) {
-  var match = Usehooks.useLocalStorage("data", undefined);
+  var match = UseLocalStorageJs("data", undefined);
   var setImportData = match[1];
   var importData = match[0];
   var startOfCal = new Date(2010, 0, 1);
@@ -380,7 +380,7 @@ function App(props) {
                                         });
                             }));
               });
-        }), [setImportData]);
+        }), []);
   var dateSet = new Set(Core__Array.keepSome(Core__Option.getOr(importData, []).map(function (entry) {
                   return entry.date;
                 })).map(function (date) {

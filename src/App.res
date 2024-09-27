@@ -486,10 +486,10 @@ module Entries = {
   }
 }
 
-// @module("./useLocalStorage.js")
-// external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "default"
-@module("@uidotdev/usehooks")
-external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "useLocalStorage"
+@module("./useLocalStorage.js")
+external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "default"
+// @module("@uidotdev/usehooks")
+// external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "useLocalStorage"
 
 @react.component
 let make = () => {
@@ -543,7 +543,7 @@ let make = () => {
   let showWeekNumber = false
   let showMonthNumber = false
 
-  let updateEntry = React.useCallback1((id, newValue) => {
+  let updateEntry = React.useCallback0((id, newValue) => {
     setImportData(v =>
       v->Option.map(
         v_ => {
@@ -559,7 +559,7 @@ let make = () => {
         },
       )
     )
-  }, [setImportData])
+  })
 
   let entries = importData
 
