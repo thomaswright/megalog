@@ -15,6 +15,10 @@ let scrollIntoView = x =>
     "block": "center",
   })
 
+let intMax = (a, b) => {
+  a > b ? a : b
+}
+
 module Icons = {
   module Flower = {
     @react.component @module("react-icons/pi")
@@ -565,7 +569,7 @@ module Entry = {
     </div>
   }
 
-  let make = React.memoCustomCompareProps(make, (a, b) => {
+  let make = React.memoCustomCompareProps(make, (_a, _b) => {
     false
     // switch (a.entry.date, b.entry.date) {
     // | (Some(x), Some(y)) => x->entryDateString == y->entryDateString
@@ -598,7 +602,7 @@ module Entries = {
 
 @react.component
 let make = () => {
-  let (importData, setImportData) = useLocalStorage("data", None)
+  let (entries, setEntries) = useLocalStorage("data", None)
   let (entryToSet: option<string>, setEntryToSet, getEntryToSet) = useStateWithGetter(() => None)
 
   let scrollToRef = React.useRef(None)
@@ -623,7 +627,7 @@ let make = () => {
   let endOfCal = Date.makeWithYMD(~year=2030, ~month=0, ~date=1)
 
   let updateEntry = React.useCallback0((id, f) => {
-    setImportData(v =>
+    setEntries(v =>
       v->Option.map(
         v_ => {
           v_->Array.map(entry => entry.id == id ? f(entry) : entry)
@@ -631,8 +635,6 @@ let make = () => {
       )
     )
   })
-
-  let entries = importData
 
   let sortEntries = data =>
     data->Option.map(v =>
@@ -656,9 +658,29 @@ let make = () => {
     ->Array.map(date => date->entryDateString)
     ->Set.fromArray
 
+  let makeNewEntry = entryDate =>
+    setEntries(v => {
+      v
+      ->Option.map(entries =>
+        [
+          ...entries,
+          {
+            id: (entries->Array.reduce(
+              0,
+              (a, c) => intMax(a, c.id->Int.fromString->Option.getOr(0)),
+            ) + 1)->Int.toString,
+            date: entryDate->Some,
+            title: "",
+            content: "",
+          },
+        ]
+      )
+      ->sortEntries
+    })
+
   <div className="relative font-mono h-dvh">
     <div className="absolute top-1 right-1">
-      <button onClick={_ => setImportData(v => v->sortEntries)}> {"Sort"->React.string} </button>
+      <button onClick={_ => setEntries(v => v->sortEntries)}> {"Sort"->React.string} </button>
     </div>
     <div className="flex flex-row h-full">
       <div className="flex flex-col h-full flex-none w-64">
@@ -675,9 +697,14 @@ let make = () => {
                 ->getElementsByClassName
                 ->Js.Nullable.toOption
                 ->Option.flatMap(x => x->Array.get(0))
-                ->Option.mapOr((), v => {
-                  v->scrollIntoView
-                })
+                ->Option.mapOr(
+                  {
+                    makeNewEntry(entryDate)
+                  },
+                  v => {
+                    v->scrollIntoView
+                  },
+                )
               },
               entryId => {
                 updateEntry(entryId, e => {
@@ -685,7 +712,7 @@ let make = () => {
                   date: Some(entryDate),
                 })
                 setEntryToSet(_ => None)
-                scrollToRef.current = entryDate->Some->entryClassNameId->Some
+                // scrollToRef.current = entryDate->Some->entryClassNameId->Some
               },
             )
           }}
@@ -713,7 +740,7 @@ let make = () => {
                   date: Some(entryDate),
                 })
                 setEntryToSet(_ => None)
-                scrollToRef.current = entryDate->Some->entryClassNameId->Some
+                // scrollToRef.current = entryDate->Some->entryClassNameId->Some
               },
             )
           }}
