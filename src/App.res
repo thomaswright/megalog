@@ -106,6 +106,22 @@ let getMonthForWeekOfYear = (weekNumber, year) => {
   dateOfWeek->Date.getMonth + 1
 }
 
+let getDaysOfWeek = (week, year) => {
+  let firstDayOfYear = Date.makeWithYMD(~year, ~month=0, ~date=1)
+
+  let daysOffset = (week - 1) * 7
+  let dayOfWeek = firstDayOfYear->Date.getDay
+
+  let offsetToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+  let mondayOfWeek = Date.makeWithYMD(~year, ~month=0, ~date=1 + daysOffset - offsetToMonday)
+
+  Array.make(~length=7, false)->Array.mapWithIndex((_, i) => {
+    let day = mondayOfWeek->Date.getTime->Date.fromTime
+    day->Date.setDate(mondayOfWeek->Date.getDate + i)
+    day
+  })
+}
+
 let useStateWithGetter = initial => {
   let (state, setState) = React.useState(initial)
   let stateRef = React.useRef(state)
@@ -455,11 +471,15 @@ module Days = {
   })
 }
 
-let entryClassNameId = entryDate => {
-  entryDate->Option.mapOr("", date => {
+let entryClassNameIds = entryDate => {
+  entryDate->Option.mapOr([], date => {
     switch date {
-    | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd")
-    | _ => ""
+    | Date(y, m, d) => ["entry-" ++ ymdDate(y, m - 1, d)->format("y-MM-dd")]
+    | Week(y, w) =>
+      getDaysOfWeek(w, y)
+      ->Array.map(date => date->format("y-MM-dd"))
+      ->Array.map(v => "entry-" ++ v)
+    | _ => []
     }
   })
 }
@@ -487,7 +507,9 @@ module Entry = {
 
     <div key={entry.id}>
       <div
-        className={[" py-2 border-b ", entry.date->entryClassNameId]->Array.join(" ")}
+        className={[" py-2 border-b ", entry.date->entryClassNameIds->Array.join(" ")]->Array.join(
+          " ",
+        )}
         style={{
           color: monthColor,
           borderColor: monthColor,
@@ -527,13 +549,13 @@ module Entry = {
   }
 
   let make = React.memoCustomCompareProps(make, (a, b) => {
-    // false
-    switch (a.entry.date, b.entry.date) {
-    | (Some(x), Some(y)) => x->entryDateString == y->entryDateString
-    | (None, None) => true
-    | _ => false
-    } &&
-    a.entry.content == b.entry.content
+    false
+    // switch (a.entry.date, b.entry.date) {
+    // | (Some(x), Some(y)) => x->entryDateString == y->entryDateString
+    // | (None, None) => true
+    // | _ => false
+    // } &&
+    // a.entry.content == b.entry.content
   })
 }
 
@@ -619,6 +641,12 @@ let make = () => {
 
   let entries = importData
 
+  let concatArray = x => {
+    x->Array.reduce([], (a, c) => {
+      Array.concat(a, c)
+    })
+  }
+
   let dateSet =
     entries
     ->Option.getOr([])
@@ -637,9 +665,16 @@ let make = () => {
           onClick={entryDate => {
             getEntryToSet()->Option.mapOr(
               {
-                getElementsByClassName(entryDate->Some->entryClassNameId)
-                ->Option.flatMap(v => v->Array.get(0))
+                entryDate
+                ->Some
+                ->entryClassNameIds
+                ->Array.map(v => {
+                  getElementsByClassName(v)->Option.flatMap(x => x->Array.get(0))
+                })
+                ->Array.keepSome
+                ->Array.get(0)
                 ->Option.mapOr((), v => {
+                  Console.log(v)
                   v->scrollIntoView({
                     "behavior": "smooth",
                     "block": "center",

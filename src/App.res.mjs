@@ -36,6 +36,19 @@ function getMonthForWeekOfYear(weekNumber, year) {
   return dateOfWeek.getMonth() + 1 | 0;
 }
 
+function getDaysOfWeek(week, year) {
+  var firstDayOfYear = new Date(year, 0, 1);
+  var daysOffset = Math.imul(week - 1 | 0, 7);
+  var dayOfWeek = firstDayOfYear.getDay();
+  var offsetToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1 | 0;
+  var mondayOfWeek = new Date(year, 0, (1 + daysOffset | 0) - offsetToMonday | 0);
+  return Core__Array.make(7, false).map(function (param, i) {
+              var day = new Date(mondayOfWeek.getTime());
+              day.setDate(mondayOfWeek.getDate() + i | 0);
+              return day;
+            });
+}
+
 function useStateWithGetter(initial) {
   var match = React.useState(initial);
   var state = match[0];
@@ -424,12 +437,19 @@ var make$1 = React.memo(App$Days, (function (a, b) {
         }
       }));
 
-function entryClassNameId(entryDate) {
-  return Core__Option.mapOr(entryDate, "", (function (date) {
-                if (date.TAG === "Date") {
-                  return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd");
-                } else {
-                  return "";
+function entryClassNameIds(entryDate) {
+  return Core__Option.mapOr(entryDate, [], (function (date) {
+                switch (date.TAG) {
+                  case "Week" :
+                      return getDaysOfWeek(date._1, date._0).map(function (date) {
+                                    return DateFns.format(date, "y-MM-dd");
+                                  }).map(function (v) {
+                                  return "entry-" + v;
+                                });
+                  case "Date" :
+                      return ["entry-" + DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd")];
+                  default:
+                    return [];
                 }
               }));
 }
@@ -509,7 +529,7 @@ function App$Entry(props) {
                       ],
                       className: [
                           " py-2 border-b ",
-                          entryClassNameId(entry.date)
+                          entryClassNameIds(entry.date).join(" ")
                         ].join(" "),
                       style: {
                         borderColor: monthColor$1,
@@ -533,15 +553,7 @@ function App$Entry(props) {
 }
 
 var make$2 = React.memo(App$Entry, (function (a, b) {
-        var match = a.entry.date;
-        var match$1 = b.entry.date;
-        if (match !== undefined ? (
-              match$1 !== undefined ? entryDateString(match) === entryDateString(match$1) : false
-            ) : match$1 === undefined) {
-          return a.entry.content === b.entry.content;
-        } else {
-          return false;
-        }
+        return false;
       }));
 
 function App$Entries(props) {
@@ -603,9 +615,12 @@ function App(props) {
                                     end: endOfCal,
                                     dateSet: dateSet,
                                     onClick: (function (entryDate) {
-                                        Core__Option.mapOr(getEntryToSet(), Core__Option.mapOr(Core__Option.flatMap(document.getElementsByClassName(entryClassNameId(entryDate)), (function (v) {
-                                                        return v[0];
-                                                      })), undefined, (function (v) {
+                                        Core__Option.mapOr(getEntryToSet(), Core__Option.mapOr(Core__Array.keepSome(entryClassNameIds(entryDate).map(function (v) {
+                                                            return Core__Option.flatMap(document.getElementsByClassName(v), (function (x) {
+                                                                          return x[0];
+                                                                        }));
+                                                          }))[0], undefined, (function (v) {
+                                                    console.log(v);
                                                     v.scrollIntoView({
                                                           behavior: "smooth",
                                                           block: "center"
