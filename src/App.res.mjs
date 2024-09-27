@@ -351,7 +351,13 @@ function App$Day(props) {
                               className: "text-neutral-500 flex-none"
                             })
                       ],
-                      className: "flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden"
+                      className: "flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden",
+                      id: "day-" + entryDateString({
+                            TAG: "Date",
+                            _0: year,
+                            _1: month,
+                            _2: monthDay
+                          })
                     })
               ]
             });
@@ -459,7 +465,10 @@ function App$Entry(props) {
                             }),
                         JsxRuntime.jsx("button", {
                               children: "Set",
-                              className: [isSelectedForSet ? "bg-blue-700 text-white" : "bg-white text-black"].join(" "),
+                              className: [
+                                  "mx-1",
+                                  isSelectedForSet ? "bg-blue-700 text-white" : "bg-white text-black"
+                                ].join(" "),
                               onClick: (function (param) {
                                   setEntryToSet(function (v) {
                                         if (Caml_obj.equal(v, entry.id)) {
@@ -468,6 +477,23 @@ function App$Entry(props) {
                                           return entry.id;
                                         }
                                       });
+                                })
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: "Go to date",
+                              className: [
+                                  "mx-1",
+                                  "bg-white text-black"
+                                ].join(" "),
+                              onClick: (function (param) {
+                                  Core__Option.mapOr(entry.date, undefined, (function (entryDate) {
+                                          Core__Option.mapOr(document.getElementById("day-" + entryDateString(entryDate)), undefined, (function (element) {
+                                                  element.scrollIntoView({
+                                                        behavior: "smooth",
+                                                        block: "center"
+                                                      });
+                                                }));
+                                        }));
                                 })
                             })
                       ],

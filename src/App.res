@@ -355,6 +355,7 @@ module Day = {
           </div>
         : React.null}
       <div
+        id={`day-${Date(year, month, monthDay)->entryDateString}`}
         className="flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden">
         <div className=" h-6 w-5 flex flex-row flex-none">
           {true && beginningOfWeek
@@ -492,6 +493,11 @@ let getMonthForWeekOfYear = (weekNumber, year) => {
   dateOfWeek->Date.getMonth + 1
 }
 
+@val @scope("document") external getElementById: string => option<Dom.element> = "getElementById"
+@send
+external scrollIntoView: (Dom.element, {"behavior": string, "block": string}) => unit =
+  "scrollIntoView"
+
 module Entry = {
   @react.component
   let make = (~entry, ~updateEntry: (string, string) => unit, ~setEntryToSet, ~entryToSet) => {
@@ -524,10 +530,24 @@ module Entry = {
         <span className=" text-white"> {entry.title->React.string} </span>
         <button
           className={[
+            "mx-1",
             isSelectedForSet ? "bg-blue-700 text-white" : "bg-white text-black",
           ]->Array.join(" ")}
           onClick={_ => setEntryToSet(v => v == Some(entry.id) ? None : Some(entry.id))}>
           {"Set"->React.string}
+        </button>
+        <button
+          className={["mx-1", "bg-white text-black"]->Array.join(" ")}
+          onClick={_ =>
+            entry.date->Option.mapOr((), entryDate => {
+              getElementById(`day-${entryDate->entryDateString}`)->Option.mapOr((), element => {
+                element->scrollIntoView({
+                  "behavior": "smooth",
+                  "block": "center",
+                })
+              })
+            })}>
+          {"Go to date"->React.string}
         </button>
       </div>
       <div className="py-2">
