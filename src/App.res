@@ -1,7 +1,9 @@
-@val @scope("document") external getElementById: string => option<Dom.element> = "getElementById"
+@val @scope("document")
+external getElementById: string => Js.Nullable.t<Dom.element> = "getElementById"
 
 @val @scope("document")
-external getElementsByClassName: string => option<array<Dom.element>> = "getElementsByClassName"
+external getElementsByClassName: string => Js.Nullable.t<array<Dom.element>> =
+  "getElementsByClassName"
 
 @send
 external scrollIntoView: (Dom.element, {"behavior": string, "block": string}) => unit =
@@ -546,7 +548,9 @@ module Entry = {
           className={["mx-1", "bg-white text-black"]->Array.join(" ")}
           onClick={_ =>
             entry.date->Option.mapOr((), entryDate => {
-              getElementById(`day-${entryDate->entryDateString}`)->Option.mapOr((), element => {
+              getElementById(`day-${entryDate->entryDateString}`)
+              ->Js.Nullable.toOption
+              ->Option.mapOr((), element => {
                 element->scrollIntoView
               })
             })}>
@@ -597,50 +601,26 @@ let make = () => {
   let (importData, setImportData) = useLocalStorage("data", None)
   let (entryToSet: option<string>, setEntryToSet, getEntryToSet) = useStateWithGetter(() => None)
 
+  let scrollToRef = React.useRef(None)
+
+  React.useEffectOnEveryRender(() => {
+    scrollToRef.current
+    ->Option.flatMap(x =>
+      x
+      ->getElementsByClassName
+      ->Js.Nullable.toOption
+      ->Option.flatMap(x => x->Array.get(0))
+    )
+    ->Option.mapOr((), element => {
+      element->scrollIntoView
+      scrollToRef.current = None
+    })
+
+    None
+  })
+
   let startOfCal = Date.makeWithYMD(~year=2010, ~month=0, ~date=1)
   let endOfCal = Date.makeWithYMD(~year=2030, ~month=0, ~date=1)
-
-  // let getDate = name => {
-  //   let date =
-  //     name
-  //     ->String.substring(~start=0, ~end=10)
-  //     ->DateFns.parse("y-MM-dd", 0)
-
-  //   date->isInvalidDate
-  //     ? None
-  //     : switch (
-  //         date->DateFns.format("y")->Int.fromString,
-  //         date->DateFns.format("MM")->Int.fromString,
-  //         date->DateFns.format("dd")->Int.fromString,
-  //       ) {
-  //       | (Some(y), Some(m), Some(d)) => Some(Date(y, m, d))
-  //       | _ => None
-  //       }
-  // }
-
-  // React.useEffect0(() => {
-  //   fetch("../testData/test.json")
-  //   ->Promise.then(response => {
-  //     json(response)
-  //   })
-  //   ->Promise.then(json => {
-  //     setImportData(
-  //       _ => Some(
-  //         json->Array.mapWithIndex(
-  //           ((name, content), i) => {
-  //             id: i->Int.toString,
-  //             date: getDate(name),
-  //             title: name,
-  //             content,
-  //           },
-  //         ),
-  //       ),
-  //     )
-  //     Promise.resolve()
-  //   })
-  //   ->ignore
-  //   None
-  // })
 
   let updateEntry = React.useCallback0((id, f) => {
     setImportData(v =>
@@ -654,6 +634,20 @@ let make = () => {
 
   let entries = importData
 
+  let sortEntries = data =>
+    data->Option.map(v =>
+      v->Array.toSorted((a, b) => {
+        String.localeCompare(
+          a.date->Option.mapOr("", x => x->entryDateString) ++ a.id,
+          b.date->Option.mapOr("", x => x->entryDateString) ++ b.id,
+        )
+      })
+    )
+  // React.useEffect0(() => {
+  //   setImportData(v => v->sortEntries)
+  //   None
+  // })
+
   let dateSet =
     entries
     ->Option.getOr([])
@@ -662,7 +656,10 @@ let make = () => {
     ->Array.map(date => date->entryDateString)
     ->Set.fromArray
 
-  <div className="font-mono h-dvh">
+  <div className="relative font-mono h-dvh">
+    <div className="absolute top-1 right-1">
+      <button onClick={_ => setImportData(v => v->sortEntries)}> {"Sort"->React.string} </button>
+    </div>
     <div className="flex flex-row h-full">
       <div className="flex flex-col h-full flex-none w-64">
         <Days
@@ -676,9 +673,9 @@ let make = () => {
                 ->Some
                 ->entryClassNameId
                 ->getElementsByClassName
+                ->Js.Nullable.toOption
                 ->Option.flatMap(x => x->Array.get(0))
                 ->Option.mapOr((), v => {
-                  Console.log(v)
                   v->scrollIntoView
                 })
               },
@@ -688,6 +685,7 @@ let make = () => {
                   date: Some(entryDate),
                 })
                 setEntryToSet(_ => None)
+                scrollToRef.current = entryDate->Some->entryClassNameId->Some
               },
             )
           }}
@@ -703,9 +701,9 @@ let make = () => {
                 ->Some
                 ->entryClassNameId
                 ->getElementsByClassName
+                ->Js.Nullable.toOption
                 ->Option.flatMap(x => x->Array.get(0))
                 ->Option.mapOr((), v => {
-                  Console.log(v)
                   v->scrollIntoView
                 })
               },
@@ -715,13 +713,14 @@ let make = () => {
                   date: Some(entryDate),
                 })
                 setEntryToSet(_ => None)
+                scrollToRef.current = entryDate->Some->entryClassNameId->Some
               },
             )
           }}
         />
       </div>
       <Entries
-        entries={importData}
+        entries={entries}
         updateEntry={(id, newContent) =>
           updateEntry(id, e => {
             ...e,
@@ -733,3 +732,45 @@ let make = () => {
     </div>
   </div>
 }
+
+// let getDate = name => {
+//   let date =
+//     name
+//     ->String.substring(~start=0, ~end=10)
+//     ->DateFns.parse("y-MM-dd", 0)
+
+//   date->isInvalidDate
+//     ? None
+//     : switch (
+//         date->DateFns.format("y")->Int.fromString,
+//         date->DateFns.format("MM")->Int.fromString,
+//         date->DateFns.format("dd")->Int.fromString,
+//       ) {
+//       | (Some(y), Some(m), Some(d)) => Some(Date(y, m, d))
+//       | _ => None
+//       }
+// }
+
+// React.useEffect0(() => {
+//   fetch("../testData/test.json")
+//   ->Promise.then(response => {
+//     json(response)
+//   })
+//   ->Promise.then(json => {
+//     setImportData(
+//       _ => Some(
+//         json->Array.mapWithIndex(
+//           ((name, content), i) => {
+//             id: i->Int.toString,
+//             date: getDate(name),
+//             title: name,
+//             content,
+//           },
+//         ),
+//       ),
+//     )
+//     Promise.resolve()
+//   })
+//   ->ignore
+//   None
+// })

@@ -4,6 +4,7 @@ import * as React from "react";
 import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as DateFns from "date-fns";
 import * as Core__Int from "@rescript/core/src/Core__Int.res.mjs";
+import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import MonacoJsx from "./Monaco.jsx";
 import * as Color from "@texel/color";
@@ -500,7 +501,7 @@ function App$Entry(props) {
                                 ].join(" "),
                               onClick: (function (param) {
                                   Core__Option.mapOr(entry.date, undefined, (function (entryDate) {
-                                          Core__Option.mapOr(document.getElementById("day-" + entryDateString(entryDate)), undefined, (function (element) {
+                                          Core__Option.mapOr(Caml_option.nullable_to_opt(document.getElementById("day-" + entryDateString(entryDate))), undefined, (function (element) {
                                                   scrollIntoView(element);
                                                 }));
                                         }));
@@ -565,6 +566,17 @@ function App(props) {
   var getEntryToSet = match$1[2];
   var setEntryToSet = match$1[1];
   var entryToSet = match$1[0];
+  var scrollToRef = React.useRef(undefined);
+  React.useEffect(function () {
+        Core__Option.mapOr(Core__Option.flatMap(scrollToRef.current, (function (x) {
+                    return Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(x)), (function (x) {
+                                  return x[0];
+                                }));
+                  })), undefined, (function (element) {
+                scrollIntoView(element);
+                scrollToRef.current = undefined;
+              }));
+      });
   var startOfCal = new Date(2010, 0, 1);
   var endOfCal = new Date(2030, 0, 1);
   var updateEntry = React.useCallback((function (id, f) {
@@ -585,83 +597,104 @@ function App(props) {
                 })).map(function (date) {
             return entryDateString(date);
           }));
-  return JsxRuntime.jsx("div", {
-              children: JsxRuntime.jsxs("div", {
-                    children: [
-                      JsxRuntime.jsxs("div", {
-                            children: [
-                              JsxRuntime.jsx(make$1, {
-                                    start: startOfCal,
-                                    end: endOfCal,
-                                    dateSet: dateSet,
-                                    onClick: (function (entryDate) {
-                                        Core__Option.mapOr(getEntryToSet(), Core__Option.mapOr(Core__Option.flatMap(document.getElementsByClassName(entryClassNameId(entryDate)), (function (x) {
-                                                        return x[0];
-                                                      })), undefined, (function (v) {
-                                                    console.log(v);
-                                                    scrollIntoView(v);
-                                                  })), (function (entryId) {
-                                                updateEntry(entryId, (function (e) {
-                                                        return {
-                                                                id: e.id,
-                                                                date: entryDate,
-                                                                title: e.title,
-                                                                content: e.content
-                                                              };
-                                                      }));
-                                                setEntryToSet(function (param) {
-                                                      
-                                                    });
-                                              }));
-                                      })
-                                  }),
-                              JsxRuntime.jsx(App$Months, {
-                                    start: startOfCal,
-                                    end: endOfCal,
-                                    dateSet: dateSet,
-                                    onClick: (function (entryDate) {
-                                        Core__Option.mapOr(entryToSet, Core__Option.mapOr(Core__Option.flatMap(document.getElementsByClassName(entryClassNameId(entryDate)), (function (x) {
-                                                        return x[0];
-                                                      })), undefined, (function (v) {
-                                                    console.log(v);
-                                                    scrollIntoView(v);
-                                                  })), (function (entryId) {
-                                                updateEntry(entryId, (function (e) {
-                                                        return {
-                                                                id: e.id,
-                                                                date: entryDate,
-                                                                title: e.title,
-                                                                content: e.content
-                                                              };
-                                                      }));
-                                                setEntryToSet(function (param) {
-                                                      
-                                                    });
-                                              }));
-                                      })
-                                  })
-                            ],
-                            className: "flex flex-col h-full flex-none w-64"
+  return JsxRuntime.jsxs("div", {
+              children: [
+                JsxRuntime.jsx("div", {
+                      children: JsxRuntime.jsx("button", {
+                            children: "Sort",
+                            onClick: (function (param) {
+                                setImportData(function (v) {
+                                      return Core__Option.map(v, (function (v) {
+                                                    return v.toSorted(function (a, b) {
+                                                                return (Core__Option.mapOr(a.date, "", (function (x) {
+                                                                                  return entryDateString(x);
+                                                                                })) + a.id).localeCompare(Core__Option.mapOr(b.date, "", (function (x) {
+                                                                                  return entryDateString(x);
+                                                                                })) + b.id);
+                                                              });
+                                                  }));
+                                    });
+                              })
                           }),
-                      JsxRuntime.jsx(App$Entries, {
-                            entries: importData,
-                            updateEntry: (function (id, newContent) {
-                                updateEntry(id, (function (e) {
-                                        return {
-                                                id: e.id,
-                                                date: e.date,
-                                                title: e.title,
-                                                content: newContent
-                                              };
-                                      }));
-                              }),
-                            setEntryToSet: setEntryToSet,
-                            entryToSet: entryToSet
-                          })
-                    ],
-                    className: "flex flex-row h-full"
-                  }),
-              className: "font-mono h-dvh"
+                      className: "absolute top-1 right-1"
+                    }),
+                JsxRuntime.jsxs("div", {
+                      children: [
+                        JsxRuntime.jsxs("div", {
+                              children: [
+                                JsxRuntime.jsx(make$1, {
+                                      start: startOfCal,
+                                      end: endOfCal,
+                                      dateSet: dateSet,
+                                      onClick: (function (entryDate) {
+                                          Core__Option.mapOr(getEntryToSet(), Core__Option.mapOr(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
+                                                          return x[0];
+                                                        })), undefined, (function (v) {
+                                                      scrollIntoView(v);
+                                                    })), (function (entryId) {
+                                                  updateEntry(entryId, (function (e) {
+                                                          return {
+                                                                  id: e.id,
+                                                                  date: entryDate,
+                                                                  title: e.title,
+                                                                  content: e.content
+                                                                };
+                                                        }));
+                                                  setEntryToSet(function (param) {
+                                                        
+                                                      });
+                                                  scrollToRef.current = entryClassNameId(entryDate);
+                                                }));
+                                        })
+                                    }),
+                                JsxRuntime.jsx(App$Months, {
+                                      start: startOfCal,
+                                      end: endOfCal,
+                                      dateSet: dateSet,
+                                      onClick: (function (entryDate) {
+                                          Core__Option.mapOr(entryToSet, Core__Option.mapOr(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
+                                                          return x[0];
+                                                        })), undefined, (function (v) {
+                                                      scrollIntoView(v);
+                                                    })), (function (entryId) {
+                                                  updateEntry(entryId, (function (e) {
+                                                          return {
+                                                                  id: e.id,
+                                                                  date: entryDate,
+                                                                  title: e.title,
+                                                                  content: e.content
+                                                                };
+                                                        }));
+                                                  setEntryToSet(function (param) {
+                                                        
+                                                      });
+                                                  scrollToRef.current = entryClassNameId(entryDate);
+                                                }));
+                                        })
+                                    })
+                              ],
+                              className: "flex flex-col h-full flex-none w-64"
+                            }),
+                        JsxRuntime.jsx(App$Entries, {
+                              entries: importData,
+                              updateEntry: (function (id, newContent) {
+                                  updateEntry(id, (function (e) {
+                                          return {
+                                                  id: e.id,
+                                                  date: e.date,
+                                                  title: e.title,
+                                                  content: newContent
+                                                };
+                                        }));
+                                }),
+                              setEntryToSet: setEntryToSet,
+                              entryToSet: entryToSet
+                            })
+                      ],
+                      className: "flex flex-row h-full"
+                    })
+              ],
+              className: "relative font-mono h-dvh"
             });
 }
 
