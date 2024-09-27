@@ -20,11 +20,12 @@ let ymdDate = (year, month, date) => Date.makeWithYMD(~year, ~month, ~date)
 let entryDateString = date =>
   switch date {
   | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd")
-  | Year(y) => y->Int.toPrecision(~digits=4)
-  | Half(y, h) => y->Int.toPrecision(~digits=4) ++ "-H" ++ h->Int.toPrecision(~digits=1)
-  | Quarter(y, q) => y->Int.toPrecision(~digits=4) ++ "-Q" ++ q->Int.toPrecision(~digits=1)
-  | Month(y, m) => y->Int.toPrecision(~digits=4) ++ m->Int.toPrecision(~digits=2)
-  | Week(y, w) => y->Int.toPrecision(~digits=4) ++ "-W" ++ w->Int.toPrecision(~digits=2)
+  | Year(y) => y->Int.toString->String.padStart(4, "0")
+  | Half(y, h) => y->Int.toString->String.padStart(4, "0") ++ "-H" ++ h->Int.toString
+  | Quarter(y, q) => y->Int.toString->String.padStart(4, "0") ++ "-Q" ++ q->Int.toString
+  | Month(y, m) =>
+    y->Int.toString->String.padStart(4, "0") ++ "-" ++ m->Int.toString->String.padStart(2, "0")
+  | Week(y, w) => y->Int.toString->String.padStart(4, "0") ++ "-W" ++ w->Int.toString
   }
 
 let day_of_ms = 1000 * 60 * 60 * 24
@@ -130,7 +131,7 @@ let monthColorDim = (monthInt, year) => {
 
 module Months = {
   @react.component
-  let make = (~start, ~end, ~dateSet) => {
+  let make = (~start, ~end, ~dateSet, ~setEntryToSet, ~entryToSet, ~onClick) => {
     <div className="p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full">
       {allDays(start, end)
       ->Array.map(d => {
@@ -169,7 +170,8 @@ module Months = {
                   
                     `,
                     }}>
-                    <div
+                    <button
+                      onClick={_ => onClick(Year(year))}
                       className={[
                         " flex flex-row items-center justify-center",
                         hasYearEntry ? `text-lime-500 bg-black` : "text-neutral-300 bg-black",
@@ -178,8 +180,9 @@ module Months = {
                         gridArea: "year",
                       }}>
                       <div className="-rotate-90"> {d->DateFns.format("y")->React.string} </div>
-                    </div>
-                    <div
+                    </button>
+                    <button
+                      onClick={_ => onClick(Quarter(year, 1))}
                       className={[
                         " flex flex-row items-center justify-center",
                         hasQ1Entry->entryCheck,
@@ -189,8 +192,9 @@ module Months = {
                       }}>
                       <div className=""> {"Q1"->React.string} </div>
                       // <Icons.Snowflake />
-                    </div>
-                    <div
+                    </button>
+                    <button
+                      onClick={_ => onClick(Quarter(year, 2))}
                       className={[
                         " flex flex-row items-center justify-center",
                         hasQ2Entry->entryCheck,
@@ -200,8 +204,9 @@ module Months = {
                       }}>
                       <div className=""> {"Q2"->React.string} </div>
                       // <Icons.Flower />
-                    </div>
-                    <div
+                    </button>
+                    <button
+                      onClick={_ => onClick(Quarter(year, 3))}
                       className={[
                         " flex flex-row items-center justify-center",
                         hasQ3Entry->entryCheck,
@@ -211,8 +216,9 @@ module Months = {
                       }}>
                       <div className=""> {"Q3"->React.string} </div>
                       // <Icons.Umbrella />
-                    </div>
-                    <div
+                    </button>
+                    <button
+                      onClick={_ => onClick(Quarter(year, 4))}
                       className={[
                         " flex flex-row items-center justify-center",
                         hasQ4Entry->entryCheck,
@@ -222,7 +228,7 @@ module Months = {
                       }}>
                       <div className=""> {"Q4"->React.string} </div>
                       // <Icons.Leaf />
-                    </div>
+                    </button>
                     {Array.make(~length=12, false)
                     ->Array.mapWithIndex((_v, i) => {
                       let monthNum = (i + 1)->Int.toString
@@ -232,7 +238,8 @@ module Months = {
 
                       let hasEntry = dateSet->Set.has(Month(year, i + 1)->entryDateString)
 
-                      <div
+                      <button
+                        onClick={_ => onClick(Month(year, i + 1))}
                         className={[
                           " flex flex-row items-center justify-center ",
                           hasEntry->entryCheck,
@@ -241,7 +248,7 @@ module Months = {
                           gridArea: "m" ++ monthNum,
                         }}>
                         <div className=""> {monthDate->DateFns.format("MMM")->React.string} </div>
-                      </div>
+                      </button>
                     })
                     ->React.array}
                   </div>
@@ -308,7 +315,7 @@ module Months = {
 
 module Days = {
   @react.component
-  let make = (~start, ~end, ~dateSet) => {
+  let make = (~start, ~end, ~dateSet, ~setEntryToSet, ~entryToSet) => {
     <div className="w-full flex-2 p-2 overflow-y-scroll ">
       {allDays(start, end)
       ->Array.map(d => {
@@ -434,7 +441,7 @@ module Editor = TextArea
 
 module Entry = {
   @react.component
-  let make = (~entry, ~updateEntry: (string, string) => unit) => {
+  let make = (~entry, ~updateEntry: (string, string) => unit, ~setEntryToSet, ~entryToSet) => {
     let monthColor = entry.date->Option.mapOr("#fff", date => {
       switch date {
       | Date(_y, m, _d) => monthColor(m, 2000)
@@ -445,10 +452,10 @@ module Entry = {
     let dateDisplay = entry.date->Option.flatMap(date => {
       switch date {
       | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd eee")->Some
-      | _ => None
+      | x => x->entryDateString->Some
       }
     })
-
+    let isSelectedForSet = entryToSet->Option.mapOr(false, v => v == entry.id)
     <div key={entry.id}>
       <div
         className=" py-2 border-b "
@@ -460,6 +467,13 @@ module Entry = {
           <span className="pr-2"> {dateDisplay_->React.string} </span>
         })}
         <span className=" text-white"> {entry.title->React.string} </span>
+        <button
+          className={[
+            isSelectedForSet ? "bg-blue-700 text-white" : "bg-white text-black",
+          ]->Array.join(" ")}
+          onClick={_ => setEntryToSet(v => v == Some(entry.id) ? None : Some(entry.id))}>
+          {"Set"->React.string}
+        </button>
       </div>
       <div className="py-2">
         <div className="rounded overflow-hidden">
@@ -482,12 +496,17 @@ module Entry = {
 
 module Entries = {
   @react.component
-  let make = (~entries: option<array<entry>>, ~updateEntry: (string, string) => unit) => {
+  let make = (
+    ~entries: option<array<entry>>,
+    ~updateEntry: (string, string) => unit,
+    ~setEntryToSet,
+    ~entryToSet,
+  ) => {
     <div className="text-xs leading-none flex-1 h-full overflow-y-scroll">
       {entries->Option.mapOr(React.null, entries_ => {
         entries_
         ->Array.map(entry => {
-          <Entry entry updateEntry />
+          <Entry entry updateEntry setEntryToSet entryToSet />
         })
         ->React.array
       })}
@@ -503,6 +522,7 @@ external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "default"
 @react.component
 let make = () => {
   let (importData, setImportData) = useLocalStorage("data", None)
+  let (entryToSet: option<string>, setEntryToSet) = React.useState(() => None)
 
   let startOfCal = Date.makeWithYMD(~year=2010, ~month=0, ~date=1)
   let endOfCal = Date.makeWithYMD(~year=2030, ~month=0, ~date=1)
@@ -552,19 +572,11 @@ let make = () => {
   let showWeekNumber = false
   let showMonthNumber = false
 
-  let updateEntry = React.useCallback0((id, newValue) => {
+  let updateEntry = React.useCallback0((id, f) => {
     setImportData(v =>
       v->Option.map(
         v_ => {
-          v_->Array.map(
-            entry =>
-              entry.id == id
-                ? {
-                    ...entry,
-                    content: newValue,
-                  }
-                : entry,
-          )
+          v_->Array.map(entry => entry.id == id ? f(entry) : entry)
         },
       )
     )
@@ -583,10 +595,33 @@ let make = () => {
   <div className="font-mono h-dvh">
     <div className="flex flex-row h-full">
       <div className="flex flex-col h-full flex-none w-64">
-        <Days start={startOfCal} end={endOfCal} dateSet={dateSet} />
-        <Months start={startOfCal} end={endOfCal} dateSet={dateSet} />
+        <Days start={startOfCal} end={endOfCal} dateSet={dateSet} setEntryToSet entryToSet />
+        <Months
+          start={startOfCal}
+          end={endOfCal}
+          dateSet={dateSet}
+          setEntryToSet
+          entryToSet
+          onClick={entryDate => {
+            entryToSet->Option.mapOr((), entryId => {
+              updateEntry(entryId, e => {
+                ...e,
+                date: Some(entryDate),
+              })
+            })
+          }}
+        />
       </div>
-      <Entries entries={importData} updateEntry={updateEntry} />
+      <Entries
+        entries={importData}
+        updateEntry={(id, newContent) =>
+          updateEntry(id, e => {
+            ...e,
+            content: newContent,
+          })}
+        setEntryToSet
+        entryToSet
+      />
     </div>
   </div>
 }
