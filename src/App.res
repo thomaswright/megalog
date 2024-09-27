@@ -13,6 +13,20 @@ type entry = {
   content: string,
 }
 
+let useStateWithGetter = initial => {
+  let (state, setState) = React.useState(initial)
+  let stateRef = React.useRef(state)
+
+  React.useEffect1(() => {
+    stateRef.current = state
+    None
+  }, [state])
+
+  let getState = () => stateRef.current
+
+  (state, setState, getState)
+}
+
 let format = DateFns.format
 
 let ymdDate = (year, month, date) => Date.makeWithYMD(~year, ~month, ~date)
@@ -117,16 +131,21 @@ let weekColor = weekInt => {
 //   Float.mod(360. /. phi *. (monthInt + year * 12)->Int.toFloat, 360.0)
 // }
 
-let monthHue = (monthInt, _) => {
+let monthHue = monthInt => {
   Float.mod(360. /. 12. *. ((monthInt - 3) * 5)->Int.toFloat, 360.0)
 }
 
-let monthColor = (monthInt, year) => {
-  hsl(monthHue(monthInt, year), 1.0, 0.7)
+let monthColors =
+  Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.7))
+let monthColorsDim =
+  Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.3))
+
+let monthColor = monthInt => {
+  monthColors->Array.getUnsafe(monthInt - 1)
 }
 
-let monthColorDim = (monthInt, year) => {
-  hsl(monthHue(monthInt, year), 1.0, 0.3)
+let monthColorDim = monthInt => {
+  monthColorsDim->Array.getUnsafe(monthInt - 1)
 }
 
 module Months = {
@@ -313,70 +332,87 @@ module Months = {
 //   }}
 // />
 
-module Days = {
+module Day = {
   @react.component
-  let make = (~start, ~end, ~dateSet, ~setEntryToSet, ~entryToSet) => {
-    <div className="w-full flex-2 p-2 overflow-y-scroll ">
-      {allDays(start, end)
-      ->Array.map(d => {
-        let beginningOfWeek = d->Date.getDay == 0
-        // let beginningOfMonth = d->Date.getDate == 1
-        // let beginningOfYear = d->DateFns.getDayOfYear == 1
-        let week = d->DateFns.format("w")
-        let year = d->Date.getFullYear
+  let make = (~d, ~dateSet, ~onClick, ~hasEntry) => {
+    let beginningOfWeek = d->Date.getDay == 0
+    // let beginningOfMonth = d->Date.getDate == 1
+    // let beginningOfYear = d->DateFns.getDayOfYear == 1
 
-        let hasEntry = dateSet->Set.has(d->format("y-MM-dd"))
-        let hasWeekEntry =
-          week
-          ->Int.fromString
-          ->Option.mapOr(false, weekNum => dateSet->Set.has(Week(year, weekNum)->entryDateString))
+    let year = d->Date.getFullYear
+    let month = d->Date.getMonth + 1
+    let monthDay = d->Date.getDate
+    let monthColor = monthColor(month)
+    let monthColorDim = monthColorDim(month)
+    let isToday = DateFns.isSameDay(Date.make(), d)
 
-        let year = d->Date.getFullYear
-        let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
-        // let monthDay = d->DateFns.format("dd")->Int.fromString->Option.getOr(0)
-        let monthColor = monthColor(month, year)
-        let monthColorDim = monthColorDim(month, year)
-        let isToday = DateFns.isSameDay(Date.make(), d)
-
-        <React.Fragment key={d->format("y-MM-dd")}>
+    <React.Fragment>
+      {true && beginningOfWeek
+        ? <div className="relative h-0 ml-px">
+            <div
+              style={{background: monthColor}} className="h-px w-full absolute-translate-y-1/2"
+            />
+          </div>
+        : React.null}
+      <div
+        className="flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden">
+        <div className=" h-6 w-5 flex flex-row flex-none">
           {true && beginningOfWeek
-            ? <div className="relative h-0 ml-px">
-                <div
-                  style={{background: monthColor}} className="h-px w-full absolute-translate-y-1/2"
-                />
-              </div>
-            : React.null}
-          <div
-            className="flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden">
-            <div className=" h-6 w-5 flex flex-row flex-none">
-              {true && beginningOfWeek
-                ? <div
+            ? {
+                let week = d->DateFns.format("w")
+
+                week
+                ->Int.fromString
+                ->Option.mapOr(React.null, weekNum => {
+                  let hasWeekEntry = dateSet->Set.has(Week(year, weekNum)->entryDateString)
+
+                  <button
+                    onClick={_ => onClick(Week(year, weekNum))}
                     style={{
                       color: hasWeekEntry ? monthColor : "#ddd",
                     }}
                     className="text-xs text-left  overflow-visible text-nowrap p-1">
                     {("" ++ week)->React.string}
-                  </div>
-                : React.null}
-            </div>
-            <div
-              className={["w-1 h-6 flex-none"]->Array.join(" ")}
-              style={{
-                backgroundColor: monthColor,
-              }}
-            />
-            <div
-              style={{
-                color: hasEntry ? monthColor : monthColorDim,
-              }}
-              className={["px-2 flex-none", isToday ? "border-r-4 border-white" : ""]->Array.join(
-                " ",
-              )}>
-              {d->DateFns.format("y-MM-dd eee")->React.string}
-            </div>
-            <div className="text-neutral-500 flex-none"> {"Singapore"->React.string} </div>
-          </div>
-        </React.Fragment>
+                  </button>
+                })
+              }
+            : React.null}
+        </div>
+        <div
+          className={["w-1 h-6 flex-none"]->Array.join(" ")}
+          style={{
+            backgroundColor: monthColor,
+          }}
+        />
+        <button
+          onClick={_ => onClick(Date(year, month, monthDay))}
+          style={{
+            color: hasEntry ? monthColor : monthColorDim,
+          }}
+          className={["px-2 flex-none", isToday ? "border-r-4 border-white" : ""]->Array.join(" ")}>
+          {d->DateFns.format("y-MM-dd eee")->React.string}
+        </button>
+        <div className="text-neutral-500 flex-none"> {"Singapore"->React.string} </div>
+      </div>
+    </React.Fragment>
+  }
+
+  let make = React.memoCustomCompareProps(make, (a, b) => {
+    // Date.equal(a.d, b.d)
+    a.d->Date.getTime == b.d->Date.getTime && a.hasEntry == b.hasEntry
+    // false
+  })
+}
+
+module Days = {
+  @react.component
+  let make = (~start, ~end, ~dateSet, ~setEntryToSet, ~entryToSet, ~onClick) => {
+    <div className="w-full flex-2 p-2 overflow-y-scroll ">
+      {allDays(start, end)
+      ->Array.map(d => {
+        <Day
+          key={d->Date.toString} d dateSet onClick hasEntry={dateSet->Set.has(d->format("y-MM-dd"))}
+        />
       })
       ->React.array}
     </div>
@@ -439,12 +475,31 @@ module Editor = TextArea
 
 @val external isInvalidDate: Date.t => bool = "isNaN"
 
+let getMonthForWeekOfYear = (weekNumber, year) => {
+  let firstDayOfYear = ymdDate(year, 0, 1)
+
+  let dayOfWeek = firstDayOfYear->Date.getDay
+  let firstMondayOfYear = firstDayOfYear
+
+  if dayOfWeek != 1 {
+    let offset = dayOfWeek == 0 ? 1 : 8 - dayOfWeek
+    firstMondayOfYear->Date.setDate(firstDayOfYear->Date.getDate + offset)
+  }
+
+  let dateOfWeek = firstMondayOfYear->Date.getTime->Date.fromTime
+  dateOfWeek->Date.setDate(firstMondayOfYear->Date.getDate + (weekNumber - 1) * 7)
+
+  dateOfWeek->Date.getMonth + 1
+}
+
 module Entry = {
   @react.component
   let make = (~entry, ~updateEntry: (string, string) => unit, ~setEntryToSet, ~entryToSet) => {
     let monthColor = entry.date->Option.mapOr("#fff", date => {
       switch date {
-      | Date(_y, m, _d) => monthColor(m, 2000)
+      | Date(_y, m, _d) => monthColor(m)
+      | Month(_y, m) => monthColor(m)
+      | Week(y, w) => getMonthForWeekOfYear(w, y)->monthColor
       | _ => "#fff"
       }
     })
@@ -522,7 +577,7 @@ external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "default"
 @react.component
 let make = () => {
   let (importData, setImportData) = useLocalStorage("data", None)
-  let (entryToSet: option<string>, setEntryToSet) = React.useState(() => None)
+  let (entryToSet: option<string>, setEntryToSet, getEntryToSet) = useStateWithGetter(() => None)
 
   let startOfCal = Date.makeWithYMD(~year=2010, ~month=0, ~date=1)
   let endOfCal = Date.makeWithYMD(~year=2030, ~month=0, ~date=1)
@@ -595,7 +650,22 @@ let make = () => {
   <div className="font-mono h-dvh">
     <div className="flex flex-row h-full">
       <div className="flex flex-col h-full flex-none w-64">
-        <Days start={startOfCal} end={endOfCal} dateSet={dateSet} setEntryToSet entryToSet />
+        <Days
+          start={startOfCal}
+          end={endOfCal}
+          dateSet={dateSet}
+          setEntryToSet
+          entryToSet
+          onClick={entryDate => {
+            getEntryToSet()->Option.mapOr((), entryId => {
+              updateEntry(entryId, e => {
+                ...e,
+                date: Some(entryDate),
+              })
+              setEntryToSet(_ => None)
+            })
+          }}
+        />
         <Months
           start={startOfCal}
           end={endOfCal}
@@ -608,6 +678,7 @@ let make = () => {
                 ...e,
                 date: Some(entryDate),
               })
+              setEntryToSet(_ => None)
             })
           }}
         />

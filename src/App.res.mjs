@@ -12,6 +12,23 @@ import * as JsxRuntime from "react/jsx-runtime";
 import UseLocalStorageJs from "./useLocalStorage.js";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
+function useStateWithGetter(initial) {
+  var match = React.useState(initial);
+  var state = match[0];
+  var stateRef = React.useRef(state);
+  React.useEffect((function () {
+          stateRef.current = state;
+        }), [state]);
+  var getState = function () {
+    return stateRef.current;
+  };
+  return [
+          state,
+          match[1],
+          getState
+        ];
+}
+
 function entryDateString(date) {
   switch (date.TAG) {
     case "Year" :
@@ -48,16 +65,24 @@ function hsl(h, s, l) {
                 ], Color.OKHSL, Color.sRGB));
 }
 
-function monthHue(monthInt, param) {
+function monthHue(monthInt) {
   return 360 / 12 * Math.imul(monthInt - 3 | 0, 5) % 360.0;
 }
 
-function monthColor(monthInt, year) {
-  return hsl(monthHue(monthInt, year), 1.0, 0.7);
+var monthColors = Core__Array.make(12, false).map(function (param, i) {
+      return hsl(monthHue(i), 1.0, 0.7);
+    });
+
+var monthColorsDim = Core__Array.make(12, false).map(function (param, i) {
+      return hsl(monthHue(i), 1.0, 0.3);
+    });
+
+function monthColor(monthInt) {
+  return monthColors[monthInt - 1 | 0];
 }
 
-function monthColorDim(monthInt, year) {
-  return hsl(monthHue(monthInt, year), 1.0, 0.3);
+function monthColorDim(monthInt) {
+  return monthColorsDim[monthInt - 1 | 0];
 }
 
 function App$Months(props) {
@@ -242,80 +267,121 @@ function App$Months(props) {
             });
 }
 
+function App$Day(props) {
+  var onClick = props.onClick;
+  var dateSet = props.dateSet;
+  var d = props.d;
+  var beginningOfWeek = d.getDay() === 0;
+  var year = d.getFullYear();
+  var month = d.getMonth() + 1 | 0;
+  var monthDay = d.getDate();
+  var monthColor$1 = monthColor(month);
+  var monthColorDim$1 = monthColorDim(month);
+  var isToday = DateFns.isSameDay(new Date(), d);
+  var tmp;
+  if (true && beginningOfWeek) {
+    var week = DateFns.format(d, "w");
+    tmp = Core__Option.mapOr(Core__Int.fromString(week, undefined), null, (function (weekNum) {
+            var hasWeekEntry = dateSet.has(entryDateString({
+                      TAG: "Week",
+                      _0: year,
+                      _1: weekNum
+                    }));
+            return JsxRuntime.jsx("button", {
+                        children: week,
+                        className: "text-xs text-left  overflow-visible text-nowrap p-1",
+                        style: {
+                          color: hasWeekEntry ? monthColor$1 : "#ddd"
+                        },
+                        onClick: (function (param) {
+                            onClick({
+                                  TAG: "Week",
+                                  _0: year,
+                                  _1: weekNum
+                                });
+                          })
+                      });
+          }));
+  } else {
+    tmp = null;
+  }
+  return JsxRuntime.jsxs(React.Fragment, {
+              children: [
+                true && beginningOfWeek ? JsxRuntime.jsx("div", {
+                        children: JsxRuntime.jsx("div", {
+                              className: "h-px w-full absolute-translate-y-1/2",
+                              style: {
+                                background: monthColor$1
+                              }
+                            }),
+                        className: "relative h-0 ml-px"
+                      }) : null,
+                JsxRuntime.jsxs("div", {
+                      children: [
+                        JsxRuntime.jsx("div", {
+                              children: tmp,
+                              className: " h-6 w-5 flex flex-row flex-none"
+                            }),
+                        JsxRuntime.jsx("div", {
+                              className: ["w-1 h-6 flex-none"].join(" "),
+                              style: {
+                                backgroundColor: monthColor$1
+                              }
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: DateFns.format(d, "y-MM-dd eee"),
+                              className: [
+                                  "px-2 flex-none",
+                                  isToday ? "border-r-4 border-white" : ""
+                                ].join(" "),
+                              style: {
+                                color: props.hasEntry ? monthColor$1 : monthColorDim$1
+                              },
+                              onClick: (function (param) {
+                                  onClick({
+                                        TAG: "Date",
+                                        _0: year,
+                                        _1: month,
+                                        _2: monthDay
+                                      });
+                                })
+                            }),
+                        JsxRuntime.jsx("div", {
+                              children: "Singapore",
+                              className: "text-neutral-500 flex-none"
+                            })
+                      ],
+                      className: "flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden"
+                    })
+              ]
+            });
+}
+
+var make = React.memo(App$Day, (function (a, b) {
+        if (a.d.getTime() === b.d.getTime()) {
+          return a.hasEntry === b.hasEntry;
+        } else {
+          return false;
+        }
+      }));
+
 function App$Days(props) {
+  var onClick = props.onClick;
   var dateSet = props.dateSet;
   return JsxRuntime.jsx("div", {
               children: allDays(props.start, props.end).map(function (d) {
-                    var beginningOfWeek = d.getDay() === 0;
-                    var week = DateFns.format(d, "w");
-                    var year = d.getFullYear();
-                    var hasEntry = dateSet.has(DateFns.format(d, "y-MM-dd"));
-                    var hasWeekEntry = Core__Option.mapOr(Core__Int.fromString(week, undefined), false, (function (weekNum) {
-                            return dateSet.has(entryDateString({
-                                            TAG: "Week",
-                                            _0: year,
-                                            _1: weekNum
-                                          }));
-                          }));
-                    var year$1 = d.getFullYear();
-                    var month = Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0);
-                    var monthColor$1 = monthColor(month, year$1);
-                    var monthColorDim$1 = monthColorDim(month, year$1);
-                    var isToday = DateFns.isSameDay(new Date(), d);
-                    return JsxRuntime.jsxs(React.Fragment, {
-                                children: [
-                                  true && beginningOfWeek ? JsxRuntime.jsx("div", {
-                                          children: JsxRuntime.jsx("div", {
-                                                className: "h-px w-full absolute-translate-y-1/2",
-                                                style: {
-                                                  background: monthColor$1
-                                                }
-                                              }),
-                                          className: "relative h-0 ml-px"
-                                        }) : null,
-                                  JsxRuntime.jsxs("div", {
-                                        children: [
-                                          JsxRuntime.jsx("div", {
-                                                children: true && beginningOfWeek ? JsxRuntime.jsx("div", {
-                                                        children: week,
-                                                        className: "text-xs text-left  overflow-visible text-nowrap p-1",
-                                                        style: {
-                                                          color: hasWeekEntry ? monthColor$1 : "#ddd"
-                                                        }
-                                                      }) : null,
-                                                className: " h-6 w-5 flex flex-row flex-none"
-                                              }),
-                                          JsxRuntime.jsx("div", {
-                                                className: ["w-1 h-6 flex-none"].join(" "),
-                                                style: {
-                                                  backgroundColor: monthColor$1
-                                                }
-                                              }),
-                                          JsxRuntime.jsx("div", {
-                                                children: DateFns.format(d, "y-MM-dd eee"),
-                                                className: [
-                                                    "px-2 flex-none",
-                                                    isToday ? "border-r-4 border-white" : ""
-                                                  ].join(" "),
-                                                style: {
-                                                  color: hasEntry ? monthColor$1 : monthColorDim$1
-                                                }
-                                              }),
-                                          JsxRuntime.jsx("div", {
-                                                children: "Singapore",
-                                                className: "text-neutral-500 flex-none"
-                                              })
-                                        ],
-                                        className: "flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden"
-                                      })
-                                ]
-                              }, DateFns.format(d, "y-MM-dd"));
+                    return JsxRuntime.jsx(make, {
+                                d: d,
+                                dateSet: dateSet,
+                                onClick: onClick,
+                                hasEntry: dateSet.has(DateFns.format(d, "y-MM-dd"))
+                              }, d.toString());
                   }),
               className: "w-full flex-2 p-2 overflow-y-scroll "
             });
 }
 
-var make = React.memo(App$Days, (function (a, b) {
+var make$1 = React.memo(App$Days, (function (a, b) {
         var dateSetId = function (x) {
           return Array.from(x.values()).toSorted(function (a, b) {
                         return a.localeCompare(b);
@@ -340,15 +406,31 @@ function App$TextArea(props) {
             });
 }
 
+function getMonthForWeekOfYear(weekNumber, year) {
+  var firstDayOfYear = new Date(year, 0, 1);
+  var dayOfWeek = firstDayOfYear.getDay();
+  if (dayOfWeek !== 1) {
+    var offset = dayOfWeek === 0 ? 1 : 8 - dayOfWeek | 0;
+    firstDayOfYear.setDate(firstDayOfYear.getDate() + offset | 0);
+  }
+  var dateOfWeek = new Date(firstDayOfYear.getTime());
+  dateOfWeek.setDate(firstDayOfYear.getDate() + Math.imul(weekNumber - 1 | 0, 7) | 0);
+  return dateOfWeek.getMonth() + 1 | 0;
+}
+
 function App$Entry(props) {
   var setEntryToSet = props.setEntryToSet;
   var updateEntry = props.updateEntry;
   var entry = props.entry;
   var monthColor$1 = Core__Option.mapOr(entry.date, "#fff", (function (date) {
-          if (date.TAG === "Date") {
-            return monthColor(date._1, 2000);
-          } else {
-            return "#fff";
+          switch (date.TAG) {
+            case "Week" :
+                return monthColor(getMonthForWeekOfYear(date._1, date._0));
+            case "Month" :
+            case "Date" :
+                return monthColor(date._1);
+            default:
+              return "#fff";
           }
         }));
   var dateDisplay = Core__Option.flatMap(entry.date, (function (date) {
@@ -411,7 +493,7 @@ function App$Entry(props) {
             }, entry.id);
 }
 
-var make$1 = React.memo(App$Entry, (function (a, b) {
+var make$2 = React.memo(App$Entry, (function (a, b) {
         return false;
       }));
 
@@ -422,7 +504,7 @@ function App$Entries(props) {
   return JsxRuntime.jsx("div", {
               children: Core__Option.mapOr(props.entries, null, (function (entries_) {
                       return entries_.map(function (entry) {
-                                  return JsxRuntime.jsx(make$1, {
+                                  return JsxRuntime.jsx(make$2, {
                                               entry: entry,
                                               updateEntry: updateEntry,
                                               setEntryToSet: setEntryToSet,
@@ -438,9 +520,10 @@ function App(props) {
   var match = UseLocalStorageJs("data", undefined);
   var setImportData = match[1];
   var importData = match[0];
-  var match$1 = React.useState(function () {
+  var match$1 = useStateWithGetter(function () {
         
       });
+  var getEntryToSet = match$1[2];
   var setEntryToSet = match$1[1];
   var entryToSet = match$1[0];
   var startOfCal = new Date(2010, 0, 1);
@@ -468,12 +551,27 @@ function App(props) {
                     children: [
                       JsxRuntime.jsxs("div", {
                             children: [
-                              JsxRuntime.jsx(make, {
+                              JsxRuntime.jsx(make$1, {
                                     start: startOfCal,
                                     end: endOfCal,
                                     dateSet: dateSet,
                                     setEntryToSet: setEntryToSet,
-                                    entryToSet: entryToSet
+                                    entryToSet: entryToSet,
+                                    onClick: (function (entryDate) {
+                                        Core__Option.mapOr(getEntryToSet(), undefined, (function (entryId) {
+                                                updateEntry(entryId, (function (e) {
+                                                        return {
+                                                                id: e.id,
+                                                                date: entryDate,
+                                                                title: e.title,
+                                                                content: e.content
+                                                              };
+                                                      }));
+                                                setEntryToSet(function (param) {
+                                                      
+                                                    });
+                                              }));
+                                      })
                                   }),
                               JsxRuntime.jsx(App$Months, {
                                     start: startOfCal,
@@ -491,6 +589,9 @@ function App(props) {
                                                                 content: e.content
                                                               };
                                                       }));
+                                                setEntryToSet(function (param) {
+                                                      
+                                                    });
                                               }));
                                       })
                                   })
@@ -519,9 +620,9 @@ function App(props) {
             });
 }
 
-var make$2 = App;
+var make$3 = App;
 
 export {
-  make$2 as make,
+  make$3 as make,
 }
-/* make Not a pure module */
+/* monthColors Not a pure module */
