@@ -17,6 +17,16 @@ let format = DateFns.format
 
 let ymdDate = (year, month, date) => Date.makeWithYMD(~year, ~month, ~date)
 
+let entryDateString = date =>
+  switch date {
+  | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd")
+  | Year(y) => y->Int.toPrecision(~digits=4)
+  | Half(y, h) => y->Int.toPrecision(~digits=4) ++ "-H" ++ h->Int.toPrecision(~digits=1)
+  | Quarter(y, q) => y->Int.toPrecision(~digits=4) ++ "-Q" ++ q->Int.toPrecision(~digits=1)
+  | Month(y, m) => y->Int.toPrecision(~digits=4) ++ m->Int.toPrecision(~digits=2)
+  | Week(y, w) => y->Int.toPrecision(~digits=4) ++ "-W" ++ w->Int.toPrecision(~digits=2)
+  }
+
 let day_of_ms = 1000 * 60 * 60 * 24
 
 let allDays = (start, end) => {
@@ -24,7 +34,7 @@ let allDays = (start, end) => {
 
   let dayDiff =
     Math.floor((end->Date.getTime -. inc->Date.getTime) /. day_of_ms->Int.toFloat)->Float.toInt
-  Array.make(~length=dayDiff, false)->Array.mapWithIndex((_, i) => {
+  Array.make(~length=dayDiff, false)->Array.mapWithIndex((_, _i) => {
     let result = inc->Date.getTime->Date.fromTime
     inc->Date.setDate(inc->Date.getDate + 1)
     result
@@ -120,26 +130,27 @@ let monthColorDim = (monthInt, year) => {
 
 module Months = {
   @react.component
-  let make = (~start, ~end) => {
+  let make = (~start, ~end, ~dateSet) => {
     <div className="p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full">
       {allDays(start, end)
       ->Array.map(d => {
-        let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
+        // let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
         let beginningOfMonth = d->Date.getDate == 1
         let beginningOfYear = d->DateFns.getDayOfYear == 1
-        let beginningOfQuarter = mod(month, 3) == 1
-        let beginningOfHalf = mod(month, 6) == 1
-        let hasYearEntry = Math.random() > 0.7
-        let hasH1Entry = Math.random() > 0.7
-        let hasH2Entry = Math.random() > 0.7
-        let hasQ1Entry = Math.random() > 0.7
-        let hasQ2Entry = Math.random() > 0.7
-        let hasQ3Entry = Math.random() > 0.7
-        let hasQ4Entry = Math.random() > 0.7
+
+        // let beginningOfQuarter = mod(month, 3) == 1
+        // let beginningOfHalf = mod(month, 6) == 1
+        let year = d->Date.getFullYear
+
+        let hasYearEntry = dateSet->Set.has(Year(year)->entryDateString)
+        // let hasH1Entry = Math.random() > 0.7
+        // let hasH2Entry = Math.random() > 0.7
+        let hasQ1Entry = dateSet->Set.has(Quarter(year, 1)->entryDateString)
+        let hasQ2Entry = dateSet->Set.has(Quarter(year, 2)->entryDateString)
+        let hasQ3Entry = dateSet->Set.has(Quarter(year, 3)->entryDateString)
+        let hasQ4Entry = dateSet->Set.has(Quarter(year, 4)->entryDateString)
 
         let entryCheck = x => x ? `text-lime-500 bg-black` : "text-neutral-600 bg-black"
-
-        let year = d->Date.getFullYear
 
         beginningOfMonth
           ? <React.Fragment>
@@ -213,12 +224,13 @@ module Months = {
                       // <Icons.Leaf />
                     </div>
                     {Array.make(~length=12, false)
-                    ->Array.mapWithIndex((v, i) => {
+                    ->Array.mapWithIndex((_v, i) => {
                       let monthNum = (i + 1)->Int.toString
-                      let monthColorDim = monthColorDim(i + 1, year)
-                      let monthColor = monthColor(i + 1, year)
-                      let hasEntry = Math.random() > 0.7
+                      // let monthColorDim = monthColorDim(i + 1, year)
+                      // let monthColor = monthColor(i + 1, year)
                       let monthDate = Date.makeWithYM(~year, ~month=i)
+
+                      let hasEntry = dateSet->Set.has(Month(year, i + 1)->entryDateString)
 
                       <div
                         className={[
@@ -293,35 +305,22 @@ module Months = {
 //     backgroundColor: weekColor(d->DateFns.format("w")->Int.fromString->Option.getOr(0)),
 //   }}
 // />
+
 module Days = {
   @react.component
-  let make = (~start, ~end, ~entries) => {
-    let dateSet =
-      entries
-      ->Option.getOr([])
-      ->Array.map(entry => entry.date)
-      ->Array.keepSome
-      ->Array.map(date =>
-        switch date {
-        | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd")->Some
-        | _ => None
-        }
-      )
-      ->Array.keepSome
-      ->Set.fromArray
-
+  let make = (~start, ~end, ~dateSet) => {
     <div className="w-full flex-2 p-2 overflow-y-scroll ">
       {allDays(start, end)
       ->Array.map(d => {
         let beginningOfWeek = d->Date.getDay == 0
-        let beginningOfMonth = d->Date.getDate == 1
-        let beginningOfYear = d->DateFns.getDayOfYear == 1
+        // let beginningOfMonth = d->Date.getDate == 1
+        // let beginningOfYear = d->DateFns.getDayOfYear == 1
 
         let hasEntry = dateSet->Set.has(d->format("y-MM-dd"))
 
         let year = d->Date.getFullYear
         let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
-        let monthDay = d->DateFns.format("dd")->Int.fromString->Option.getOr(0)
+        // let monthDay = d->DateFns.format("dd")->Int.fromString->Option.getOr(0)
         let monthColor = monthColor(month, year)
         let monthColorDim = monthColorDim(month, year)
         let isToday = DateFns.isSameDay(Date.make(), d)
@@ -423,7 +422,7 @@ module Entries = {
             "#fff",
             date => {
               switch date {
-              | Date(y, m, d) => monthColor(m, 2000)
+              | Date(_y, m, _d) => monthColor(m, 2000)
               | _ => "#fff"
               }
             },
@@ -432,7 +431,7 @@ module Entries = {
           let dateDisplay = entry.date->Option.flatMap(
             date => {
               switch date {
-              | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd")->Some
+              | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd eee")->Some
               | _ => None
               }
             },
@@ -517,8 +516,8 @@ let make = () => {
     None
   })
 
-  let showWeekNumber = false
-  let showMonthNumber = false
+  // let showWeekNumber = false
+  // let showMonthNumber = false
 
   let updateEntry = (id, newValue) => {
     setImportData(v =>
@@ -535,11 +534,22 @@ let make = () => {
       })
     )
   }
+
+  let entries = importData
+
+  let dateSet =
+    entries
+    ->Option.getOr([])
+    ->Array.map(entry => entry.date)
+    ->Array.keepSome
+    ->Array.map(date => date->entryDateString)
+    ->Set.fromArray
+
   <div className="font-mono h-dvh">
     <div className="flex flex-row h-full">
       <div className="flex flex-col h-full flex-none w-64">
-        <Days start={startOfCal} end={endOfCal} entries={importData} />
-        <Months start={startOfCal} end={endOfCal} />
+        <Days start={startOfCal} end={endOfCal} dateSet={dateSet} />
+        <Months start={startOfCal} end={endOfCal} dateSet={dateSet} />
       </div>
       <Entries entries={importData} updateEntry={updateEntry} />
     </div>

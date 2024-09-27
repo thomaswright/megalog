@@ -10,10 +10,28 @@ import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
+function entryDateString(date) {
+  switch (date.TAG) {
+    case "Year" :
+        return date._0.toPrecision(4);
+    case "Half" :
+        return date._0.toPrecision(4) + "-H" + date._1.toPrecision(1);
+    case "Quarter" :
+        return date._0.toPrecision(4) + "-Q" + date._1.toPrecision(1);
+    case "Month" :
+        return date._0.toPrecision(4) + date._1.toPrecision(2);
+    case "Week" :
+        return date._0.toPrecision(4) + "-W" + date._1.toPrecision(2);
+    case "Date" :
+        return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd");
+    
+  }
+}
+
 function allDays(start, end) {
   var inc = new Date(start.getTime());
   var dayDiff = Math.floor((end.getTime() - inc.getTime()) / 86400000) | 0;
-  return Core__Array.make(dayDiff, false).map(function (param, i) {
+  return Core__Array.make(dayDiff, false).map(function (param, _i) {
               var result = new Date(inc.getTime());
               inc.setDate(inc.getDate() + 1 | 0);
               return result;
@@ -41,19 +59,36 @@ function monthColorDim(monthInt, year) {
 }
 
 function App$Months(props) {
+  var dateSet = props.dateSet;
   return JsxRuntime.jsx("div", {
               children: allDays(props.start, props.end).map(function (d) {
-                    Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0);
                     var beginningOfMonth = d.getDate() === 1;
                     var beginningOfYear = DateFns.getDayOfYear(d) === 1;
-                    var hasYearEntry = Math.random() > 0.7;
-                    Math.random() > 0.7;
-                    Math.random() > 0.7;
-                    var hasQ1Entry = Math.random() > 0.7;
-                    var hasQ2Entry = Math.random() > 0.7;
-                    var hasQ3Entry = Math.random() > 0.7;
-                    var hasQ4Entry = Math.random() > 0.7;
                     var year = d.getFullYear();
+                    var hasYearEntry = dateSet.has(entryDateString({
+                              TAG: "Year",
+                              _0: year
+                            }));
+                    var hasQ1Entry = dateSet.has(entryDateString({
+                              TAG: "Quarter",
+                              _0: year,
+                              _1: 1
+                            }));
+                    var hasQ2Entry = dateSet.has(entryDateString({
+                              TAG: "Quarter",
+                              _0: year,
+                              _1: 2
+                            }));
+                    var hasQ3Entry = dateSet.has(entryDateString({
+                              TAG: "Quarter",
+                              _0: year,
+                              _1: 3
+                            }));
+                    var hasQ4Entry = dateSet.has(entryDateString({
+                              TAG: "Quarter",
+                              _0: year,
+                              _1: 4
+                            }));
                     if (beginningOfMonth) {
                       return JsxRuntime.jsx(React.Fragment, {
                                   children: beginningOfYear ? JsxRuntime.jsxs("div", {
@@ -123,12 +158,14 @@ function App$Months(props) {
                                                     gridArea: "q4"
                                                   }
                                                 }),
-                                            Core__Array.make(12, false).map(function (v, i) {
+                                            Core__Array.make(12, false).map(function (_v, i) {
                                                   var monthNum = (i + 1 | 0).toString();
-                                                  monthColorDim(i + 1 | 0, year);
-                                                  monthColor(i + 1 | 0, year);
-                                                  var hasEntry = Math.random() > 0.7;
                                                   var monthDate = new Date(year, i);
+                                                  var hasEntry = dateSet.has(entryDateString({
+                                                            TAG: "Month",
+                                                            _0: year,
+                                                            _1: i + 1 | 0
+                                                          }));
                                                   return JsxRuntime.jsx("div", {
                                                               children: JsxRuntime.jsx("div", {
                                                                     children: DateFns.format(monthDate, "MMM"),
@@ -162,23 +199,13 @@ function App$Months(props) {
 }
 
 function App$Days(props) {
-  var dateSet = new Set(Core__Array.keepSome(Core__Array.keepSome(Core__Option.getOr(props.entries, []).map(function (entry) {
-                      return entry.date;
-                    })).map(function (date) {
-                if (date.TAG === "Date") {
-                  return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd");
-                }
-                
-              })));
+  var dateSet = props.dateSet;
   return JsxRuntime.jsx("div", {
               children: allDays(props.start, props.end).map(function (d) {
                     var beginningOfWeek = d.getDay() === 0;
-                    d.getDate() === 1;
-                    DateFns.getDayOfYear(d) === 1;
                     var hasEntry = dateSet.has(DateFns.format(d, "y-MM-dd"));
                     var year = d.getFullYear();
                     var month = Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "M"), undefined), 0);
-                    Core__Option.getOr(Core__Int.fromString(DateFns.format(d, "dd"), undefined), 0);
                     var monthColor$1 = monthColor(month, year);
                     var monthColorDim$1 = monthColorDim(month, year);
                     var isToday = DateFns.isSameDay(new Date(), d);
@@ -258,7 +285,7 @@ function App$Entries(props) {
                                         }));
                                   var dateDisplay = Core__Option.flatMap(entry.date, (function (date) {
                                           if (date.TAG === "Date") {
-                                            return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd");
+                                            return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd eee");
                                           }
                                           
                                         }));
@@ -365,6 +392,11 @@ function App(props) {
                       }));
         });
   };
+  var dateSet = new Set(Core__Array.keepSome(Core__Option.getOr(importData, []).map(function (entry) {
+                  return entry.date;
+                })).map(function (date) {
+            return entryDateString(date);
+          }));
   return JsxRuntime.jsx("div", {
               children: JsxRuntime.jsxs("div", {
                     children: [
@@ -373,11 +405,12 @@ function App(props) {
                               JsxRuntime.jsx(App$Days, {
                                     start: startOfCal,
                                     end: endOfCal,
-                                    entries: importData
+                                    dateSet: dateSet
                                   }),
                               JsxRuntime.jsx(App$Months, {
                                     start: startOfCal,
-                                    end: endOfCal
+                                    end: endOfCal,
+                                    dateSet: dateSet
                                   })
                             ],
                             className: "flex flex-col h-full flex-none w-64"
