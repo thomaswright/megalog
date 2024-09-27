@@ -365,6 +365,19 @@ module Days = {
       ->React.array}
     </div>
   }
+
+  let make = React.memoCustomCompareProps(make, (a, b) => {
+    let dateSetId = x =>
+      x
+      ->Set.values
+      ->Iterator.toArray
+      ->Array.toSorted((a, b) => String.localeCompare(a, b))
+      ->Array.join("")
+
+    a.start->format("y-MM-dd") == b.start->format("y-MM-dd") &&
+    a.end->format("y-MM-dd") == b.end->format("y-MM-dd") &&
+    a.dateSet->dateSetId == b.dateSet->dateSetId
+  })
 }
 
 type importData = array<(string, string)>
@@ -410,56 +423,62 @@ module Editor = TextArea
 
 @val external isInvalidDate: Date.t => bool = "isNaN"
 
+module Entry = {
+  @react.component
+  let make = (~entry, ~updateEntry: (string, string) => unit) => {
+    let monthColor = entry.date->Option.mapOr("#fff", date => {
+      switch date {
+      | Date(_y, m, _d) => monthColor(m, 2000)
+      | _ => "#fff"
+      }
+    })
+
+    let dateDisplay = entry.date->Option.flatMap(date => {
+      switch date {
+      | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd eee")->Some
+      | _ => None
+      }
+    })
+
+    <div key={entry.id}>
+      <div
+        className=" py-2 border-b "
+        style={{
+          color: monthColor,
+          borderColor: monthColor,
+        }}>
+        {dateDisplay->Option.mapOr(React.null, dateDisplay_ => {
+          <span className="pr-2"> {dateDisplay_->React.string} </span>
+        })}
+        <span className=" text-white"> {entry.title->React.string} </span>
+      </div>
+      <div className="py-2">
+        <div className="rounded overflow-hidden">
+          <Editor content={entry.content} onChange={newValue => updateEntry(entry.id, newValue)} />
+        </div>
+      </div>
+    </div>
+  }
+
+  let make = React.memoCustomCompareProps(make, (a, b) => {
+    false
+    // switch (a.entry.date, b.entry.date) {
+    // | (Some(x), Some(y)) => x->entryDateString == y->entryDateString
+    // | (None, None) => true
+    // | _ => false
+    // } &&
+    // a.entry.content == b.entry.content
+  })
+}
+
 module Entries = {
   @react.component
   let make = (~entries: option<array<entry>>, ~updateEntry: (string, string) => unit) => {
     <div className="text-xs leading-none flex-1 h-full overflow-y-scroll">
       {entries->Option.mapOr(React.null, entries_ => {
         entries_
-        // ->Array.filterWithIndex((_, i) => i > 20 && i < 30)
         ->Array.map(entry => {
-          let monthColor = entry.date->Option.mapOr(
-            "#fff",
-            date => {
-              switch date {
-              | Date(_y, m, _d) => monthColor(m, 2000)
-              | _ => "#fff"
-              }
-            },
-          )
-
-          let dateDisplay = entry.date->Option.flatMap(
-            date => {
-              switch date {
-              | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd eee")->Some
-              | _ => None
-              }
-            },
-          )
-
-          <div key={entry.id}>
-            <div
-              className=" py-2 border-b "
-              style={{
-                color: monthColor,
-                borderColor: monthColor,
-              }}>
-              {dateDisplay->Option.mapOr(
-                React.null,
-                dateDisplay_ => {
-                  <span className="pr-2"> {dateDisplay_->React.string} </span>
-                },
-              )}
-              <span className=" text-white"> {entry.title->React.string} </span>
-            </div>
-            <div className="py-2">
-              <div className="rounded overflow-hidden">
-                <Editor
-                  content={entry.content} onChange={newValue => updateEntry(entry.id, newValue)}
-                />
-              </div>
-            </div>
-          </div>
+          <Entry entry updateEntry />
         })
         ->React.array
       })}
@@ -467,9 +486,14 @@ module Entries = {
   }
 }
 
+// @module("./useLocalStorage.js")
+// external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "default"
+@module("@uidotdev/usehooks")
+external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "useLocalStorage"
+
 @react.component
 let make = () => {
-  let (importData, setImportData) = React.useState(() => None)
+  let (importData, setImportData) = useLocalStorage("data", None)
 
   let startOfCal = Date.makeWithYMD(~year=2010, ~month=0, ~date=1)
   let endOfCal = Date.makeWithYMD(~year=2030, ~month=0, ~date=1)
@@ -492,48 +516,50 @@ let make = () => {
         }
   }
 
-  React.useEffect0(() => {
-    fetch("../testData/test.json")
-    ->Promise.then(response => {
-      json(response)
-    })
-    ->Promise.then(json => {
-      setImportData(
-        _ => Some(
-          json->Array.mapWithIndex(
-            ((name, content), i) => {
-              id: i->Int.toString,
-              date: getDate(name),
-              title: name,
-              content,
-            },
-          ),
-        ),
-      )
-      Promise.resolve()
-    })
-    ->ignore
-    None
-  })
+  // React.useEffect0(() => {
+  //   fetch("../testData/test.json")
+  //   ->Promise.then(response => {
+  //     json(response)
+  //   })
+  //   ->Promise.then(json => {
+  //     setImportData(
+  //       _ => Some(
+  //         json->Array.mapWithIndex(
+  //           ((name, content), i) => {
+  //             id: i->Int.toString,
+  //             date: getDate(name),
+  //             title: name,
+  //             content,
+  //           },
+  //         ),
+  //       ),
+  //     )
+  //     Promise.resolve()
+  //   })
+  //   ->ignore
+  //   None
+  // })
 
-  // let showWeekNumber = false
-  // let showMonthNumber = false
+  let showWeekNumber = false
+  let showMonthNumber = false
 
-  let updateEntry = (id, newValue) => {
+  let updateEntry = React.useCallback1((id, newValue) => {
     setImportData(v =>
-      v->Option.map(v_ => {
-        v_->Array.map(
-          entry =>
-            entry.id == id
-              ? {
-                  ...entry,
-                  content: newValue,
-                }
-              : entry,
-        )
-      })
+      v->Option.map(
+        v_ => {
+          v_->Array.map(
+            entry =>
+              entry.id == id
+                ? {
+                    ...entry,
+                    content: newValue,
+                  }
+                : entry,
+          )
+        },
+      )
     )
-  }
+  }, [setImportData])
 
   let entries = importData
 

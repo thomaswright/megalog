@@ -8,6 +8,7 @@ import MonacoJsx from "./Monaco.jsx";
 import * as Color from "@texel/color";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
+import * as Usehooks from "@uidotdev/usehooks";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
 function entryDateString(date) {
@@ -259,6 +260,19 @@ function App$Days(props) {
             });
 }
 
+var make = React.memo(App$Days, (function (a, b) {
+        var dateSetId = function (x) {
+          return Array.from(x.values()).toSorted(function (a, b) {
+                        return a.localeCompare(b);
+                      }).join("");
+        };
+        if (DateFns.format(a.start, "y-MM-dd") === DateFns.format(b.start, "y-MM-dd") && DateFns.format(a.end, "y-MM-dd") === DateFns.format(b.end, "y-MM-dd")) {
+          return dateSetId(a.dateSet) === dateSetId(b.dateSet);
+        } else {
+          return false;
+        }
+      }));
+
 function App$TextArea(props) {
   var onChange = props.onChange;
   return JsxRuntime.jsx(ReactTextareaAutosize, {
@@ -271,59 +285,72 @@ function App$TextArea(props) {
             });
 }
 
+function App$Entry(props) {
+  var updateEntry = props.updateEntry;
+  var entry = props.entry;
+  var monthColor$1 = Core__Option.mapOr(entry.date, "#fff", (function (date) {
+          if (date.TAG === "Date") {
+            return monthColor(date._1, 2000);
+          } else {
+            return "#fff";
+          }
+        }));
+  var dateDisplay = Core__Option.flatMap(entry.date, (function (date) {
+          if (date.TAG === "Date") {
+            return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd eee");
+          }
+          
+        }));
+  return JsxRuntime.jsxs("div", {
+              children: [
+                JsxRuntime.jsxs("div", {
+                      children: [
+                        Core__Option.mapOr(dateDisplay, null, (function (dateDisplay_) {
+                                return JsxRuntime.jsx("span", {
+                                            children: dateDisplay_,
+                                            className: "pr-2"
+                                          });
+                              })),
+                        JsxRuntime.jsx("span", {
+                              children: entry.title,
+                              className: " text-white"
+                            })
+                      ],
+                      className: " py-2 border-b ",
+                      style: {
+                        borderColor: monthColor$1,
+                        color: monthColor$1
+                      }
+                    }),
+                JsxRuntime.jsx("div", {
+                      children: JsxRuntime.jsx("div", {
+                            children: JsxRuntime.jsx(App$TextArea, {
+                                  content: entry.content,
+                                  onChange: (function (newValue) {
+                                      updateEntry(entry.id, newValue);
+                                    })
+                                }),
+                            className: "rounded overflow-hidden"
+                          }),
+                      className: "py-2"
+                    })
+              ]
+            }, entry.id);
+}
+
+var make$1 = React.memo(App$Entry, (function (a, b) {
+        return false;
+      }));
+
 function App$Entries(props) {
   var updateEntry = props.updateEntry;
   return JsxRuntime.jsx("div", {
               children: Core__Option.mapOr(props.entries, null, (function (entries_) {
                       return entries_.map(function (entry) {
-                                  var monthColor$1 = Core__Option.mapOr(entry.date, "#fff", (function (date) {
-                                          if (date.TAG === "Date") {
-                                            return monthColor(date._1, 2000);
-                                          } else {
-                                            return "#fff";
-                                          }
-                                        }));
-                                  var dateDisplay = Core__Option.flatMap(entry.date, (function (date) {
-                                          if (date.TAG === "Date") {
-                                            return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd eee");
-                                          }
-                                          
-                                        }));
-                                  return JsxRuntime.jsxs("div", {
-                                              children: [
-                                                JsxRuntime.jsxs("div", {
-                                                      children: [
-                                                        Core__Option.mapOr(dateDisplay, null, (function (dateDisplay_) {
-                                                                return JsxRuntime.jsx("span", {
-                                                                            children: dateDisplay_,
-                                                                            className: "pr-2"
-                                                                          });
-                                                              })),
-                                                        JsxRuntime.jsx("span", {
-                                                              children: entry.title,
-                                                              className: " text-white"
-                                                            })
-                                                      ],
-                                                      className: " py-2 border-b ",
-                                                      style: {
-                                                        borderColor: monthColor$1,
-                                                        color: monthColor$1
-                                                      }
-                                                    }),
-                                                JsxRuntime.jsx("div", {
-                                                      children: JsxRuntime.jsx("div", {
-                                                            children: JsxRuntime.jsx(App$TextArea, {
-                                                                  content: entry.content,
-                                                                  onChange: (function (newValue) {
-                                                                      updateEntry(entry.id, newValue);
-                                                                    })
-                                                                }),
-                                                            className: "rounded overflow-hidden"
-                                                          }),
-                                                      className: "py-2"
-                                                    })
-                                              ]
-                                            }, entry.id);
+                                  return JsxRuntime.jsx(make$1, {
+                                              entry: entry,
+                                              updateEntry: updateEntry
+                                            });
                                 });
                     })),
               className: "text-xs leading-none flex-1 h-full overflow-y-scroll"
@@ -331,67 +358,29 @@ function App$Entries(props) {
 }
 
 function App(props) {
-  var match = React.useState(function () {
-        
-      });
+  var match = Usehooks.useLocalStorage("data", undefined);
   var setImportData = match[1];
   var importData = match[0];
   var startOfCal = new Date(2010, 0, 1);
   var endOfCal = new Date(2030, 0, 1);
-  var getDate = function (name) {
-    var date = DateFns.parse(name.substring(0, 10), "y-MM-dd", 0);
-    if (isNaN(date)) {
-      return ;
-    }
-    var match = Core__Int.fromString(DateFns.format(date, "y"), undefined);
-    var match$1 = Core__Int.fromString(DateFns.format(date, "MM"), undefined);
-    var match$2 = Core__Int.fromString(DateFns.format(date, "dd"), undefined);
-    if (match !== undefined && match$1 !== undefined && match$2 !== undefined) {
-      return {
-              TAG: "Date",
-              _0: match,
-              _1: match$1,
-              _2: match$2
-            };
-    }
-    
-  };
-  React.useEffect((function () {
-          fetch("../testData/test.json").then(function (response) {
-                  return response.json();
-                }).then(function (json) {
-                setImportData(function (param) {
-                      return json.map(function (param, i) {
-                                  var name = param[0];
-                                  return {
-                                          id: i.toString(),
-                                          date: getDate(name),
-                                          title: name,
-                                          content: param[1]
-                                        };
-                                });
-                    });
-                return Promise.resolve();
+  var updateEntry = React.useCallback((function (id, newValue) {
+          setImportData(function (v) {
+                return Core__Option.map(v, (function (v_) {
+                              return v_.map(function (entry) {
+                                          if (entry.id === id) {
+                                            return {
+                                                    id: entry.id,
+                                                    date: entry.date,
+                                                    title: entry.title,
+                                                    content: newValue
+                                                  };
+                                          } else {
+                                            return entry;
+                                          }
+                                        });
+                            }));
               });
-        }), []);
-  var updateEntry = function (id, newValue) {
-    setImportData(function (v) {
-          return Core__Option.map(v, (function (v_) {
-                        return v_.map(function (entry) {
-                                    if (entry.id === id) {
-                                      return {
-                                              id: entry.id,
-                                              date: entry.date,
-                                              title: entry.title,
-                                              content: newValue
-                                            };
-                                    } else {
-                                      return entry;
-                                    }
-                                  });
-                      }));
-        });
-  };
+        }), [setImportData]);
   var dateSet = new Set(Core__Array.keepSome(Core__Option.getOr(importData, []).map(function (entry) {
                   return entry.date;
                 })).map(function (date) {
@@ -402,7 +391,7 @@ function App(props) {
                     children: [
                       JsxRuntime.jsxs("div", {
                             children: [
-                              JsxRuntime.jsx(App$Days, {
+                              JsxRuntime.jsx(make, {
                                     start: startOfCal,
                                     end: endOfCal,
                                     dateSet: dateSet
@@ -426,9 +415,9 @@ function App(props) {
             });
 }
 
-var make = App;
+var make$2 = App;
 
 export {
-  make ,
+  make$2 as make,
 }
-/*  Not a pure module */
+/* make Not a pure module */
