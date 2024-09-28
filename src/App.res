@@ -5,6 +5,9 @@ external getElementById: string => Js.Nullable.t<Dom.element> = "getElementById"
 external getElementsByClassName: string => Js.Nullable.t<array<Dom.element>> =
   "getElementsByClassName"
 
+@val @scope("document")
+external documentQuerySelector: string => Js.Nullable.t<Dom.element> = "querySelector"
+
 @send
 external scrollIntoView: (Dom.element, {"behavior": string, "block": string}) => unit =
   "scrollIntoView"
@@ -17,6 +20,9 @@ external selectionStart: (Dom.element, int) => unit = "selectionStart"
 
 @set
 external selectionEnd: (Dom.element, int) => unit = "selectionEnd"
+
+@send
+external querySelector: (Dom.element, string) => Js.Nullable.t<Dom.element> = "querySelector"
 
 @get @scope("value") external textAreaLength: Dom.element => int = "length"
 
@@ -574,9 +580,9 @@ module Entry = {
           element->focus
         })
       })
-    <div key={entry.id}>
+    <div className={entry.date->entryClassNameId} key={entry.id}>
       <div
-        className={[" py-2 border-b flex flex-row items-center pr-4"]->Array.join(" ")}
+        className={["heading py-2 border-b flex flex-row items-center pr-4"]->Array.join(" ")}
         style={{
           color: monthColor,
           borderColor: monthColor,
@@ -638,7 +644,7 @@ module Entry = {
       <div className="py-2">
         <div className="rounded overflow-hidden">
           <Editor
-            className={entry.date->entryClassNameId}
+            className={"editor"}
             content={entry.content}
             onChange={newContent => updateEntry(entry.id, v => {...v, content: newContent})}
             readonly={entry.lock}
@@ -696,13 +702,29 @@ let make = () => {
       ->Option.flatMap(x => x->Array.get(0))
     )
     ->Option.mapOr((), element => {
-      element->scrollIntoView({
-        "behavior": "smooth",
-        "block": "center",
-      })
-      element->focus
-      element->selectionStart(element->textAreaLength)
-      element->selectionEnd(element->textAreaLength)
+      element
+      ->querySelector(".heading")
+      ->Js.Nullable.toOption
+      ->Option.mapOr(
+        (),
+        headingElement => {
+          headingElement->scrollIntoView({
+            "behavior": "smooth",
+            "block": "center",
+          })
+        },
+      )
+      element
+      ->querySelector(".editor")
+      ->Js.Nullable.toOption
+      ->Option.mapOr(
+        (),
+        editorElement => {
+          editorElement->focus
+          // element->selectionStart(element->textAreaLength)
+          // element->selectionEnd(element->textAreaLength)
+        },
+      )
 
       // element->focus
       scrollToRef.current = None
@@ -782,13 +804,24 @@ let make = () => {
           x =>
             switch x {
             | Some(element) => {
-                element->scrollIntoView({
-                  "behavior": "smooth",
-                  "block": "center",
+                element
+                ->querySelector(".heading")
+                ->Js.Nullable.toOption
+                ->Option.mapOr((), headingElement => {
+                  headingElement->scrollIntoView({
+                    "behavior": "smooth",
+                    "block": "center",
+                  })
                 })
-                element->focus
-                element->selectionStart(element->textAreaLength)
-                element->selectionEnd(element->textAreaLength)
+
+                element
+                ->querySelector(".editor")
+                ->Js.Nullable.toOption
+                ->Option.mapOr((), editorElement => {
+                  editorElement->focus
+                  // element->selectionStart(element->textAreaLength)
+                  // element->selectionEnd(element->textAreaLength)
+                })
               }
             | None => {
                 makeNewEntry(entryDate)

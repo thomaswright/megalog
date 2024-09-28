@@ -574,7 +574,7 @@ function App$Entry(props) {
                               className: "flex flex-row items-center"
                             })
                       ],
-                      className: [" py-2 border-b flex flex-row items-center pr-4"].join(" "),
+                      className: ["heading py-2 border-b flex flex-row items-center pr-4"].join(" "),
                       style: {
                         borderColor: monthColor$1,
                         color: monthColor$1
@@ -595,14 +595,15 @@ function App$Entry(props) {
                                                     };
                                             }));
                                     }),
-                                  className: entryClassNameId(entry.date),
+                                  className: "editor",
                                   readonly: entry.lock
                                 }),
                             className: "rounded overflow-hidden"
                           }),
                       className: "py-2"
                     })
-              ]
+              ],
+              className: entryClassNameId(entry.date)
             }, entry.id);
 }
 
@@ -647,13 +648,15 @@ function App(props) {
                                   return x[0];
                                 }));
                   })), undefined, (function (element) {
-                element.scrollIntoView({
-                      behavior: "smooth",
-                      block: "center"
-                    });
-                element.focus();
-                element.selectionStart = element.value.length;
-                element.selectionEnd = element.value.length;
+                Core__Option.mapOr(Caml_option.nullable_to_opt(element.querySelector(".heading")), undefined, (function (headingElement) {
+                        headingElement.scrollIntoView({
+                              behavior: "smooth",
+                              block: "center"
+                            });
+                      }));
+                Core__Option.mapOr(Caml_option.nullable_to_opt(element.querySelector(".editor")), undefined, (function (editorElement) {
+                        editorElement.focus();
+                      }));
                 scrollToRef.current = undefined;
               }));
       });
@@ -712,14 +715,15 @@ function App(props) {
     Core__Option.mapOr(getEntryToSet(), (function (x) {
               if (x !== undefined) {
                 var element = Caml_option.valFromOption(x);
-                element.scrollIntoView({
-                      behavior: "smooth",
-                      block: "center"
-                    });
-                element.focus();
-                element.selectionStart = element.value.length;
-                element.selectionEnd = element.value.length;
-                return ;
+                Core__Option.mapOr(Caml_option.nullable_to_opt(element.querySelector(".heading")), undefined, (function (headingElement) {
+                        headingElement.scrollIntoView({
+                              behavior: "smooth",
+                              block: "center"
+                            });
+                      }));
+                return Core__Option.mapOr(Caml_option.nullable_to_opt(element.querySelector(".editor")), undefined, (function (editorElement) {
+                              editorElement.focus();
+                            }));
               }
               makeNewEntry(entryDate);
               scrollToRef.current = entryClassNameId(entryDate);
