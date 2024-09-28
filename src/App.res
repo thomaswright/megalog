@@ -562,7 +562,18 @@ module Entry = {
     })
 
     let isSelectedForSet = entryToSet->Option.mapOr(false, v => v == entry.id)
-
+    let goToDay = () =>
+      entry.date->Option.mapOr((), entryDate => {
+        getElementById(`day-${entryDate->entryDateString}`)
+        ->Js.Nullable.toOption
+        ->Option.mapOr((), element => {
+          element->scrollIntoView({
+            "behavior": "smooth",
+            "block": "center",
+          })
+          element->focus
+        })
+      })
     <div key={entry.id}>
       <div
         className={[" py-2 border-b flex flex-row items-center pr-4"]->Array.join(" ")}
@@ -571,7 +582,21 @@ module Entry = {
           borderColor: monthColor,
         }}>
         {dateDisplay->Option.mapOr(React.null, dateDisplay_ => {
-          <span className="pr-2"> {dateDisplay_->React.string} </span>
+          <span
+            className="cursor-pointer mr-2"
+            style={{
+              color: isSelectedForSet ? "black" : monthColor,
+              backgroundColor: isSelectedForSet ? monthColor : "transparent",
+            }}
+            onClick={_ => {
+              if isSelectedForSet {
+                setEntryToSet(_ => None)
+              } else {
+                goToDay()
+              }
+            }}>
+            {dateDisplay_->React.string}
+          </span>
         })}
         <span className=" text-white"> {entry.title->React.string} </span>
         <span className="flex-1" />
@@ -584,29 +609,18 @@ module Entry = {
               </button>
             : <React.Fragment>
                 <button
-                  className={[
-                    "mx-1",
-                    isSelectedForSet ? "bg-blue-700 text-white" : "bg-white text-black",
-                  ]->Array.join(" ")}
+                  className={["mx-1 text-black"]->Array.join(" ")}
+                  style={{
+                    backgroundColor: isSelectedForSet ? monthColor : "white",
+                  }}
                   onClick={_ => setEntryToSet(v => v == Some(entry.id) ? None : Some(entry.id))}>
                   {"Set"->React.string}
                 </button>
-                <button
-                  className={["mx-1", "bg-white text-black"]->Array.join(" ")}
-                  onClick={_ =>
-                    entry.date->Option.mapOr((), entryDate => {
-                      getElementById(`day-${entryDate->entryDateString}`)
-                      ->Js.Nullable.toOption
-                      ->Option.mapOr((), element => {
-                        element->scrollIntoView({
-                          "behavior": "smooth",
-                          "block": "center",
-                        })
-                        element->focus
-                      })
-                    })}>
-                  {"Go to date"->React.string}
-                </button>
+                // <button
+                //   className={["mx-1", "bg-white text-black"]->Array.join(" ")}
+                //   onClick={_ => goToDay()}>
+                //   {"Go to date"->React.string}
+                // </button>
                 <button
                   className={["mx-1", "bg-white text-black"]->Array.join(" ")}
                   onClick={_ => deleteEntry(entry.id)}>
@@ -794,11 +808,8 @@ let make = () => {
     )
   }
 
-  <div className="relative font-mono h-dvh">
-    <div className="absolute top-1 right-1">
-      <button onClick={_ => setEntries(v => v->sortEntries)}> {"Sort"->React.string} </button>
-    </div>
-    <div className="flex flex-row h-full">
+  <div className="relative font-mono h-dvh flex flex-col">
+    <div className="flex flex-row flex-1 overflow-hidden">
       <div className="flex flex-col h-full flex-none w-64">
         <Days start={startOfCal} end={endOfCal} dateSet={dateSet} onClick={onClickDate} />
         <Months start={startOfCal} end={endOfCal} dateSet={dateSet} onClick={onClickDate} />
@@ -812,6 +823,23 @@ let make = () => {
           setEntries(v => v->Option.map(entries => entries->Array.filter(entry => entry.id != id)))
         }}
       />
+    </div>
+    <div className="flex-none border-t flex flex-row gap-2 items-center px-2">
+      <button onClick={_ => setEntries(v => v->sortEntries)}> {"Sort"->React.string} </button>
+      <button
+        onClick={_ =>
+          setEntries(v =>
+            v->Option.map(entries => entries->Array.map(entry => {...entry, lock: true}))
+          )}>
+        <Icons.Lock />
+      </button>
+      <button
+        onClick={_ =>
+          setEntries(v =>
+            v->Option.map(entries => entries->Array.map(entry => {...entry, lock: false}))
+          )}>
+        <Icons.OpenLock />
+      </button>
     </div>
   </div>
 }

@@ -464,6 +464,17 @@ function App$Entry(props) {
   var isSelectedForSet = Core__Option.mapOr(props.entryToSet, false, (function (v) {
           return v === entry.id;
         }));
+  var goToDay = function () {
+    Core__Option.mapOr(entry.date, undefined, (function (entryDate) {
+            Core__Option.mapOr(Caml_option.nullable_to_opt(document.getElementById("day-" + entryDateString(entryDate))), undefined, (function (element) {
+                    element.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center"
+                        });
+                    element.focus();
+                  }));
+          }));
+  };
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsxs("div", {
@@ -471,7 +482,20 @@ function App$Entry(props) {
                         Core__Option.mapOr(dateDisplay, null, (function (dateDisplay_) {
                                 return JsxRuntime.jsx("span", {
                                             children: dateDisplay_,
-                                            className: "pr-2"
+                                            className: "cursor-pointer mr-2",
+                                            style: {
+                                              backgroundColor: isSelectedForSet ? monthColor$1 : "transparent",
+                                              color: isSelectedForSet ? "black" : monthColor$1
+                                            },
+                                            onClick: (function (param) {
+                                                if (isSelectedForSet) {
+                                                  return setEntryToSet(function (param) {
+                                                              
+                                                            });
+                                                } else {
+                                                  return goToDay();
+                                                }
+                                              })
                                           });
                               })),
                         JsxRuntime.jsx("span", {
@@ -503,10 +527,10 @@ function App$Entry(props) {
                                       children: [
                                         JsxRuntime.jsx("button", {
                                               children: "Set",
-                                              className: [
-                                                  "mx-1",
-                                                  isSelectedForSet ? "bg-blue-700 text-white" : "bg-white text-black"
-                                                ].join(" "),
+                                              className: ["mx-1 text-black"].join(" "),
+                                              style: {
+                                                backgroundColor: isSelectedForSet ? monthColor$1 : "white"
+                                              },
                                               onClick: (function (param) {
                                                   setEntryToSet(function (v) {
                                                         if (Caml_obj.equal(v, entry.id)) {
@@ -515,24 +539,6 @@ function App$Entry(props) {
                                                           return entry.id;
                                                         }
                                                       });
-                                                })
-                                            }),
-                                        JsxRuntime.jsx("button", {
-                                              children: "Go to date",
-                                              className: [
-                                                  "mx-1",
-                                                  "bg-white text-black"
-                                                ].join(" "),
-                                              onClick: (function (param) {
-                                                  Core__Option.mapOr(entry.date, undefined, (function (entryDate) {
-                                                          Core__Option.mapOr(Caml_option.nullable_to_opt(document.getElementById("day-" + entryDateString(entryDate))), undefined, (function (element) {
-                                                                  element.scrollIntoView({
-                                                                        behavior: "smooth",
-                                                                        block: "center"
-                                                                      });
-                                                                  element.focus();
-                                                                }));
-                                                        }));
                                                 })
                                             }),
                                         JsxRuntime.jsx("button", {
@@ -736,17 +742,6 @@ function App(props) {
   };
   return JsxRuntime.jsxs("div", {
               children: [
-                JsxRuntime.jsx("div", {
-                      children: JsxRuntime.jsx("button", {
-                            children: "Sort",
-                            onClick: (function (param) {
-                                setEntries(function (v) {
-                                      return sortEntries(v);
-                                    });
-                              })
-                          }),
-                      className: "absolute top-1 right-1"
-                    }),
                 JsxRuntime.jsxs("div", {
                       children: [
                         JsxRuntime.jsxs("div", {
@@ -782,10 +777,59 @@ function App(props) {
                                 })
                             })
                       ],
-                      className: "flex flex-row h-full"
+                      className: "flex flex-row flex-1 overflow-hidden"
+                    }),
+                JsxRuntime.jsxs("div", {
+                      children: [
+                        JsxRuntime.jsx("button", {
+                              children: "Sort",
+                              onClick: (function (param) {
+                                  setEntries(function (v) {
+                                        return sortEntries(v);
+                                      });
+                                })
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: JsxRuntime.jsx(Tb.TbLock, {}),
+                              onClick: (function (param) {
+                                  setEntries(function (v) {
+                                        return Core__Option.map(v, (function (entries) {
+                                                      return entries.map(function (entry) {
+                                                                  return {
+                                                                          id: entry.id,
+                                                                          date: entry.date,
+                                                                          title: entry.title,
+                                                                          content: entry.content,
+                                                                          lock: true
+                                                                        };
+                                                                });
+                                                    }));
+                                      });
+                                })
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: JsxRuntime.jsx(Tb.TbLockOpen, {}),
+                              onClick: (function (param) {
+                                  setEntries(function (v) {
+                                        return Core__Option.map(v, (function (entries) {
+                                                      return entries.map(function (entry) {
+                                                                  return {
+                                                                          id: entry.id,
+                                                                          date: entry.date,
+                                                                          title: entry.title,
+                                                                          content: entry.content,
+                                                                          lock: false
+                                                                        };
+                                                                });
+                                                    }));
+                                      });
+                                })
+                            })
+                      ],
+                      className: "flex-none border-t flex flex-row gap-2 items-center px-2"
                     })
               ],
-              className: "relative font-mono h-dvh"
+              className: "relative font-mono h-dvh flex flex-col"
             });
 }
 
