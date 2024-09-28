@@ -725,6 +725,44 @@ let make = () => {
       ->sortEntries
     })
   }
+  let onClickDate = entryDate => {
+    getEntryToSet()->Option.mapOr(
+      {
+        entryDate
+        ->Some
+        ->entryClassNameId
+        ->getElementsByClassName
+        ->Js.Nullable.toOption
+        ->Option.flatMap(x => x->Array.get(0))
+        ->{
+          x =>
+            switch x {
+            | Some(element) => {
+                element->scrollIntoView({
+                  "behavior": "smooth",
+                  "block": "center",
+                })
+                element->focus
+                element->selectionStart(element->textAreaLength)
+                element->selectionEnd(element->textAreaLength)
+              }
+            | None => {
+                makeNewEntry(entryDate)
+                scrollToRef.current = entryDate->Some->entryClassNameId->Some
+              }
+            }
+        }
+      },
+      entryId => {
+        updateEntry(entryId, e => {
+          ...e,
+          date: Some(entryDate),
+        })
+        setEntryToSet(_ => None)
+        // scrollToRef.current = entryDate->Some->entryClassNameId->Some
+      },
+    )
+  }
 
   <div className="relative font-mono h-dvh">
     <div className="absolute top-1 right-1">
@@ -732,92 +770,8 @@ let make = () => {
     </div>
     <div className="flex flex-row h-full">
       <div className="flex flex-col h-full flex-none w-64">
-        <Days
-          start={startOfCal}
-          end={endOfCal}
-          dateSet={dateSet}
-          onClick={entryDate => {
-            getEntryToSet()->Option.mapOr(
-              {
-                entryDate
-                ->Some
-                ->entryClassNameId
-                ->getElementsByClassName
-                ->Js.Nullable.toOption
-                ->Option.flatMap(x => x->Array.get(0))
-                ->{
-                  x =>
-                    switch x {
-                    | Some(element) => {
-                        element->scrollIntoView({
-                          "behavior": "smooth",
-                          "block": "center",
-                        })
-                        element->focus
-                        element->selectionStart(element->textAreaLength)
-                        element->selectionEnd(element->textAreaLength)
-                      }
-                    | None => {
-                        makeNewEntry(entryDate)
-                        scrollToRef.current = entryDate->Some->entryClassNameId->Some
-                      }
-                    }
-                }
-              },
-              entryId => {
-                updateEntry(entryId, e => {
-                  ...e,
-                  date: Some(entryDate),
-                })
-                setEntryToSet(_ => None)
-                // scrollToRef.current = entryDate->Some->entryClassNameId->Some
-              },
-            )
-          }}
-        />
-        <Months
-          start={startOfCal}
-          end={endOfCal}
-          dateSet={dateSet}
-          onClick={entryDate => {
-            entryToSet->Option.mapOr(
-              {
-                entryDate
-                ->Some
-                ->entryClassNameId
-                ->getElementsByClassName
-                ->Js.Nullable.toOption
-                ->Option.flatMap(x => x->Array.get(0))
-                ->{
-                  x =>
-                    switch x {
-                    | Some(element) => {
-                        element->scrollIntoView({
-                          "behavior": "smooth",
-                          "block": "center",
-                        })
-                        element->focus
-                        element->selectionStart(element->textAreaLength)
-                        element->selectionEnd(element->textAreaLength)
-                      }
-                    | None => {
-                        makeNewEntry(entryDate)
-                        scrollToRef.current = entryDate->Some->entryClassNameId->Some
-                      }
-                    }
-                }
-              },
-              entryId => {
-                updateEntry(entryId, e => {
-                  ...e,
-                  date: Some(entryDate),
-                })
-                setEntryToSet(_ => None)
-                // scrollToRef.current = entryDate->Some->entryClassNameId->Some
-              },
-            )
-          }}
-        />
+        <Days start={startOfCal} end={endOfCal} dateSet={dateSet} onClick={onClickDate} />
+        <Months start={startOfCal} end={endOfCal} dateSet={dateSet} onClick={onClickDate} />
       </div>
       <Entries
         entries={entries}

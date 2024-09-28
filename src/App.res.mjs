@@ -576,7 +576,6 @@ function App(props) {
       });
   var getEntryToSet = match$1[2];
   var setEntryToSet = match$1[1];
-  var entryToSet = match$1[0];
   var scrollToRef = React.useRef(undefined);
   React.useEffect(function () {
         Core__Option.mapOr(Core__Option.flatMap(scrollToRef.current, (function (x) {
@@ -644,6 +643,37 @@ function App(props) {
                           })));
         });
   };
+  var onClickDate = function (entryDate) {
+    Core__Option.mapOr(getEntryToSet(), (function (x) {
+              if (x !== undefined) {
+                var element = Caml_option.valFromOption(x);
+                element.scrollIntoView({
+                      behavior: "smooth",
+                      block: "center"
+                    });
+                element.focus();
+                element.selectionStart = element.value.length;
+                element.selectionEnd = element.value.length;
+                return ;
+              }
+              makeNewEntry(entryDate);
+              scrollToRef.current = entryClassNameId(entryDate);
+            })(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
+                    return x[0];
+                  }))), (function (entryId) {
+            updateEntry(entryId, (function (e) {
+                    return {
+                            id: e.id,
+                            date: entryDate,
+                            title: e.title,
+                            content: e.content
+                          };
+                  }));
+            setEntryToSet(function (param) {
+                  
+                });
+          }));
+  };
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsx("div", {
@@ -665,73 +695,13 @@ function App(props) {
                                       start: startOfCal,
                                       end: endOfCal,
                                       dateSet: dateSet,
-                                      onClick: (function (entryDate) {
-                                          Core__Option.mapOr(getEntryToSet(), (function (x) {
-                                                    if (x !== undefined) {
-                                                      var element = Caml_option.valFromOption(x);
-                                                      element.scrollIntoView({
-                                                            behavior: "smooth",
-                                                            block: "center"
-                                                          });
-                                                      element.focus();
-                                                      element.selectionStart = element.value.length;
-                                                      element.selectionEnd = element.value.length;
-                                                      return ;
-                                                    }
-                                                    makeNewEntry(entryDate);
-                                                    scrollToRef.current = entryClassNameId(entryDate);
-                                                  })(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
-                                                          return x[0];
-                                                        }))), (function (entryId) {
-                                                  updateEntry(entryId, (function (e) {
-                                                          return {
-                                                                  id: e.id,
-                                                                  date: entryDate,
-                                                                  title: e.title,
-                                                                  content: e.content
-                                                                };
-                                                        }));
-                                                  setEntryToSet(function (param) {
-                                                        
-                                                      });
-                                                }));
-                                        })
+                                      onClick: onClickDate
                                     }),
                                 JsxRuntime.jsx(App$Months, {
                                       start: startOfCal,
                                       end: endOfCal,
                                       dateSet: dateSet,
-                                      onClick: (function (entryDate) {
-                                          Core__Option.mapOr(entryToSet, (function (x) {
-                                                    if (x !== undefined) {
-                                                      var element = Caml_option.valFromOption(x);
-                                                      element.scrollIntoView({
-                                                            behavior: "smooth",
-                                                            block: "center"
-                                                          });
-                                                      element.focus();
-                                                      element.selectionStart = element.value.length;
-                                                      element.selectionEnd = element.value.length;
-                                                      return ;
-                                                    }
-                                                    makeNewEntry(entryDate);
-                                                    scrollToRef.current = entryClassNameId(entryDate);
-                                                  })(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
-                                                          return x[0];
-                                                        }))), (function (entryId) {
-                                                  updateEntry(entryId, (function (e) {
-                                                          return {
-                                                                  id: e.id,
-                                                                  date: entryDate,
-                                                                  title: e.title,
-                                                                  content: e.content
-                                                                };
-                                                        }));
-                                                  setEntryToSet(function (param) {
-                                                        
-                                                      });
-                                                }));
-                                        })
+                                      onClick: onClickDate
                                     })
                               ],
                               className: "flex flex-col h-full flex-none w-64"
@@ -749,7 +719,7 @@ function App(props) {
                                         }));
                                 }),
                               setEntryToSet: setEntryToSet,
-                              entryToSet: entryToSet,
+                              entryToSet: match$1[0],
                               deleteEntry: (function (id) {
                                   setEntries(function (v) {
                                         return Core__Option.map(v, (function (entries) {
