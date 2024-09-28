@@ -439,6 +439,7 @@ function entryClassNameId(entryDate) {
 }
 
 function App$Entry(props) {
+  var deleteEntry = props.deleteEntry;
   var setEntryToSet = props.setEntryToSet;
   var updateEntry = props.updateEntry;
   var entry = props.entry;
@@ -506,6 +507,16 @@ function App$Entry(props) {
                                                 }));
                                         }));
                                 })
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: "Delete",
+                              className: [
+                                  "mx-1",
+                                  "bg-white text-black"
+                                ].join(" "),
+                              onClick: (function (param) {
+                                  deleteEntry(entry.id);
+                                })
                             })
                       ],
                       className: [
@@ -538,6 +549,7 @@ var make$2 = React.memo(App$Entry, (function (_a, _b) {
       }));
 
 function App$Entries(props) {
+  var deleteEntry = props.deleteEntry;
   var entryToSet = props.entryToSet;
   var setEntryToSet = props.setEntryToSet;
   var updateEntry = props.updateEntry;
@@ -548,7 +560,8 @@ function App$Entries(props) {
                                               entry: entry,
                                               updateEntry: updateEntry,
                                               setEntryToSet: setEntryToSet,
-                                              entryToSet: entryToSet
+                                              entryToSet: entryToSet,
+                                              deleteEntry: deleteEntry
                                             });
                                 });
                     })),
@@ -649,11 +662,17 @@ function App(props) {
                                       end: endOfCal,
                                       dateSet: dateSet,
                                       onClick: (function (entryDate) {
-                                          Core__Option.mapOr(getEntryToSet(), Core__Option.mapOr(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
+                                          Core__Option.mapOr(getEntryToSet(), (function (x) {
+                                                    if (x !== undefined) {
+                                                      return scrollIntoView(Caml_option.valFromOption(x));
+                                                    } else {
+                                                      makeNewEntry(entryDate);
+                                                      scrollToRef.current = entryClassNameId(entryDate);
+                                                      return ;
+                                                    }
+                                                  })(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
                                                           return x[0];
-                                                        })), makeNewEntry(entryDate), (function (v) {
-                                                      scrollIntoView(v);
-                                                    })), (function (entryId) {
+                                                        }))), (function (entryId) {
                                                   updateEntry(entryId, (function (e) {
                                                           return {
                                                                   id: e.id,
@@ -673,11 +692,17 @@ function App(props) {
                                       end: endOfCal,
                                       dateSet: dateSet,
                                       onClick: (function (entryDate) {
-                                          Core__Option.mapOr(entryToSet, Core__Option.mapOr(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
+                                          Core__Option.mapOr(entryToSet, (function (x) {
+                                                    if (x !== undefined) {
+                                                      return scrollIntoView(Caml_option.valFromOption(x));
+                                                    } else {
+                                                      makeNewEntry(entryDate);
+                                                      scrollToRef.current = entryClassNameId(entryDate);
+                                                      return ;
+                                                    }
+                                                  })(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
                                                           return x[0];
-                                                        })), undefined, (function (v) {
-                                                      scrollIntoView(v);
-                                                    })), (function (entryId) {
+                                                        }))), (function (entryId) {
                                                   updateEntry(entryId, (function (e) {
                                                           return {
                                                                   id: e.id,
@@ -708,7 +733,16 @@ function App(props) {
                                         }));
                                 }),
                               setEntryToSet: setEntryToSet,
-                              entryToSet: entryToSet
+                              entryToSet: entryToSet,
+                              deleteEntry: (function (id) {
+                                  setEntries(function (v) {
+                                        return Core__Option.map(v, (function (entries) {
+                                                      return entries.filter(function (entry) {
+                                                                  return entry.id !== id;
+                                                                });
+                                                    }));
+                                      });
+                                })
                             })
                       ],
                       className: "flex flex-row h-full"

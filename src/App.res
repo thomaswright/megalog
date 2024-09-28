@@ -510,7 +510,13 @@ let entryClassNameId = entryDate => {
 
 module Entry = {
   @react.component
-  let make = (~entry, ~updateEntry: (string, string) => unit, ~setEntryToSet, ~entryToSet) => {
+  let make = (
+    ~entry,
+    ~updateEntry: (string, string) => unit,
+    ~setEntryToSet,
+    ~entryToSet,
+    ~deleteEntry,
+  ) => {
     let monthColor = entry.date->Option.mapOr("#fff", date => {
       switch date {
       | Date(_y, m, _d) => monthColor(m)
@@ -560,6 +566,11 @@ module Entry = {
             })}>
           {"Go to date"->React.string}
         </button>
+        <button
+          className={["mx-1", "bg-white text-black"]->Array.join(" ")}
+          onClick={_ => deleteEntry(entry.id)}>
+          {"Delete"->React.string}
+        </button>
       </div>
       <div className="py-2">
         <div className="rounded overflow-hidden">
@@ -587,12 +598,13 @@ module Entries = {
     ~updateEntry: (string, string) => unit,
     ~setEntryToSet,
     ~entryToSet,
+    ~deleteEntry,
   ) => {
     <div className="text-xs leading-none flex-1 h-full overflow-y-scroll">
       {entries->Option.mapOr(React.null, entries_ => {
         entries_
         ->Array.map(entry => {
-          <Entry entry updateEntry setEntryToSet entryToSet />
+          <Entry entry updateEntry setEntryToSet entryToSet deleteEntry />
         })
         ->React.array
       })}
@@ -658,7 +670,7 @@ let make = () => {
     ->Array.map(date => date->entryDateString)
     ->Set.fromArray
 
-  let makeNewEntry = entryDate =>
+  let makeNewEntry = entryDate => {
     setEntries(v => {
       v
       ->Option.map(entries =>
@@ -679,6 +691,7 @@ let make = () => {
       )
       ->sortEntries
     })
+  }
 
   <div className="relative font-mono h-dvh">
     <div className="absolute top-1 right-1">
@@ -699,14 +712,16 @@ let make = () => {
                 ->getElementsByClassName
                 ->Js.Nullable.toOption
                 ->Option.flatMap(x => x->Array.get(0))
-                ->Option.mapOr(
-                  {
-                    makeNewEntry(entryDate)
-                  },
-                  v => {
-                    v->scrollIntoView
-                  },
-                )
+                ->{
+                  x =>
+                    switch x {
+                    | Some(v) => v->scrollIntoView
+                    | None => {
+                        makeNewEntry(entryDate)
+                        scrollToRef.current = entryDate->Some->entryClassNameId->Some
+                      }
+                    }
+                }
               },
               entryId => {
                 updateEntry(entryId, e => {
@@ -732,9 +747,16 @@ let make = () => {
                 ->getElementsByClassName
                 ->Js.Nullable.toOption
                 ->Option.flatMap(x => x->Array.get(0))
-                ->Option.mapOr((), v => {
-                  v->scrollIntoView
-                })
+                ->{
+                  x =>
+                    switch x {
+                    | Some(v) => v->scrollIntoView
+                    | None => {
+                        makeNewEntry(entryDate)
+                        scrollToRef.current = entryDate->Some->entryClassNameId->Some
+                      }
+                    }
+                }
               },
               entryId => {
                 updateEntry(entryId, e => {
@@ -757,6 +779,9 @@ let make = () => {
           })}
         setEntryToSet
         entryToSet
+        deleteEntry={id => {
+          setEntries(v => v->Option.map(entries => entries->Array.filter(entry => entry.id != id)))
+        }}
       />
     </div>
   </div>
