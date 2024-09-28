@@ -265,11 +265,9 @@ function App$Months(props) {
                                                                     children: DateFns.format(monthDate, "MMM"),
                                                                     className: ""
                                                                   }),
-                                                              className: [
-                                                                  " flex flex-row items-center justify-center ",
-                                                                  hasEntry ? "text-lime-500 bg-black" : "text-neutral-600 bg-black"
-                                                                ].join(" "),
+                                                              className: [" flex flex-row items-center justify-center bg-black"].join(" "),
                                                               style: {
+                                                                color: hasEntry ? monthColor(i + 1 | 0) : "#333",
                                                                 gridArea: "m" + monthNum
                                                               },
                                                               onClick: (function (param) {

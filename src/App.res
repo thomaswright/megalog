@@ -364,15 +364,18 @@ module Months = {
                       let monthDate = Date.makeWithYM(~year, ~month=i)
 
                       let hasEntry = dateSet->Set.has(Month(year, i + 1)->entryDateString)
+                      // let color = hasEntry
+                      //   ? `bg-black `
+                      //   : "bg-black text-neutral-600"
 
                       <button
                         onClick={_ => onClick(Month(year, i + 1))}
                         className={[
-                          " flex flex-row items-center justify-center ",
-                          hasEntry->entryCheck,
+                          " flex flex-row items-center justify-center bg-black",
                         ]->Array.join(" ")}
                         style={{
                           gridArea: "m" ++ monthNum,
+                          color: hasEntry ? monthColor(i + 1) : "#333",
                         }}>
                         <div className=""> {monthDate->DateFns.format("MMM")->React.string} </div>
                       </button>
