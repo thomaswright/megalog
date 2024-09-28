@@ -4,7 +4,6 @@ import * as React from "react";
 import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as DateFns from "date-fns";
 import * as Core__Int from "@rescript/core/src/Core__Int.res.mjs";
-import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import MonacoJsx from "./Monaco.jsx";
@@ -612,22 +611,19 @@ function App(props) {
   var makeNewEntry = function (entryDate) {
     setEntries(function (v) {
           return sortEntries(Core__Option.map(v, (function (entries) {
-                            return Belt_Array.concatMany([
-                                        entries,
-                                        [{
-                                            id: (Core__Array.reduce(entries, 0, (function (a, c) {
-                                                        var b = Core__Option.getOr(Core__Int.fromString(c.id, undefined), 0);
-                                                        if (Caml_obj.greaterthan(a, b)) {
-                                                          return a;
-                                                        } else {
-                                                          return b;
-                                                        }
-                                                      })) + 1 | 0).toString(),
-                                            date: entryDate,
-                                            title: "",
-                                            content: ""
-                                          }]
-                                      ]);
+                            return entries.concat([{
+                                          id: (Core__Array.reduce(entries, 0, (function (a, c) {
+                                                      var b = Core__Option.getOr(Core__Int.fromString(c.id, undefined), 0);
+                                                      if (Caml_obj.greaterthan(a, b)) {
+                                                        return a;
+                                                      } else {
+                                                        return b;
+                                                      }
+                                                    })) + 1 | 0).toString(),
+                                          date: entryDate,
+                                          title: "",
+                                          content: ""
+                                        }]);
                           })));
         });
   };

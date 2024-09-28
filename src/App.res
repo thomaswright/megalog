@@ -662,18 +662,20 @@ let make = () => {
     setEntries(v => {
       v
       ->Option.map(entries =>
-        [
-          ...entries,
-          {
-            id: (entries->Array.reduce(
-              0,
-              (a, c) => intMax(a, c.id->Int.fromString->Option.getOr(0)),
-            ) + 1)->Int.toString,
-            date: entryDate->Some,
-            title: "",
-            content: "",
-          },
-        ]
+        Array.concat(
+          entries,
+          [
+            {
+              id: (entries->Array.reduce(
+                0,
+                (a, c) => intMax(a, c.id->Int.fromString->Option.getOr(0)),
+              ) + 1)->Int.toString,
+              date: entryDate->Some,
+              title: "",
+              content: "",
+            },
+          ],
+        )
       )
       ->sortEntries
     })
