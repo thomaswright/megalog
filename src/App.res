@@ -49,6 +49,14 @@ module Icons = {
     @react.component @module("react-icons/tb")
     external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbBeach"
   }
+  module Lock = {
+    @react.component @module("react-icons/tb")
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbLock"
+  }
+  module OpenLock = {
+    @react.component @module("react-icons/tb")
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbLockOpen"
+  }
 }
 
 type importData = array<(string, string)>
@@ -73,13 +81,15 @@ module TextareaAutosize = {
     ~value: string,
     ~className: string,
     ~onChange: ReactEvent.Form.t => unit,
+    ~readOnly: bool,
   ) => React.element = "default"
 }
 
 module TextArea = {
   @react.component
-  let make = (~content: string, ~onChange: string => unit, ~className="") => {
+  let make = (~content: string, ~onChange: string => unit, ~className="", ~readonly=false) => {
     <TextareaAutosize
+      readOnly={readonly}
       className={["bg-black w-full", className]->Array.join(" ")}
       value={content}
       onChange={e => {
@@ -118,6 +128,7 @@ type entry = {
   date: option<entryDate>,
   title: string,
   content: string,
+  lock: bool,
 }
 
 let getMonthForWeekOfYear = (weekNumber, year) => {
@@ -529,7 +540,7 @@ module Entry = {
   @react.component
   let make = (
     ~entry,
-    ~updateEntry: (string, string) => unit,
+    ~updateEntry: (string, entry => entry) => unit,
     ~setEntryToSet,
     ~entryToSet,
     ~deleteEntry,
@@ -554,7 +565,7 @@ module Entry = {
 
     <div key={entry.id}>
       <div
-        className={[" py-2 border-b "]->Array.join(" ")}
+        className={[" py-2 border-b flex flex-row items-center pr-4"]->Array.join(" ")}
         style={{
           color: monthColor,
           borderColor: monthColor,
@@ -563,42 +574,60 @@ module Entry = {
           <span className="pr-2"> {dateDisplay_->React.string} </span>
         })}
         <span className=" text-white"> {entry.title->React.string} </span>
-        <button
-          className={[
-            "mx-1",
-            isSelectedForSet ? "bg-blue-700 text-white" : "bg-white text-black",
-          ]->Array.join(" ")}
-          onClick={_ => setEntryToSet(v => v == Some(entry.id) ? None : Some(entry.id))}>
-          {"Set"->React.string}
-        </button>
-        <button
-          className={["mx-1", "bg-white text-black"]->Array.join(" ")}
-          onClick={_ =>
-            entry.date->Option.mapOr((), entryDate => {
-              getElementById(`day-${entryDate->entryDateString}`)
-              ->Js.Nullable.toOption
-              ->Option.mapOr((), element => {
-                element->scrollIntoView({
-                  "behavior": "smooth",
-                  "block": "center",
-                })
-                element->focus
-              })
-            })}>
-          {"Go to date"->React.string}
-        </button>
-        <button
-          className={["mx-1", "bg-white text-black"]->Array.join(" ")}
-          onClick={_ => deleteEntry(entry.id)}>
-          {"Delete"->React.string}
-        </button>
+        <span className="flex-1" />
+        <span className="flex flex-row items-center">
+          {entry.lock
+            ? <button
+                className={["mx-1", "bg-black text-neutral-500"]->Array.join(" ")}
+                onClick={_ => updateEntry(entry.id, v => {...v, lock: false})}>
+                <Icons.Lock />
+              </button>
+            : <React.Fragment>
+                <button
+                  className={[
+                    "mx-1",
+                    isSelectedForSet ? "bg-blue-700 text-white" : "bg-white text-black",
+                  ]->Array.join(" ")}
+                  onClick={_ => setEntryToSet(v => v == Some(entry.id) ? None : Some(entry.id))}>
+                  {"Set"->React.string}
+                </button>
+                <button
+                  className={["mx-1", "bg-white text-black"]->Array.join(" ")}
+                  onClick={_ =>
+                    entry.date->Option.mapOr((), entryDate => {
+                      getElementById(`day-${entryDate->entryDateString}`)
+                      ->Js.Nullable.toOption
+                      ->Option.mapOr((), element => {
+                        element->scrollIntoView({
+                          "behavior": "smooth",
+                          "block": "center",
+                        })
+                        element->focus
+                      })
+                    })}>
+                  {"Go to date"->React.string}
+                </button>
+                <button
+                  className={["mx-1", "bg-white text-black"]->Array.join(" ")}
+                  onClick={_ => deleteEntry(entry.id)}>
+                  {"Delete"->React.string}
+                </button>
+                <button
+                  className={["mx-1", " text-neutral-500"]->Array.join(" ")}
+                  onClick={_ => updateEntry(entry.id, v => {...v, lock: true})}>
+                  <Icons.OpenLock />
+                  // {"Lock"->React.string}
+                </button>
+              </React.Fragment>}
+        </span>
       </div>
       <div className="py-2">
         <div className="rounded overflow-hidden">
           <Editor
             className={entry.date->entryClassNameId}
             content={entry.content}
-            onChange={newValue => updateEntry(entry.id, newValue)}
+            onChange={newContent => updateEntry(entry.id, v => {...v, content: newContent})}
+            readonly={entry.lock}
           />
         </div>
       </div>
@@ -620,7 +649,7 @@ module Entries = {
   @react.component
   let make = (
     ~entries: option<array<entry>>,
-    ~updateEntry: (string, string) => unit,
+    ~updateEntry: (string, entry => entry) => unit,
     ~setEntryToSet,
     ~entryToSet,
     ~deleteEntry,
@@ -718,6 +747,7 @@ let make = () => {
               date: entryDate->Some,
               title: "",
               content: "",
+              lock: false,
             },
           ],
         )
@@ -775,11 +805,7 @@ let make = () => {
       </div>
       <Entries
         entries={entries}
-        updateEntry={(id, newContent) =>
-          updateEntry(id, e => {
-            ...e,
-            content: newContent,
-          })}
+        updateEntry={updateEntry}
         setEntryToSet
         entryToSet
         deleteEntry={id => {

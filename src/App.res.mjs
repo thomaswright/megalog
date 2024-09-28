@@ -9,14 +9,17 @@ import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import MonacoJsx from "./Monaco.jsx";
 import * as Color from "@texel/color";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
+import * as Tb from "react-icons/tb";
 import * as JsxRuntime from "react/jsx-runtime";
 import UseLocalStorageJs from "./useLocalStorage.js";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
 function App$TextArea(props) {
+  var __readonly = props.readonly;
   var __className = props.className;
   var onChange = props.onChange;
   var className = __className !== undefined ? __className : "";
+  var readonly = __readonly !== undefined ? __readonly : false;
   return JsxRuntime.jsx(ReactTextareaAutosize, {
               value: props.content,
               className: [
@@ -26,7 +29,8 @@ function App$TextArea(props) {
               onChange: (function (e) {
                   var value = e.target.value;
                   onChange(value);
-                })
+                }),
+              readOnly: readonly
             });
 }
 
@@ -474,52 +478,97 @@ function App$Entry(props) {
                               children: entry.title,
                               className: " text-white"
                             }),
-                        JsxRuntime.jsx("button", {
-                              children: "Set",
-                              className: [
-                                  "mx-1",
-                                  isSelectedForSet ? "bg-blue-700 text-white" : "bg-white text-black"
-                                ].join(" "),
-                              onClick: (function (param) {
-                                  setEntryToSet(function (v) {
-                                        if (Caml_obj.equal(v, entry.id)) {
-                                          return ;
-                                        } else {
-                                          return entry.id;
-                                        }
-                                      });
-                                })
+                        JsxRuntime.jsx("span", {
+                              className: "flex-1"
                             }),
-                        JsxRuntime.jsx("button", {
-                              children: "Go to date",
-                              className: [
-                                  "mx-1",
-                                  "bg-white text-black"
-                                ].join(" "),
-                              onClick: (function (param) {
-                                  Core__Option.mapOr(entry.date, undefined, (function (entryDate) {
-                                          Core__Option.mapOr(Caml_option.nullable_to_opt(document.getElementById("day-" + entryDateString(entryDate))), undefined, (function (element) {
-                                                  element.scrollIntoView({
-                                                        behavior: "smooth",
-                                                        block: "center"
-                                                      });
-                                                  element.focus();
+                        JsxRuntime.jsx("span", {
+                              children: entry.lock ? JsxRuntime.jsx("button", {
+                                      children: JsxRuntime.jsx(Tb.TbLock, {}),
+                                      className: [
+                                          "mx-1",
+                                          "bg-black text-neutral-500"
+                                        ].join(" "),
+                                      onClick: (function (param) {
+                                          updateEntry(entry.id, (function (v) {
+                                                  return {
+                                                          id: v.id,
+                                                          date: v.date,
+                                                          title: v.title,
+                                                          content: v.content,
+                                                          lock: false
+                                                        };
                                                 }));
-                                        }));
-                                })
-                            }),
-                        JsxRuntime.jsx("button", {
-                              children: "Delete",
-                              className: [
-                                  "mx-1",
-                                  "bg-white text-black"
-                                ].join(" "),
-                              onClick: (function (param) {
-                                  deleteEntry(entry.id);
-                                })
+                                        })
+                                    }) : JsxRuntime.jsxs(React.Fragment, {
+                                      children: [
+                                        JsxRuntime.jsx("button", {
+                                              children: "Set",
+                                              className: [
+                                                  "mx-1",
+                                                  isSelectedForSet ? "bg-blue-700 text-white" : "bg-white text-black"
+                                                ].join(" "),
+                                              onClick: (function (param) {
+                                                  setEntryToSet(function (v) {
+                                                        if (Caml_obj.equal(v, entry.id)) {
+                                                          return ;
+                                                        } else {
+                                                          return entry.id;
+                                                        }
+                                                      });
+                                                })
+                                            }),
+                                        JsxRuntime.jsx("button", {
+                                              children: "Go to date",
+                                              className: [
+                                                  "mx-1",
+                                                  "bg-white text-black"
+                                                ].join(" "),
+                                              onClick: (function (param) {
+                                                  Core__Option.mapOr(entry.date, undefined, (function (entryDate) {
+                                                          Core__Option.mapOr(Caml_option.nullable_to_opt(document.getElementById("day-" + entryDateString(entryDate))), undefined, (function (element) {
+                                                                  element.scrollIntoView({
+                                                                        behavior: "smooth",
+                                                                        block: "center"
+                                                                      });
+                                                                  element.focus();
+                                                                }));
+                                                        }));
+                                                })
+                                            }),
+                                        JsxRuntime.jsx("button", {
+                                              children: "Delete",
+                                              className: [
+                                                  "mx-1",
+                                                  "bg-white text-black"
+                                                ].join(" "),
+                                              onClick: (function (param) {
+                                                  deleteEntry(entry.id);
+                                                })
+                                            }),
+                                        JsxRuntime.jsx("button", {
+                                              children: JsxRuntime.jsx(Tb.TbLockOpen, {}),
+                                              className: [
+                                                  "mx-1",
+                                                  " text-neutral-500"
+                                                ].join(" "),
+                                              onClick: (function (param) {
+                                                  updateEntry(entry.id, (function (v) {
+                                                          return {
+                                                                  id: v.id,
+                                                                  date: v.date,
+                                                                  title: v.title,
+                                                                  content: v.content,
+                                                                  lock: true
+                                                                };
+                                                        }));
+                                                })
+                                            })
+                                      ]
+                                    }),
+                              className: "flex flex-row items-center"
                             })
                       ],
-                      className: [" py-2 border-b "].join(" "),
+                      className: [" py-2 border-b flex flex-row items-center pr-4"].join(" "),
                       style: {
                         borderColor: monthColor$1,
                         color: monthColor$1
@@ -529,10 +578,19 @@ function App$Entry(props) {
                       children: JsxRuntime.jsx("div", {
                             children: JsxRuntime.jsx(App$TextArea, {
                                   content: entry.content,
-                                  onChange: (function (newValue) {
-                                      updateEntry(entry.id, newValue);
+                                  onChange: (function (newContent) {
+                                      updateEntry(entry.id, (function (v) {
+                                              return {
+                                                      id: v.id,
+                                                      date: v.date,
+                                                      title: v.title,
+                                                      content: newContent,
+                                                      lock: v.lock
+                                                    };
+                                            }));
                                     }),
-                                  className: entryClassNameId(entry.date)
+                                  className: entryClassNameId(entry.date),
+                                  readonly: entry.lock
                                 }),
                             className: "rounded overflow-hidden"
                           }),
@@ -638,7 +696,8 @@ function App(props) {
                                                     })) + 1 | 0).toString(),
                                           date: entryDate,
                                           title: "",
-                                          content: ""
+                                          content: "",
+                                          lock: false
                                         }]);
                           })));
         });
@@ -666,7 +725,8 @@ function App(props) {
                             id: e.id,
                             date: entryDate,
                             title: e.title,
-                            content: e.content
+                            content: e.content,
+                            lock: e.lock
                           };
                   }));
             setEntryToSet(function (param) {
@@ -708,16 +768,7 @@ function App(props) {
                             }),
                         JsxRuntime.jsx(App$Entries, {
                               entries: entries,
-                              updateEntry: (function (id, newContent) {
-                                  updateEntry(id, (function (e) {
-                                          return {
-                                                  id: e.id,
-                                                  date: e.date,
-                                                  title: e.title,
-                                                  content: newContent
-                                                };
-                                        }));
-                                }),
+                              updateEntry: updateEntry,
                               setEntryToSet: setEntryToSet,
                               entryToSet: match$1[0],
                               deleteEntry: (function (id) {
