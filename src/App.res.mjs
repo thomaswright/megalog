@@ -13,18 +13,16 @@ import * as JsxRuntime from "react/jsx-runtime";
 import UseLocalStorageJs from "./useLocalStorage.js";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
-function scrollIntoView(x) {
-  x.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-}
-
 function App$TextArea(props) {
+  var __className = props.className;
   var onChange = props.onChange;
+  var className = __className !== undefined ? __className : "";
   return JsxRuntime.jsx(ReactTextareaAutosize, {
               value: props.content,
-              className: "bg-black w-full",
+              className: [
+                  "bg-black w-full",
+                  className
+                ].join(" "),
               onChange: (function (e) {
                   var value = e.target.value;
                   onChange(value);
@@ -277,7 +275,7 @@ function App$Months(props) {
                                                                         _1: i + 1 | 0
                                                                       });
                                                                 })
-                                                            });
+                                                            }, monthNum);
                                                 })
                                           ],
                                           className: "gap-px text-xs bg-neutral-800 border border-neutral-800",
@@ -501,7 +499,11 @@ function App$Entry(props) {
                               onClick: (function (param) {
                                   Core__Option.mapOr(entry.date, undefined, (function (entryDate) {
                                           Core__Option.mapOr(Caml_option.nullable_to_opt(document.getElementById("day-" + entryDateString(entryDate))), undefined, (function (element) {
-                                                  scrollIntoView(element);
+                                                  element.scrollIntoView({
+                                                        behavior: "smooth",
+                                                        block: "center"
+                                                      });
+                                                  element.focus();
                                                 }));
                                         }));
                                 })
@@ -517,10 +519,7 @@ function App$Entry(props) {
                                 })
                             })
                       ],
-                      className: [
-                          " py-2 border-b ",
-                          entryClassNameId(entry.date)
-                        ].join(" "),
+                      className: [" py-2 border-b "].join(" "),
                       style: {
                         borderColor: monthColor$1,
                         color: monthColor$1
@@ -532,7 +531,8 @@ function App$Entry(props) {
                                   content: entry.content,
                                   onChange: (function (newValue) {
                                       updateEntry(entry.id, newValue);
-                                    })
+                                    }),
+                                  className: entryClassNameId(entry.date)
                                 }),
                             className: "rounded overflow-hidden"
                           }),
@@ -560,7 +560,7 @@ function App$Entries(props) {
                                               setEntryToSet: setEntryToSet,
                                               entryToSet: entryToSet,
                                               deleteEntry: deleteEntry
-                                            });
+                                            }, entry.id);
                                 });
                     })),
               className: "text-xs leading-none flex-1 h-full overflow-y-scroll"
@@ -584,7 +584,13 @@ function App(props) {
                                   return x[0];
                                 }));
                   })), undefined, (function (element) {
-                scrollIntoView(element);
+                element.scrollIntoView({
+                      behavior: "smooth",
+                      block: "center"
+                    });
+                element.focus();
+                element.selectionStart = element.value.length;
+                element.selectionEnd = element.value.length;
                 scrollToRef.current = undefined;
               }));
       });
@@ -662,12 +668,18 @@ function App(props) {
                                       onClick: (function (entryDate) {
                                           Core__Option.mapOr(getEntryToSet(), (function (x) {
                                                     if (x !== undefined) {
-                                                      return scrollIntoView(Caml_option.valFromOption(x));
-                                                    } else {
-                                                      makeNewEntry(entryDate);
-                                                      scrollToRef.current = entryClassNameId(entryDate);
+                                                      var element = Caml_option.valFromOption(x);
+                                                      element.scrollIntoView({
+                                                            behavior: "smooth",
+                                                            block: "center"
+                                                          });
+                                                      element.focus();
+                                                      element.selectionStart = element.value.length;
+                                                      element.selectionEnd = element.value.length;
                                                       return ;
                                                     }
+                                                    makeNewEntry(entryDate);
+                                                    scrollToRef.current = entryClassNameId(entryDate);
                                                   })(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
                                                           return x[0];
                                                         }))), (function (entryId) {
@@ -692,12 +704,18 @@ function App(props) {
                                       onClick: (function (entryDate) {
                                           Core__Option.mapOr(entryToSet, (function (x) {
                                                     if (x !== undefined) {
-                                                      return scrollIntoView(Caml_option.valFromOption(x));
-                                                    } else {
-                                                      makeNewEntry(entryDate);
-                                                      scrollToRef.current = entryClassNameId(entryDate);
+                                                      var element = Caml_option.valFromOption(x);
+                                                      element.scrollIntoView({
+                                                            behavior: "smooth",
+                                                            block: "center"
+                                                          });
+                                                      element.focus();
+                                                      element.selectionStart = element.value.length;
+                                                      element.selectionEnd = element.value.length;
                                                       return ;
                                                     }
+                                                    makeNewEntry(entryDate);
+                                                    scrollToRef.current = entryClassNameId(entryDate);
                                                   })(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
                                                           return x[0];
                                                         }))), (function (entryId) {

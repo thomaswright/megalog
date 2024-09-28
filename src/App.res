@@ -9,11 +9,24 @@ external getElementsByClassName: string => Js.Nullable.t<array<Dom.element>> =
 external scrollIntoView: (Dom.element, {"behavior": string, "block": string}) => unit =
   "scrollIntoView"
 
-let scrollIntoView = x =>
-  x->scrollIntoView({
-    "behavior": "smooth",
-    "block": "center",
-  })
+@send
+external focus: Dom.element => unit = "focus"
+
+@set
+external selectionStart: (Dom.element, int) => unit = "selectionStart"
+
+@set
+external selectionEnd: (Dom.element, int) => unit = "selectionEnd"
+
+@get @scope("value") external textAreaLength: Dom.element => int = "length"
+
+// let scrollIntoView = x => {
+//   x->scrollIntoView({
+//     "behavior": "smooth",
+//     "block": "center",
+//   })
+//   x->focus
+// }
 
 let intMax = (a, b) => {
   a > b ? a : b
@@ -65,9 +78,9 @@ module TextareaAutosize = {
 
 module TextArea = {
   @react.component
-  let make = (~content: string, ~onChange: string => unit) => {
+  let make = (~content: string, ~onChange: string => unit, ~className="") => {
     <TextareaAutosize
-      className="bg-black w-full"
+      className={["bg-black w-full", className]->Array.join(" ")}
       value={content}
       onChange={e => {
         let value = (e->ReactEvent.Form.target)["value"]
@@ -369,6 +382,7 @@ module Months = {
                       //   : "bg-black text-neutral-600"
 
                       <button
+                        key={monthNum}
                         onClick={_ => onClick(Month(year, i + 1))}
                         className={[
                           " flex flex-row items-center justify-center bg-black",
@@ -540,7 +554,7 @@ module Entry = {
 
     <div key={entry.id}>
       <div
-        className={[" py-2 border-b ", entry.date->entryClassNameId]->Array.join(" ")}
+        className={[" py-2 border-b "]->Array.join(" ")}
         style={{
           color: monthColor,
           borderColor: monthColor,
@@ -564,7 +578,11 @@ module Entry = {
               getElementById(`day-${entryDate->entryDateString}`)
               ->Js.Nullable.toOption
               ->Option.mapOr((), element => {
-                element->scrollIntoView
+                element->scrollIntoView({
+                  "behavior": "smooth",
+                  "block": "center",
+                })
+                element->focus
               })
             })}>
           {"Go to date"->React.string}
@@ -577,7 +595,11 @@ module Entry = {
       </div>
       <div className="py-2">
         <div className="rounded overflow-hidden">
-          <Editor content={entry.content} onChange={newValue => updateEntry(entry.id, newValue)} />
+          <Editor
+            className={entry.date->entryClassNameId}
+            content={entry.content}
+            onChange={newValue => updateEntry(entry.id, newValue)}
+          />
         </div>
       </div>
     </div>
@@ -607,7 +629,7 @@ module Entries = {
       {entries->Option.mapOr(React.null, entries_ => {
         entries_
         ->Array.map(entry => {
-          <Entry entry updateEntry setEntryToSet entryToSet deleteEntry />
+          <Entry key={entry.id} entry updateEntry setEntryToSet entryToSet deleteEntry />
         })
         ->React.array
       })}
@@ -631,7 +653,15 @@ let make = () => {
       ->Option.flatMap(x => x->Array.get(0))
     )
     ->Option.mapOr((), element => {
-      element->scrollIntoView
+      element->scrollIntoView({
+        "behavior": "smooth",
+        "block": "center",
+      })
+      element->focus
+      element->selectionStart(element->textAreaLength)
+      element->selectionEnd(element->textAreaLength)
+
+      // element->focus
       scrollToRef.current = None
     })
 
@@ -718,7 +748,15 @@ let make = () => {
                 ->{
                   x =>
                     switch x {
-                    | Some(v) => v->scrollIntoView
+                    | Some(element) => {
+                        element->scrollIntoView({
+                          "behavior": "smooth",
+                          "block": "center",
+                        })
+                        element->focus
+                        element->selectionStart(element->textAreaLength)
+                        element->selectionEnd(element->textAreaLength)
+                      }
                     | None => {
                         makeNewEntry(entryDate)
                         scrollToRef.current = entryDate->Some->entryClassNameId->Some
@@ -753,7 +791,15 @@ let make = () => {
                 ->{
                   x =>
                     switch x {
-                    | Some(v) => v->scrollIntoView
+                    | Some(element) => {
+                        element->scrollIntoView({
+                          "behavior": "smooth",
+                          "block": "center",
+                        })
+                        element->focus
+                        element->selectionStart(element->textAreaLength)
+                        element->selectionEnd(element->textAreaLength)
+                      }
                     | None => {
                         makeNewEntry(entryDate)
                         scrollToRef.current = entryDate->Some->entryClassNameId->Some
