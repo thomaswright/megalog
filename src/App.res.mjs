@@ -415,7 +415,7 @@ function App$Days(props) {
                                 hasEntry: dateSet.has(DateFns.format(d, "y-MM-dd"))
                               }, d.toString());
                   }),
-              className: "w-full flex-2 p-2 overflow-y-scroll "
+              className: "w-full flex-2 overflow-y-scroll "
             });
 }
 
@@ -595,7 +595,7 @@ function App$Entry(props) {
                                                     };
                                             }));
                                     }),
-                                  className: "editor",
+                                  className: "editor scroll-m-20",
                                   readonly: entry.lock
                                 }),
                             className: "rounded overflow-hidden"
@@ -654,9 +654,6 @@ function App(props) {
                               block: "center"
                             });
                       }));
-                Core__Option.mapOr(Caml_option.nullable_to_opt(element.querySelector(".editor")), undefined, (function (editorElement) {
-                        editorElement.focus();
-                      }));
                 scrollToRef.current = undefined;
               }));
       });
@@ -714,19 +711,17 @@ function App(props) {
   var onClickDate = function (entryDate) {
     Core__Option.mapOr(getEntryToSet(), (function (x) {
               if (x !== undefined) {
-                var element = Caml_option.valFromOption(x);
-                Core__Option.mapOr(Caml_option.nullable_to_opt(element.querySelector(".heading")), undefined, (function (headingElement) {
-                        headingElement.scrollIntoView({
-                              behavior: "smooth",
-                              block: "center"
-                            });
-                      }));
-                return Core__Option.mapOr(Caml_option.nullable_to_opt(element.querySelector(".editor")), undefined, (function (editorElement) {
-                              editorElement.focus();
+                return Core__Option.mapOr(Caml_option.nullable_to_opt(Caml_option.valFromOption(x).querySelector(".heading")), undefined, (function (headingElement) {
+                              headingElement.scrollIntoView({
+                                    behavior: "smooth",
+                                    block: "center"
+                                  });
                             }));
+              } else {
+                makeNewEntry(entryDate);
+                scrollToRef.current = entryClassNameId(entryDate);
+                return ;
               }
-              makeNewEntry(entryDate);
-              scrollToRef.current = entryClassNameId(entryDate);
             })(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
                     return x[0];
                   }))), (function (entryId) {
@@ -763,7 +758,7 @@ function App(props) {
                                       onClick: onClickDate
                                     })
                               ],
-                              className: "flex flex-col h-full flex-none w-64"
+                              className: "flex flex-col h-full flex-none w-64 "
                             }),
                         JsxRuntime.jsx(App$Entries, {
                               entries: entries,
@@ -830,7 +825,7 @@ function App(props) {
                                 })
                             })
                       ],
-                      className: "flex-none border-t flex flex-row gap-2 items-center px-2"
+                      className: "flex-none border-t border-neutral-700 flex flex-row gap-2 items-center px-2"
                     })
               ],
               className: "relative font-mono h-dvh flex flex-col"

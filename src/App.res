@@ -498,7 +498,7 @@ module Day = {
 module Days = {
   @react.component
   let make = (~start, ~end, ~dateSet, ~onClick) => {
-    <div className="w-full flex-2 p-2 overflow-y-scroll ">
+    <div className="w-full flex-2 overflow-y-scroll ">
       {allDays(start, end)
       ->Array.map(d => {
         <Day
@@ -644,7 +644,7 @@ module Entry = {
       <div className="py-2">
         <div className="rounded overflow-hidden">
           <Editor
-            className={"editor"}
+            className={"editor scroll-m-20"}
             content={entry.content}
             onChange={newContent => updateEntry(entry.id, v => {...v, content: newContent})}
             readonly={entry.lock}
@@ -714,17 +714,18 @@ let make = () => {
           })
         },
       )
-      element
-      ->querySelector(".editor")
-      ->Js.Nullable.toOption
-      ->Option.mapOr(
-        (),
-        editorElement => {
-          editorElement->focus
-          // element->selectionStart(element->textAreaLength)
-          // element->selectionEnd(element->textAreaLength)
-        },
-      )
+
+      // element
+      // ->querySelector(".editor")
+      // ->Js.Nullable.toOption
+      // ->Option.mapOr(
+      //   (),
+      //   editorElement => {
+      //     editorElement->focus
+      //     // element->selectionStart(element->textAreaLength)
+      //     // element->selectionEnd(element->textAreaLength)
+      //   },
+      // )
 
       // element->focus
       scrollToRef.current = None
@@ -803,26 +804,31 @@ let make = () => {
         ->{
           x =>
             switch x {
-            | Some(element) => {
-                element
-                ->querySelector(".heading")
-                ->Js.Nullable.toOption
-                ->Option.mapOr((), headingElement => {
-                  headingElement->scrollIntoView({
-                    "behavior": "smooth",
-                    "block": "center",
-                  })
-                })
+            | Some(element) =>
+              // element
+              // ->querySelector(".editor")
+              // ->Js.Nullable.toOption
+              // ->Option.mapOr((), editorElement => {
+              //   // editorElement->focus
+              //   editorElement->scrollIntoView({
+              //     "behavior": "smooth",
+              //     "block": "start",
+              //   })
 
-                element
-                ->querySelector(".editor")
-                ->Js.Nullable.toOption
-                ->Option.mapOr((), editorElement => {
-                  editorElement->focus
-                  // element->selectionStart(element->textAreaLength)
-                  // element->selectionEnd(element->textAreaLength)
+              //   // element->selectionStart(element->textAreaLength)
+              //   // element->selectionEnd(element->textAreaLength)
+              // })
+
+              element
+              ->querySelector(".heading")
+              ->Js.Nullable.toOption
+              ->Option.mapOr((), headingElement => {
+                headingElement->scrollIntoView({
+                  "behavior": "smooth",
+                  "block": "center",
                 })
-              }
+                // headingElement->focus
+              })
             | None => {
                 makeNewEntry(entryDate)
                 scrollToRef.current = entryDate->Some->entryClassNameId->Some
@@ -843,7 +849,7 @@ let make = () => {
 
   <div className="relative font-mono h-dvh flex flex-col">
     <div className="flex flex-row flex-1 overflow-hidden">
-      <div className="flex flex-col h-full flex-none w-64">
+      <div className="flex flex-col h-full flex-none w-64 ">
         <Days start={startOfCal} end={endOfCal} dateSet={dateSet} onClick={onClickDate} />
         <Months start={startOfCal} end={endOfCal} dateSet={dateSet} onClick={onClickDate} />
       </div>
@@ -857,7 +863,7 @@ let make = () => {
         }}
       />
     </div>
-    <div className="flex-none border-t flex flex-row gap-2 items-center px-2">
+    <div className="flex-none border-t border-neutral-700 flex flex-row gap-2 items-center px-2">
       <button onClick={_ => setEntries(v => v->sortEntries)}> {"Sort"->React.string} </button>
       <button
         onClick={_ =>
