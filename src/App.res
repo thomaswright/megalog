@@ -37,14 +37,6 @@ external querySelector: (Dom.element, string) => Js.Nullable.t<Dom.element> = "q
 
 @get @scope("value") external textAreaLength: Dom.element => int = "length"
 
-// let scrollIntoView = x => {
-//   x->scrollIntoView({
-//     "behavior": "smooth",
-//     "block": "center",
-//   })
-//   x->focus
-// }
-
 let intMax = (a, b) => {
   a > b ? a : b
 }
@@ -123,8 +115,6 @@ module Editor = TextArea
 
 @module("./useLocalStorage.js")
 external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "default"
-// @module("@uidotdev/usehooks")
-// external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "useLocalStorage"
 
 let concatArray = x => {
   x->Array.reduce([], (a, c) => {
@@ -303,22 +293,14 @@ module Months = {
     <div className="p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full font-black">
       {allDays(start, end)
       ->Array.map(d => {
-        // let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
         let beginningOfMonth = d->Date.getDate == 1
         let beginningOfYear = d->DateFns.getDayOfYear == 1
-
-        // let beginningOfQuarter = mod(month, 3) == 1
-        // let beginningOfHalf = mod(month, 6) == 1
         let year = d->Date.getFullYear
-
         let hasYearEntry = dateSet->Set.has(Year(year)->entryDateString)
-        // let hasH1Entry = Math.random() > 0.7
-        // let hasH2Entry = Math.random() > 0.7
         let hasQ1Entry = dateSet->Set.has(Quarter(year, 1)->entryDateString)
         let hasQ2Entry = dateSet->Set.has(Quarter(year, 2)->entryDateString)
         let hasQ3Entry = dateSet->Set.has(Quarter(year, 3)->entryDateString)
         let hasQ4Entry = dateSet->Set.has(Quarter(year, 4)->entryDateString)
-
         let entryCheck = x => x ? `text-lime-500 bg-black` : "text-inherit bg-black"
 
         beginningOfMonth
@@ -405,14 +387,8 @@ module Months = {
                     {Array.make(~length=12, false)
                     ->Array.mapWithIndex((_v, i) => {
                       let monthNum = (i + 1)->Int.toString
-                      // let monthColorDim = monthColorDim(i + 1, year)
-                      // let monthColor = monthColor(i + 1, year)
                       let monthDate = Date.makeWithYM(~year, ~month=i)
-
                       let hasEntry = dateSet->Set.has(Month(year, i + 1)->entryDateString)
-                      // let color = hasEntry
-                      //   ? `bg-black `
-                      //   : "bg-black text-plain-600"
 
                       <button
                         key={monthNum}
@@ -443,8 +419,6 @@ module Day = {
   @react.component
   let make = (~d, ~dateSet, ~onClick, ~hasEntry) => {
     let beginningOfWeek = d->Date.getDay == 0
-    // let beginningOfMonth = d->Date.getDate == 1
-    // let beginningOfYear = d->DateFns.getDayOfYear == 1
 
     let year = d->Date.getFullYear
     let month = d->Date.getMonth + 1
@@ -544,30 +518,11 @@ module Days = {
   })
 }
 
-// let entryClassNameIds = entryDate => {
-//   entryDate->Option.mapOr([], date => {
-//     switch date {
-//     | Date(y, m, d) => ["entry-" ++ ymdDate(y, m - 1, d)->format("y-MM-dd")]
-//     | Week(y, w) =>
-//       getDaysOfWeek(w, y)
-//       ->Array.map(date => date->format("y-MM-dd"))
-//       ->Array.map(v => "entry-" ++ v)
-//     | _ => []
-//     }
-//   })
-// }
-
 let entryClassNameId = entryDate => {
   entryDate->Option.mapOr("", date => {
     "entryview-" ++ date->entryDateString
   })
 }
-
-// let dayId = entryDate => {
-//   entryDate->Option.mapOr("", date => {
-//     "entry-" ++ date->entryDateString
-//   })
-// }
 
 module Entry = {
   @react.component
@@ -578,7 +533,6 @@ module Entry = {
     ~isSelectedForSet,
     ~deleteEntry,
   ) => {
-    Console.log("render")
     let monthColor = entry.date->Option.mapOr("#fff", date => {
       switch date {
       | Date(_y, m, _d) => monthColor(m)
@@ -675,11 +629,6 @@ module Entry = {
                   onClick={_ => setEntryToSet(v => v == Some(entry.id) ? None : Some(entry.id))}>
                   {(isSelectedForSet ? "Cancel" : "Set")->React.string}
                 </button>
-                // <button
-                //   className={["mx-1", "bg-white text-black"]->Array.join(" ")}
-                //   onClick={_ => goToDay()}>
-                //   {"Go to date"->React.string}
-                // </button>
                 <button
                   className={["mx-1", "bg-white text-black"]->Array.join(" ")}
                   onClick={_ => deleteEntry(entry.id)}>

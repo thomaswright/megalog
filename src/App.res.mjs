@@ -484,7 +484,6 @@ function App$Entry(props) {
   var setEntryToSet = props.setEntryToSet;
   var updateEntry = props.updateEntry;
   var entry = props.entry;
-  console.log("render");
   var monthColor$1 = Core__Option.mapOr(entry.date, "#fff", (function (date) {
           switch (date.TAG) {
             case "Year" :
