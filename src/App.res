@@ -479,13 +479,16 @@ module Day = {
       {beginningOfWeek
         ? <div className="relative h-0 ml-px">
             <div
-              style={{background: monthColor}} className="h-px w-full absolute-translate-y-1/2"
+              style={{
+                background: monthColor,
+              }}
+              className="h-px w-full absolute -translate-y-1/2"
             />
           </div>
         : React.null}
       <div
-        className=" flex flex-row items-center gap-1 h-5 max-h-5 whitespace-nowrap overflow-x-hidden">
-        <div className=" h-5 w-5 flex flex-row flex-none">
+        className="text-xs font-black flex flex-row items-center gap-1 h-5 whitespace-nowrap overflow-x-hidden">
+        <div className=" h-full w-5 flex flex-row flex-none items-center">
           {beginningOfWeek
             ? {
                 let week = d->DateFns.format("w")
@@ -499,7 +502,7 @@ module Day = {
                     style={{
                       color: hasWeekEntry ? monthColor : "#ddd",
                     }}
-                    className=" text-left  overflow-visible text-nowrap p-1 font-black">
+                    className="text-left overflow-visible text-nowrap px-1 font-normal">
                     {("" ++ week)->React.string}
                   </button>
                 })
@@ -507,11 +510,11 @@ module Day = {
             : React.null}
         </div>
         <button
-          className="h-5 flex-1 flex flex-row whitespace-nowrap overflow-x-hidden"
+          className="h-full flex-1 flex flex-row items-center whitespace-nowrap overflow-x-hidden"
           onClick={_ => onClick(Date(year, month, monthDay))}
           id={`dayview-${Date(year, month, monthDay)->entryDateString}`}>
           <span
-            className={["w-1 h-5 flex-none"]->Array.join(" ")}
+            className={["w-1 h-full flex-none"]->Array.join(" ")}
             style={{
               backgroundColor: monthColor,
             }}
@@ -520,13 +523,12 @@ module Day = {
             style={{
               color: entry->Option.isSome ? monthColor : monthColorDim,
             }}
-            className={[
-              "font-black px-2 flex-none",
-              isToday ? "border-r-4 border-white" : "",
-            ]->Array.join(" ")}>
+            className={[" px-2 flex-none", isToday ? "border-r-4 border-white" : ""]->Array.join(
+              " ",
+            )}>
             {d->DateFns.format("y-MM-dd eee")->React.string}
           </span>
-          <span className="text-plain-500 flex-none">
+          <span className="font-light text-white flex-none italic">
             {entry->Option.mapOr("", e => e.title)->React.string}
           </span>
         </button>
@@ -593,7 +595,6 @@ module Entry = {
     ~isSelectedForSet,
     ~deleteEntry,
   ) => {
-    Console.log("render")
     let monthColor = entry.date->Option.mapOr("#fff", date => {
       switch date {
       | Date(_y, m, _d) => monthColor(m)

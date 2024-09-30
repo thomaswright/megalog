@@ -359,7 +359,7 @@ function App$Day(props) {
     tmp = Core__Option.mapOr(Core__Int.fromString(week, undefined), null, (function (weekNum) {
             return JsxRuntime.jsx("button", {
                         children: week,
-                        className: " text-left  overflow-visible text-nowrap p-1 font-black",
+                        className: "text-left overflow-visible text-nowrap px-1 font-normal",
                         id: "dayview-" + entryDateString({
                               TAG: "Week",
                               _0: year,
@@ -384,7 +384,7 @@ function App$Day(props) {
               children: [
                 beginningOfWeek ? JsxRuntime.jsx("div", {
                         children: JsxRuntime.jsx("div", {
-                              className: "h-px w-full absolute-translate-y-1/2",
+                              className: "h-px w-full absolute -translate-y-1/2",
                               style: {
                                 background: monthColor$1
                               }
@@ -395,12 +395,12 @@ function App$Day(props) {
                       children: [
                         JsxRuntime.jsx("div", {
                               children: tmp,
-                              className: " h-5 w-5 flex flex-row flex-none"
+                              className: " h-full w-5 flex flex-row flex-none items-center"
                             }),
                         JsxRuntime.jsxs("button", {
                               children: [
                                 JsxRuntime.jsx("span", {
-                                      className: ["w-1 h-5 flex-none"].join(" "),
+                                      className: ["w-1 h-full flex-none"].join(" "),
                                       style: {
                                         backgroundColor: monthColor$1
                                       }
@@ -408,7 +408,7 @@ function App$Day(props) {
                                 JsxRuntime.jsx("span", {
                                       children: DateFns.format(d, "y-MM-dd eee"),
                                       className: [
-                                          "font-black px-2 flex-none",
+                                          " px-2 flex-none",
                                           isToday ? "border-r-4 border-white" : ""
                                         ].join(" "),
                                       style: {
@@ -419,10 +419,10 @@ function App$Day(props) {
                                       children: Core__Option.mapOr(entry, "", (function (e) {
                                               return e.title;
                                             })),
-                                      className: "text-plain-500 flex-none"
+                                      className: "font-light text-white flex-none italic"
                                     })
                               ],
-                              className: "h-5 flex-1 flex flex-row whitespace-nowrap overflow-x-hidden",
+                              className: "h-full flex-1 flex flex-row items-center whitespace-nowrap overflow-x-hidden",
                               id: "dayview-" + entryDateString({
                                     TAG: "Date",
                                     _0: year,
@@ -439,7 +439,7 @@ function App$Day(props) {
                                 })
                             })
                       ],
-                      className: " flex flex-row items-center gap-1 h-5 max-h-5 whitespace-nowrap overflow-x-hidden"
+                      className: "text-xs font-black flex flex-row items-center gap-1 h-5 whitespace-nowrap overflow-x-hidden"
                     })
               ]
             });
@@ -490,7 +490,6 @@ function App$Entry(props) {
   var setEntryToSet = props.setEntryToSet;
   var updateEntry = props.updateEntry;
   var entry = props.entry;
-  console.log("render");
   var monthColor$1 = Core__Option.mapOr(entry.date, "#fff", (function (date) {
           switch (date.TAG) {
             case "Year" :
