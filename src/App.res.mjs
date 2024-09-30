@@ -95,6 +95,14 @@ function allDays(start, end) {
             });
 }
 
+function allYears(start, end) {
+  var startYear = start.getFullYear();
+  var endYear = end.getFullYear();
+  return Core__Array.make(endYear - startYear | 0, false).map(function (param, i) {
+              return new Date(startYear + i | 0, 0, 1);
+            });
+}
+
 function hsl(h, s, l) {
   return Color.RGBToHex(Color.convert([
                   h,
@@ -127,9 +135,7 @@ function App$Months(props) {
   var onClick = props.onClick;
   var dateSet = props.dateSet;
   return JsxRuntime.jsx("div", {
-              children: allDays(props.start, props.end).filter(function (d) {
-                      return DateFns.getDayOfYear(d) === 1;
-                    }).map(function (d) {
+              children: allYears(props.start, props.end).map(function (d) {
                     var year = d.getFullYear();
                     var hasYearEntry = dateSet.has(entryDateString({
                               TAG: "Year",

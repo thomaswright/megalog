@@ -214,6 +214,15 @@ let allDays = (start, end) => {
   })
 }
 
+let allYears = (start, end) => {
+  let startYear = start->Date.getFullYear
+  let endYear = end->Date.getFullYear
+
+  Array.make(~length=endYear - startYear, false)->Array.mapWithIndex((_, i) => {
+    Date.makeWithYMD(~year=startYear + i, ~month=0, ~date=1)
+  })
+}
+
 let hsv = (h, s, v) => Texel.convert((h, s, v), Texel.okhsv, Texel.srgb)->Texel.rgbToHex
 let hsl = (h, s, l) => Texel.convert((h, s, l), Texel.okhsl, Texel.srgb)->Texel.rgbToHex
 
@@ -291,8 +300,7 @@ module Months = {
   @react.component
   let make = (~start, ~end, ~dateSet, ~onClick) => {
     <div className="p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full font-black">
-      {allDays(start, end)
-      ->Array.filter(d => d->DateFns.getDayOfYear == 1)
+      {allYears(start, end)
       ->Array.map(d => {
         let year = d->Date.getFullYear
         let hasYearEntry = dateSet->Set.has(Year(year)->entryDateString)
@@ -477,7 +485,6 @@ module Day = {
   }
 
   let make = React.memoCustomCompareProps(make, (a, b) => {
-    // Date.equal(a.d, b.d)
     a.d->Date.getTime == b.d->Date.getTime && a.hasEntry == b.hasEntry
     // false
   })
