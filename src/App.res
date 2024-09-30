@@ -321,6 +321,7 @@ module Months = {
         let entryCheck = x => x ? `text-white bg-black` : "text-inherit bg-black"
 
         <div
+          key={year->Int.toString}
           className="gap-px text-xs bg-plain-800 border border-plain-700 text-plain-600"
           style={{
             display: "grid",
@@ -429,7 +430,6 @@ module Months = {
 module Day = {
   @react.component
   let make = (~d, ~onClick, ~hasWeekEntry, ~entry: option<entry>) => {
-    Console.log("render")
     let beginningOfWeek = d->Date.getDay == 0
 
     let year = d->Date.getFullYear
@@ -554,6 +554,7 @@ module Entry = {
     ~isSelectedForSet,
     ~deleteEntry,
   ) => {
+    Console.log("render")
     let monthColor = entry.date->Option.mapOr("#fff", date => {
       switch date {
       | Date(_y, m, _d) => monthColor(m)
@@ -632,7 +633,19 @@ module Entry = {
             {dateDisplay_->React.string}
           </span>
         })}
-        <span className=" text-white min-w-8 italic font-light"> {entry.title->React.string} </span>
+        <input
+          readOnly={entry.lock}
+          type_="text"
+          className={"bg-inherit text-white min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1"}
+          placeholder={""}
+          value={entry.title}
+          onChange={e => {
+            updateEntry(entry.id, v => {
+              ...v,
+              title: ReactEvent.Form.target(e)["value"],
+            })
+          }}
+        />
         <span className="flex-1" />
         <span className="flex flex-row items-center">
           {entry.lock
@@ -648,7 +661,7 @@ module Entry = {
                     backgroundColor: isSelectedForSet ? monthColor : "white",
                   }}
                   onClick={_ => setEntryToSet(v => v == Some(entry.id) ? None : Some(entry.id))}>
-                  {(isSelectedForSet ? "Cancel" : "Set")->React.string}
+                  {(isSelectedForSet ? "Cancel" : "Set Date")->React.string}
                 </button>
                 <button
                   className={["mx-1", "bg-white text-black"]->Array.join(" ")}
@@ -686,6 +699,7 @@ module Entry = {
     } &&
     a.entry.content == b.entry.content &&
     a.entry.lock == b.entry.lock &&
+    a.entry.title == b.entry.title &&
     a.isSelectedForSet == b.isSelectedForSet
   })
 }
