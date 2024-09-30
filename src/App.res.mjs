@@ -127,9 +127,9 @@ function App$Months(props) {
   var onClick = props.onClick;
   var dateSet = props.dateSet;
   return JsxRuntime.jsx("div", {
-              children: allDays(props.start, props.end).map(function (d) {
-                    var beginningOfMonth = d.getDate() === 1;
-                    var beginningOfYear = DateFns.getDayOfYear(d) === 1;
+              children: allDays(props.start, props.end).filter(function (d) {
+                      return DateFns.getDayOfYear(d) === 1;
+                    }).map(function (d) {
                     var year = d.getFullYear();
                     var hasYearEntry = dateSet.has(entryDateString({
                               TAG: "Year",
@@ -155,180 +155,174 @@ function App$Months(props) {
                               _0: year,
                               _1: 4
                             }));
-                    if (beginningOfMonth) {
-                      return JsxRuntime.jsx(React.Fragment, {
-                                  children: beginningOfYear ? JsxRuntime.jsxs("div", {
-                                          children: [
-                                            JsxRuntime.jsx("button", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: DateFns.format(d, "y"),
-                                                        className: "-rotate-90"
-                                                      }),
-                                                  className: [
-                                                      "monthview-" + entryDateString({
-                                                            TAG: "Year",
-                                                            _0: year
-                                                          }),
-                                                      " flex flex-row items-center justify-center",
-                                                      hasYearEntry ? "text-lime-500 bg-black" : "text-plain-400 bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "year"
-                                                  },
-                                                  onClick: (function (param) {
-                                                      onClick({
-                                                            TAG: "Year",
-                                                            _0: year
-                                                          });
-                                                    })
+                    return JsxRuntime.jsxs("div", {
+                                children: [
+                                  JsxRuntime.jsx("button", {
+                                        children: JsxRuntime.jsx("div", {
+                                              children: DateFns.format(d, "y"),
+                                              className: "-rotate-90"
+                                            }),
+                                        className: [
+                                            "monthview-" + entryDateString({
+                                                  TAG: "Year",
+                                                  _0: year
                                                 }),
-                                            JsxRuntime.jsx("button", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: "Q1",
-                                                        className: ""
-                                                      }),
-                                                  className: [
-                                                      "monthview-" + entryDateString({
-                                                            TAG: "Quarter",
-                                                            _0: year,
-                                                            _1: 1
-                                                          }),
-                                                      " flex flex-row items-center justify-center",
-                                                      hasQ1Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "q1"
-                                                  },
-                                                  onClick: (function (param) {
-                                                      onClick({
-                                                            TAG: "Quarter",
-                                                            _0: year,
-                                                            _1: 1
-                                                          });
-                                                    })
+                                            " flex flex-row items-center justify-center",
+                                            hasYearEntry ? "text-lime-500 bg-black" : "text-plain-400 bg-black"
+                                          ].join(" "),
+                                        style: {
+                                          gridArea: "year"
+                                        },
+                                        onClick: (function (param) {
+                                            onClick({
+                                                  TAG: "Year",
+                                                  _0: year
+                                                });
+                                          })
+                                      }),
+                                  JsxRuntime.jsx("button", {
+                                        children: JsxRuntime.jsx("div", {
+                                              children: "Q1",
+                                              className: ""
+                                            }),
+                                        className: [
+                                            "monthview-" + entryDateString({
+                                                  TAG: "Quarter",
+                                                  _0: year,
+                                                  _1: 1
                                                 }),
-                                            JsxRuntime.jsx("button", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: "Q2",
-                                                        className: ""
-                                                      }),
-                                                  className: [
-                                                      "monthview-" + entryDateString({
-                                                            TAG: "Quarter",
-                                                            _0: year,
-                                                            _1: 2
-                                                          }),
-                                                      " flex flex-row items-center justify-center",
-                                                      hasQ2Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "q2"
-                                                  },
-                                                  onClick: (function (param) {
-                                                      onClick({
-                                                            TAG: "Quarter",
-                                                            _0: year,
-                                                            _1: 2
-                                                          });
-                                                    })
+                                            " flex flex-row items-center justify-center",
+                                            hasQ1Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
+                                          ].join(" "),
+                                        style: {
+                                          gridArea: "q1"
+                                        },
+                                        onClick: (function (param) {
+                                            onClick({
+                                                  TAG: "Quarter",
+                                                  _0: year,
+                                                  _1: 1
+                                                });
+                                          })
+                                      }),
+                                  JsxRuntime.jsx("button", {
+                                        children: JsxRuntime.jsx("div", {
+                                              children: "Q2",
+                                              className: ""
+                                            }),
+                                        className: [
+                                            "monthview-" + entryDateString({
+                                                  TAG: "Quarter",
+                                                  _0: year,
+                                                  _1: 2
                                                 }),
-                                            JsxRuntime.jsx("button", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: "Q3",
-                                                        className: ""
-                                                      }),
-                                                  className: [
-                                                      "monthview-" + entryDateString({
-                                                            TAG: "Quarter",
-                                                            _0: year,
-                                                            _1: 3
-                                                          }),
-                                                      " flex flex-row items-center justify-center",
-                                                      hasQ3Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "q3"
-                                                  },
-                                                  onClick: (function (param) {
-                                                      onClick({
-                                                            TAG: "Quarter",
-                                                            _0: year,
-                                                            _1: 3
-                                                          });
-                                                    })
+                                            " flex flex-row items-center justify-center",
+                                            hasQ2Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
+                                          ].join(" "),
+                                        style: {
+                                          gridArea: "q2"
+                                        },
+                                        onClick: (function (param) {
+                                            onClick({
+                                                  TAG: "Quarter",
+                                                  _0: year,
+                                                  _1: 2
+                                                });
+                                          })
+                                      }),
+                                  JsxRuntime.jsx("button", {
+                                        children: JsxRuntime.jsx("div", {
+                                              children: "Q3",
+                                              className: ""
+                                            }),
+                                        className: [
+                                            "monthview-" + entryDateString({
+                                                  TAG: "Quarter",
+                                                  _0: year,
+                                                  _1: 3
                                                 }),
-                                            JsxRuntime.jsx("button", {
-                                                  children: JsxRuntime.jsx("div", {
-                                                        children: "Q4",
-                                                        className: ""
-                                                      }),
-                                                  className: [
-                                                      "monthview-" + entryDateString({
-                                                            TAG: "Quarter",
-                                                            _0: year,
-                                                            _1: 4
-                                                          }),
-                                                      " flex flex-row items-center justify-center",
-                                                      hasQ4Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
-                                                    ].join(" "),
-                                                  style: {
-                                                    gridArea: "q4"
-                                                  },
-                                                  onClick: (function (param) {
-                                                      onClick({
-                                                            TAG: "Quarter",
-                                                            _0: year,
-                                                            _1: 4
-                                                          });
-                                                    })
+                                            " flex flex-row items-center justify-center",
+                                            hasQ3Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
+                                          ].join(" "),
+                                        style: {
+                                          gridArea: "q3"
+                                        },
+                                        onClick: (function (param) {
+                                            onClick({
+                                                  TAG: "Quarter",
+                                                  _0: year,
+                                                  _1: 3
+                                                });
+                                          })
+                                      }),
+                                  JsxRuntime.jsx("button", {
+                                        children: JsxRuntime.jsx("div", {
+                                              children: "Q4",
+                                              className: ""
+                                            }),
+                                        className: [
+                                            "monthview-" + entryDateString({
+                                                  TAG: "Quarter",
+                                                  _0: year,
+                                                  _1: 4
                                                 }),
-                                            Core__Array.make(12, false).map(function (_v, i) {
-                                                  var monthNum = (i + 1 | 0).toString();
-                                                  var monthDate = new Date(year, i);
-                                                  var hasEntry = dateSet.has(entryDateString({
-                                                            TAG: "Month",
-                                                            _0: year,
-                                                            _1: i + 1 | 0
-                                                          }));
-                                                  return JsxRuntime.jsx("button", {
-                                                              children: JsxRuntime.jsx("div", {
-                                                                    children: DateFns.format(monthDate, "MMM"),
-                                                                    className: ""
-                                                                  }),
-                                                              className: [
-                                                                  "monthview-" + entryDateString({
-                                                                        TAG: "Month",
-                                                                        _0: year,
-                                                                        _1: i + 1 | 0
-                                                                      }),
-                                                                  " flex flex-row items-center justify-center bg-black"
-                                                                ].join(" "),
-                                                              style: {
-                                                                color: hasEntry ? monthColor(i + 1 | 0) : "inherit",
-                                                                gridArea: "m" + monthNum
-                                                              },
-                                                              onClick: (function (param) {
-                                                                  onClick({
-                                                                        TAG: "Month",
-                                                                        _0: year,
-                                                                        _1: i + 1 | 0
-                                                                      });
-                                                                })
-                                                            }, monthNum);
-                                                })
-                                          ],
-                                          className: "gap-px text-xs bg-plain-800 border border-plain-700 text-plain-600",
-                                          style: {
-                                            display: "grid",
-                                            gridTemplateAreas: "\n                    \"year q1 m1 m2 m3\"\n                    \"year q2 m4 m5 m6\"\n                    \"year q3 m7 m8 m9\"\n                    \"year q4 m10 m11 m12\"\n                  \n                    ",
-                                            gridTemplateColumns: "1fr 1.25fr 2fr 2fr 2fr ",
-                                            gridTemplateRows: " repeat(4, 1.0fr)"
-                                          }
-                                        }) : null
-                                });
-                    } else {
-                      return null;
-                    }
+                                            " flex flex-row items-center justify-center",
+                                            hasQ4Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
+                                          ].join(" "),
+                                        style: {
+                                          gridArea: "q4"
+                                        },
+                                        onClick: (function (param) {
+                                            onClick({
+                                                  TAG: "Quarter",
+                                                  _0: year,
+                                                  _1: 4
+                                                });
+                                          })
+                                      }),
+                                  Core__Array.make(12, false).map(function (_v, i) {
+                                        var monthNum = (i + 1 | 0).toString();
+                                        var monthDate = new Date(year, i);
+                                        var hasEntry = dateSet.has(entryDateString({
+                                                  TAG: "Month",
+                                                  _0: year,
+                                                  _1: i + 1 | 0
+                                                }));
+                                        return JsxRuntime.jsx("button", {
+                                                    children: JsxRuntime.jsx("div", {
+                                                          children: DateFns.format(monthDate, "MMM"),
+                                                          className: ""
+                                                        }),
+                                                    className: [
+                                                        "monthview-" + entryDateString({
+                                                              TAG: "Month",
+                                                              _0: year,
+                                                              _1: i + 1 | 0
+                                                            }),
+                                                        " flex flex-row items-center justify-center bg-black"
+                                                      ].join(" "),
+                                                    style: {
+                                                      color: hasEntry ? monthColor(i + 1 | 0) : "inherit",
+                                                      gridArea: "m" + monthNum
+                                                    },
+                                                    onClick: (function (param) {
+                                                        onClick({
+                                                              TAG: "Month",
+                                                              _0: year,
+                                                              _1: i + 1 | 0
+                                                            });
+                                                      })
+                                                  }, monthNum);
+                                      })
+                                ],
+                                className: "gap-px text-xs bg-plain-800 border border-plain-700 text-plain-600",
+                                style: {
+                                  display: "grid",
+                                  gridTemplateAreas: "\n                    \"year q1 m1 m2 m3\"\n                    \"year q2 m4 m5 m6\"\n                    \"year q3 m7 m8 m9\"\n                    \"year q4 m10 m11 m12\"\n                  \n                    ",
+                                  gridTemplateColumns: "1fr 1.25fr 2fr 2fr 2fr ",
+                                  gridTemplateRows: " repeat(4, 1.0fr)"
+                                }
+                              });
                   }),
               className: "p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full font-black"
             });
