@@ -40,6 +40,8 @@ function App$TextArea(props) {
             });
 }
 
+var standardDateFormat = "y-MM-dd";
+
 function getMonthForWeekOfYear(weekNumber, year) {
   var firstDayOfYear = new Date(year, 0, 1);
   var dayOfWeek = firstDayOfYear.getDay();
@@ -80,7 +82,7 @@ function entryDateString(date) {
     case "Week" :
         return date._0.toString().padStart(4, "0") + "-W" + date._1.toString();
     case "Date" :
-        return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd");
+        return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), standardDateFormat);
     
   }
 }
@@ -335,9 +337,11 @@ function App$Months(props) {
 }
 
 function App$Day(props) {
+  var entry = props.entry;
+  var hasWeekEntry = props.hasWeekEntry;
   var onClick = props.onClick;
-  var dateSet = props.dateSet;
   var d = props.d;
+  console.log("render");
   var beginningOfWeek = d.getDay() === 0;
   var year = d.getFullYear();
   var month = d.getMonth() + 1 | 0;
@@ -349,11 +353,6 @@ function App$Day(props) {
   if (true && beginningOfWeek) {
     var week = DateFns.format(d, "w");
     tmp = Core__Option.mapOr(Core__Int.fromString(week, undefined), null, (function (weekNum) {
-            var hasWeekEntry = dateSet.has(entryDateString({
-                      TAG: "Week",
-                      _0: year,
-                      _1: weekNum
-                    }));
             return JsxRuntime.jsx("button", {
                         children: week,
                         className: " text-left  overflow-visible text-nowrap p-1 font-black",
@@ -413,7 +412,7 @@ function App$Day(props) {
                                     _2: monthDay
                                   }),
                               style: {
-                                color: props.hasEntry ? monthColor$1 : monthColorDim$1
+                                color: Core__Option.isSome(entry) ? monthColor$1 : monthColorDim$1
                               },
                               onClick: (function (param) {
                                   onClick({
@@ -425,7 +424,9 @@ function App$Day(props) {
                                 })
                             }),
                         JsxRuntime.jsx("div", {
-                              children: "Singapore",
+                              children: Core__Option.mapOr(entry, "", (function (e) {
+                                      return e.title;
+                                    })),
                               className: "text-plain-500 flex-none"
                             })
                       ],
@@ -436,23 +437,32 @@ function App$Day(props) {
 }
 
 var make = React.memo(App$Day, (function (a, b) {
+        var tmp = false;
         if (a.d.getTime() === b.d.getTime()) {
-          return a.hasEntry === b.hasEntry;
+          var match = a.entry;
+          var match$1 = b.entry;
+          tmp = match !== undefined ? (
+              match$1 !== undefined ? match.title === match$1.title : false
+            ) : match$1 === undefined;
+        }
+        if (tmp) {
+          return a.hasWeekEntry === b.hasWeekEntry;
         } else {
           return false;
         }
       }));
 
 function App$Days(props) {
+  var dateEntries = props.dateEntries;
   var onClick = props.onClick;
   var dateSet = props.dateSet;
   return JsxRuntime.jsx("div", {
               children: allDays(props.start, props.end).map(function (d) {
                     return JsxRuntime.jsx(make, {
                                 d: d,
-                                dateSet: dateSet,
                                 onClick: onClick,
-                                hasEntry: dateSet.has(DateFns.format(d, "y-MM-dd"))
+                                hasWeekEntry: dateSet.has(DateFns.format(d, "y") + "-W" + DateFns.format(d, "w")),
+                                entry: dateEntries.get(DateFns.format(d, standardDateFormat))
                               }, d.toString());
                   }),
               className: "w-full flex-2 overflow-y-scroll text-xs"
@@ -465,7 +475,7 @@ var make$1 = React.memo(App$Days, (function (a, b) {
                         return a.localeCompare(b);
                       }).join("");
         };
-        if (DateFns.format(a.start, "y-MM-dd") === DateFns.format(b.start, "y-MM-dd") && DateFns.format(a.end, "y-MM-dd") === DateFns.format(b.end, "y-MM-dd")) {
+        if (DateFns.format(a.start, standardDateFormat) === DateFns.format(b.start, standardDateFormat) && DateFns.format(a.end, standardDateFormat) === DateFns.format(b.end, standardDateFormat)) {
           return dateSetId(a.dateSet) === dateSetId(b.dateSet);
         } else {
           return false;
@@ -821,6 +831,19 @@ function App(props) {
                 })).map(function (date) {
             return entryDateString(date);
           }));
+  var dateEntries = new Map(Core__Array.keepSome(Core__Option.getOr(entries, []).map(function (entry) {
+                  return Core__Option.map(entry.date, (function (v) {
+                                return [
+                                        v,
+                                        entry
+                                      ];
+                              }));
+                })).map(function (param) {
+            return [
+                    entryDateString(param[0]),
+                    param[1]
+                  ];
+          }));
   var makeNewEntry = function (entryDate) {
     setEntries(function (v) {
           return sortEntries(Core__Option.map(v, (function (entries) {
@@ -921,7 +944,8 @@ function App(props) {
                                       start: startOfCal,
                                       end: endOfCal,
                                       dateSet: dateSet,
-                                      onClick: onClickDate
+                                      onClick: onClickDate,
+                                      dateEntries: dateEntries
                                     }),
                                 JsxRuntime.jsx(App$Months, {
                                       start: startOfCal,

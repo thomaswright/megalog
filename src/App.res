@@ -116,6 +116,8 @@ module Editor = TextArea
 @module("./useLocalStorage.js")
 external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "default"
 
+let standardDateFormat = "y-MM-dd"
+
 let concatArray = x => {
   x->Array.reduce([], (a, c) => {
     Array.concat(a, c)
@@ -189,9 +191,17 @@ let format = DateFns.format
 
 let ymdDate = (year, month, date) => Date.makeWithYMD(~year, ~month, ~date)
 
+let dateToEntryDate = d => {
+  let year = d->Date.getFullYear
+  let month = d->Date.getMonth + 1
+  let monthDay = d->Date.getDate
+
+  Date(year, month, monthDay)
+}
+
 let entryDateString = date =>
   switch date {
-  | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd")
+  | Date(y, m, d) => ymdDate(y, m - 1, d)->format(standardDateFormat)
   | Year(y) => y->Int.toString->String.padStart(4, "0")
   // | Half(y, h) => y->Int.toString->String.padStart(4, "0") ++ "-H" ++ h->Int.toString
   | Quarter(y, q) => y->Int.toString->String.padStart(4, "0") ++ "-Q" ++ q->Int.toString
@@ -418,7 +428,8 @@ module Months = {
 
 module Day = {
   @react.component
-  let make = (~d, ~dateSet, ~onClick, ~hasEntry) => {
+  let make = (~d, ~onClick, ~hasWeekEntry, ~entry: option<entry>) => {
+    Console.log("render")
     let beginningOfWeek = d->Date.getDay == 0
 
     let year = d->Date.getFullYear
@@ -446,8 +457,6 @@ module Day = {
                 week
                 ->Int.fromString
                 ->Option.mapOr(React.null, weekNum => {
-                  let hasWeekEntry = dateSet->Set.has(Week(year, weekNum)->entryDateString)
-
                   <button
                     id={`dayview-${Week(year, weekNum)->entryDateString}`}
                     onClick={_ => onClick(Week(year, weekNum))}
@@ -471,7 +480,7 @@ module Day = {
           id={`dayview-${Date(year, month, monthDay)->entryDateString}`}
           onClick={_ => onClick(Date(year, month, monthDay))}
           style={{
-            color: hasEntry ? monthColor : monthColorDim,
+            color: entry->Option.isSome ? monthColor : monthColorDim,
           }}
           className={[
             "font-black px-2 flex-none",
@@ -479,25 +488,37 @@ module Day = {
           ]->Array.join(" ")}>
           {d->DateFns.format("y-MM-dd eee")->React.string}
         </button>
-        <div className="text-plain-500 flex-none"> {"Singapore"->React.string} </div>
+        <div className="text-plain-500 flex-none">
+          {entry->Option.mapOr("", e => e.title)->React.string}
+        </div>
       </div>
     </React.Fragment>
   }
 
   let make = React.memoCustomCompareProps(make, (a, b) => {
-    a.d->Date.getTime == b.d->Date.getTime && a.hasEntry == b.hasEntry
+    a.d->Date.getTime == b.d->Date.getTime &&
+    switch (a.entry, b.entry) {
+    | (Some(ae), Some(be)) => ae.title == be.title
+    | (None, None) => true
+    | _ => false
+    } &&
+    a.hasWeekEntry == b.hasWeekEntry
     // false
   })
 }
 
 module Days = {
   @react.component
-  let make = (~start, ~end, ~dateSet, ~onClick) => {
+  let make = (~start, ~end, ~dateSet, ~onClick, ~dateEntries) => {
     <div className="w-full flex-2 overflow-y-scroll text-xs">
       {allDays(start, end)
       ->Array.map(d => {
         <Day
-          key={d->Date.toString} d dateSet onClick hasEntry={dateSet->Set.has(d->format("y-MM-dd"))}
+          key={d->Date.toString}
+          d
+          onClick
+          entry={dateEntries->Map.get(d->format(standardDateFormat))}
+          hasWeekEntry={dateSet->Set.has(d->format("y") ++ "-W" ++ d->format("w"))}
         />
       })
       ->React.array}
@@ -512,8 +533,8 @@ module Days = {
       ->Array.toSorted((a, b) => String.localeCompare(a, b))
       ->Array.join("")
 
-    a.start->format("y-MM-dd") == b.start->format("y-MM-dd") &&
-    a.end->format("y-MM-dd") == b.end->format("y-MM-dd") &&
+    a.start->format(standardDateFormat) == b.start->format(standardDateFormat) &&
+    a.end->format(standardDateFormat) == b.end->format(standardDateFormat) &&
     a.dateSet->dateSetId == b.dateSet->dateSetId
   })
 }
@@ -749,6 +770,14 @@ let make = () => {
     ->Array.map(date => date->entryDateString)
     ->Set.fromArray
 
+  let dateEntries =
+    entries
+    ->Option.getOr([])
+    ->Array.map(entry => entry.date->Option.map(v => (v, entry)))
+    ->Array.keepSome
+    ->Array.map(((date, entry)) => (date->entryDateString, entry))
+    ->Map.fromArray
+
   let makeNewEntry = entryDate => {
     setEntries(v => {
       v
@@ -821,7 +850,9 @@ let make = () => {
   <div className="relative font-mono h-dvh flex flex-col">
     <div className="flex flex-row flex-1 overflow-hidden">
       <div className="flex flex-col h-full flex-none w-64 ">
-        <Days start={startOfCal} end={endOfCal} dateSet={dateSet} onClick={onClickDate} />
+        <Days
+          start={startOfCal} end={endOfCal} dateSet={dateSet} dateEntries onClick={onClickDate}
+        />
         <Months start={startOfCal} end={endOfCal} dateSet={dateSet} onClick={onClickDate} />
       </div>
       <Entries
@@ -858,7 +889,7 @@ let make = () => {
 //   let date =
 //     name
 //     ->String.substring(~start=0, ~end=10)
-//     ->DateFns.parse("y-MM-dd", 0)
+//     ->DateFns.parse(standardDateFormat, 0)
 
 //   date->isInvalidDate
 //     ? None
