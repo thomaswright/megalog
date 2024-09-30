@@ -14,6 +14,12 @@ import * as JsxRuntime from "react/jsx-runtime";
 import UseLocalStorageJs from "./useLocalStorage.js";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
+function getElementByClassOp(s) {
+  return Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(s)), (function (x) {
+                return x[0];
+              }));
+}
+
 function App$TextArea(props) {
   var __readonly = props.readonly;
   var __className = props.className;
@@ -67,8 +73,6 @@ function entryDateString(date) {
   switch (date.TAG) {
     case "Year" :
         return date._0.toString().padStart(4, "0");
-    case "Half" :
-        return date._0.toString().padStart(4, "0") + "-H" + date._1.toString();
     case "Quarter" :
         return date._0.toString().padStart(4, "0") + "-Q" + date._1.toString();
     case "Month" :
@@ -161,6 +165,10 @@ function App$Months(props) {
                                                         className: "-rotate-90"
                                                       }),
                                                   className: [
+                                                      "monthview-" + entryDateString({
+                                                            TAG: "Year",
+                                                            _0: year
+                                                          }),
                                                       " flex flex-row items-center justify-center",
                                                       hasYearEntry ? "text-lime-500 bg-black" : "text-neutral-300 bg-black"
                                                     ].join(" "),
@@ -180,6 +188,11 @@ function App$Months(props) {
                                                         className: ""
                                                       }),
                                                   className: [
+                                                      "monthview-" + entryDateString({
+                                                            TAG: "Quarter",
+                                                            _0: year,
+                                                            _1: 1
+                                                          }),
                                                       " flex flex-row items-center justify-center",
                                                       hasQ1Entry ? "text-lime-500 bg-black" : "text-neutral-600 bg-black"
                                                     ].join(" "),
@@ -200,6 +213,11 @@ function App$Months(props) {
                                                         className: ""
                                                       }),
                                                   className: [
+                                                      "monthview-" + entryDateString({
+                                                            TAG: "Quarter",
+                                                            _0: year,
+                                                            _1: 2
+                                                          }),
                                                       " flex flex-row items-center justify-center",
                                                       hasQ2Entry ? "text-lime-500 bg-black" : "text-neutral-600 bg-black"
                                                     ].join(" "),
@@ -220,6 +238,11 @@ function App$Months(props) {
                                                         className: ""
                                                       }),
                                                   className: [
+                                                      "monthview-" + entryDateString({
+                                                            TAG: "Quarter",
+                                                            _0: year,
+                                                            _1: 3
+                                                          }),
                                                       " flex flex-row items-center justify-center",
                                                       hasQ3Entry ? "text-lime-500 bg-black" : "text-neutral-600 bg-black"
                                                     ].join(" "),
@@ -240,6 +263,11 @@ function App$Months(props) {
                                                         className: ""
                                                       }),
                                                   className: [
+                                                      "monthview-" + entryDateString({
+                                                            TAG: "Quarter",
+                                                            _0: year,
+                                                            _1: 4
+                                                          }),
                                                       " flex flex-row items-center justify-center",
                                                       hasQ4Entry ? "text-lime-500 bg-black" : "text-neutral-600 bg-black"
                                                     ].join(" "),
@@ -267,7 +295,14 @@ function App$Months(props) {
                                                                     children: DateFns.format(monthDate, "MMM"),
                                                                     className: ""
                                                                   }),
-                                                              className: [" flex flex-row items-center justify-center bg-black"].join(" "),
+                                                              className: [
+                                                                  "monthview-" + entryDateString({
+                                                                        TAG: "Month",
+                                                                        _0: year,
+                                                                        _1: i + 1 | 0
+                                                                      }),
+                                                                  " flex flex-row items-center justify-center bg-black"
+                                                                ].join(" "),
                                                               style: {
                                                                 color: hasEntry ? monthColor(i + 1 | 0) : "#333",
                                                                 gridArea: "m" + monthNum
@@ -322,6 +357,11 @@ function App$Day(props) {
             return JsxRuntime.jsx("button", {
                         children: week,
                         className: "text-xs text-left  overflow-visible text-nowrap p-1",
+                        id: "dayview-" + entryDateString({
+                              TAG: "Week",
+                              _0: year,
+                              _1: weekNum
+                            }),
                         style: {
                           color: hasWeekEntry ? monthColor$1 : "#ddd"
                         },
@@ -366,6 +406,12 @@ function App$Day(props) {
                                   "px-2 flex-none",
                                   isToday ? "border-r-4 border-white" : ""
                                 ].join(" "),
+                              id: "dayview-" + entryDateString({
+                                    TAG: "Date",
+                                    _0: year,
+                                    _1: month,
+                                    _2: monthDay
+                                  }),
                               style: {
                                 color: props.hasEntry ? monthColor$1 : monthColorDim$1
                               },
@@ -383,13 +429,7 @@ function App$Day(props) {
                               className: "text-neutral-500 flex-none"
                             })
                       ],
-                      className: "flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden",
-                      id: "day-" + entryDateString({
-                            TAG: "Date",
-                            _0: year,
-                            _1: month,
-                            _2: monthDay
-                          })
+                      className: "flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden"
                     })
               ]
             });
@@ -434,7 +474,7 @@ var make$1 = React.memo(App$Days, (function (a, b) {
 
 function entryClassNameId(entryDate) {
   return Core__Option.mapOr(entryDate, "", (function (date) {
-                return "entry-" + entryDateString(date);
+                return "entryview-" + entryDateString(date);
               }));
 }
 
@@ -445,13 +485,15 @@ function App$Entry(props) {
   var entry = props.entry;
   var monthColor$1 = Core__Option.mapOr(entry.date, "#fff", (function (date) {
           switch (date.TAG) {
+            case "Year" :
+            case "Quarter" :
+                return "#fff";
             case "Week" :
                 return monthColor(getMonthForWeekOfYear(date._1, date._0));
             case "Month" :
             case "Date" :
                 return monthColor(date._1);
-            default:
-              return "#fff";
+            
           }
         }));
   var dateDisplay = Core__Option.flatMap(entry.date, (function (date) {
@@ -466,12 +508,94 @@ function App$Entry(props) {
         }));
   var goToDay = function () {
     Core__Option.mapOr(entry.date, undefined, (function (entryDate) {
-            Core__Option.mapOr(Caml_option.nullable_to_opt(document.getElementById("day-" + entryDateString(entryDate))), undefined, (function (element) {
+            var dayMatch;
+            switch (entryDate.TAG) {
+              case "Year" :
+                  dayMatch = {
+                    TAG: "Date",
+                    _0: entryDate._0,
+                    _1: 0,
+                    _2: 1
+                  };
+                  break;
+              case "Quarter" :
+                  dayMatch = {
+                    TAG: "Date",
+                    _0: entryDate._0,
+                    _1: entryDate._1 - 3 | 0,
+                    _2: 1
+                  };
+                  break;
+              case "Month" :
+                  dayMatch = {
+                    TAG: "Date",
+                    _0: entryDate._0,
+                    _1: entryDate._1,
+                    _2: 1
+                  };
+                  break;
+              case "Week" :
+                  dayMatch = {
+                    TAG: "Week",
+                    _0: entryDate._0,
+                    _1: entryDate._1
+                  };
+                  break;
+              case "Date" :
+                  dayMatch = {
+                    TAG: "Date",
+                    _0: entryDate._0,
+                    _1: entryDate._1,
+                    _2: entryDate._2
+                  };
+                  break;
+              
+            }
+            var s = "dayview-" + entryDateString(dayMatch);
+            Core__Option.mapOr(Caml_option.nullable_to_opt(document.getElementById(s)), undefined, (function (element) {
                     element.scrollIntoView({
                           behavior: "smooth",
                           block: "center"
                         });
-                    element.focus();
+                  }));
+            var monthMatch;
+            switch (entryDate.TAG) {
+              case "Year" :
+                  monthMatch = {
+                    TAG: "Year",
+                    _0: entryDate._0
+                  };
+                  break;
+              case "Quarter" :
+                  monthMatch = {
+                    TAG: "Quarter",
+                    _0: entryDate._0,
+                    _1: entryDate._1
+                  };
+                  break;
+              case "Week" :
+                  var y = entryDate._0;
+                  monthMatch = {
+                    TAG: "Month",
+                    _0: y,
+                    _1: getMonthForWeekOfYear(entryDate._1, y)
+                  };
+                  break;
+              case "Month" :
+              case "Date" :
+                  monthMatch = {
+                    TAG: "Month",
+                    _0: entryDate._0,
+                    _1: entryDate._1
+                  };
+                  break;
+              
+            }
+            Core__Option.mapOr(getElementByClassOp("monthview-" + entryDateString(monthMatch)), undefined, (function (element) {
+                    element.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center"
+                        });
                   }));
           }));
   };
@@ -574,7 +698,10 @@ function App$Entry(props) {
                               className: "flex flex-row items-center"
                             })
                       ],
-                      className: ["heading py-2 border-b flex flex-row items-center pr-4"].join(" "),
+                      className: [
+                          entryClassNameId(entry.date),
+                          "heading py-2 border-b flex flex-row items-center pr-4"
+                        ].join(" "),
                       style: {
                         borderColor: monthColor$1,
                         color: monthColor$1
@@ -602,8 +729,7 @@ function App$Entry(props) {
                           }),
                       className: "py-2"
                     })
-              ],
-              className: entryClassNameId(entry.date)
+              ]
             }, entry.id);
 }
 
@@ -644,16 +770,12 @@ function App(props) {
   var scrollToRef = React.useRef(undefined);
   React.useEffect(function () {
         Core__Option.mapOr(Core__Option.flatMap(scrollToRef.current, (function (x) {
-                    return Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(x)), (function (x) {
-                                  return x[0];
-                                }));
+                    return getElementByClassOp(x);
                   })), undefined, (function (element) {
-                Core__Option.mapOr(Caml_option.nullable_to_opt(element.querySelector(".heading")), undefined, (function (headingElement) {
-                        headingElement.scrollIntoView({
-                              behavior: "smooth",
-                              block: "center"
-                            });
-                      }));
+                element.scrollIntoView({
+                      behavior: "smooth",
+                      block: "center"
+                    });
                 scrollToRef.current = undefined;
               }));
       });
@@ -709,22 +831,61 @@ function App(props) {
         });
   };
   var onClickDate = function (entryDate) {
-    Core__Option.mapOr(getEntryToSet(), (function (x) {
-              if (x !== undefined) {
-                return Core__Option.mapOr(Caml_option.nullable_to_opt(Caml_option.valFromOption(x).querySelector(".heading")), undefined, (function (headingElement) {
-                              headingElement.scrollIntoView({
-                                    behavior: "smooth",
-                                    block: "center"
-                                  });
-                            }));
-              } else {
-                makeNewEntry(entryDate);
-                scrollToRef.current = entryClassNameId(entryDate);
-                return ;
-              }
-            })(Core__Option.flatMap(Caml_option.nullable_to_opt(document.getElementsByClassName(entryClassNameId(entryDate))), (function (x) {
-                    return x[0];
-                  }))), (function (entryId) {
+    ((function (x) {
+            if (x !== undefined) {
+              Caml_option.valFromOption(x).scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                  });
+            } else {
+              makeNewEntry(entryDate);
+              scrollToRef.current = entryClassNameId(entryDate);
+            }
+          })(getElementByClassOp(entryClassNameId(entryDate))));
+    var tmp;
+    switch (entryDate.TAG) {
+      case "Year" :
+          var s = "dayview-" + entryDateString({
+                TAG: "Date",
+                _0: entryDate._0,
+                _1: 1,
+                _2: 1
+              });
+          tmp = Caml_option.nullable_to_opt(document.getElementById(s));
+          break;
+      case "Quarter" :
+          var s$1 = "dayview-" + entryDateString({
+                TAG: "Date",
+                _0: entryDate._0,
+                _1: Math.imul(entryDate._1 - 1 | 0, 3),
+                _2: 1
+              });
+          tmp = Caml_option.nullable_to_opt(document.getElementById(s$1));
+          break;
+      case "Month" :
+          var s$2 = "dayview-" + entryDateString({
+                TAG: "Date",
+                _0: entryDate._0,
+                _1: entryDate._1,
+                _2: 1
+              });
+          tmp = Caml_option.nullable_to_opt(document.getElementById(s$2));
+          break;
+      case "Week" :
+      case "Date" :
+          tmp = getElementByClassOp("monthview-" + entryDateString({
+                    TAG: "Year",
+                    _0: entryDate._0
+                  }));
+          break;
+      
+    }
+    Core__Option.mapOr(getEntryToSet(), Core__Option.mapOr(tmp, undefined, (function (element) {
+                element.scrollIntoView({
+                      behavior: "smooth",
+                      block: "center"
+                    });
+              })), (function (entryId) {
             updateEntry(entryId, (function (e) {
                     return {
                             id: e.id,

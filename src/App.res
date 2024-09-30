@@ -5,6 +5,17 @@ external getElementById: string => Js.Nullable.t<Dom.element> = "getElementById"
 external getElementsByClassName: string => Js.Nullable.t<array<Dom.element>> =
   "getElementsByClassName"
 
+let getElementByClassOp = s =>
+  s
+  ->getElementsByClassName
+  ->Js.Nullable.toOption
+  ->Option.flatMap(x => x->Array.get(0))
+
+let getElementByIdOp = s =>
+  s
+  ->getElementById
+  ->Js.Nullable.toOption
+
 @val @scope("document")
 external documentQuerySelector: string => Js.Nullable.t<Dom.element> = "querySelector"
 
@@ -123,7 +134,7 @@ let concatArray = x => {
 
 type entryDate =
   | Year(int)
-  | Half(int, int)
+  // | Half(int, int)
   | Quarter(int, int)
   | Month(int, int)
   | Week(int, int)
@@ -192,7 +203,7 @@ let entryDateString = date =>
   switch date {
   | Date(y, m, d) => ymdDate(y, m - 1, d)->format("y-MM-dd")
   | Year(y) => y->Int.toString->String.padStart(4, "0")
-  | Half(y, h) => y->Int.toString->String.padStart(4, "0") ++ "-H" ++ h->Int.toString
+  // | Half(y, h) => y->Int.toString->String.padStart(4, "0") ++ "-H" ++ h->Int.toString
   | Quarter(y, q) => y->Int.toString->String.padStart(4, "0") ++ "-Q" ++ q->Int.toString
   | Month(y, m) =>
     y->Int.toString->String.padStart(4, "0") ++ "-" ++ m->Int.toString->String.padStart(2, "0")
@@ -330,6 +341,7 @@ module Months = {
                     <button
                       onClick={_ => onClick(Year(year))}
                       className={[
+                        `monthview-${Year(year)->entryDateString}`,
                         " flex flex-row items-center justify-center",
                         hasYearEntry ? `text-lime-500 bg-black` : "text-neutral-300 bg-black",
                       ]->Array.join(" ")}
@@ -341,6 +353,7 @@ module Months = {
                     <button
                       onClick={_ => onClick(Quarter(year, 1))}
                       className={[
+                        `monthview-${Quarter(year, 1)->entryDateString}`,
                         " flex flex-row items-center justify-center",
                         hasQ1Entry->entryCheck,
                       ]->Array.join(" ")}
@@ -353,6 +366,7 @@ module Months = {
                     <button
                       onClick={_ => onClick(Quarter(year, 2))}
                       className={[
+                        `monthview-${Quarter(year, 2)->entryDateString}`,
                         " flex flex-row items-center justify-center",
                         hasQ2Entry->entryCheck,
                       ]->Array.join(" ")}
@@ -365,6 +379,7 @@ module Months = {
                     <button
                       onClick={_ => onClick(Quarter(year, 3))}
                       className={[
+                        `monthview-${Quarter(year, 3)->entryDateString}`,
                         " flex flex-row items-center justify-center",
                         hasQ3Entry->entryCheck,
                       ]->Array.join(" ")}
@@ -377,6 +392,7 @@ module Months = {
                     <button
                       onClick={_ => onClick(Quarter(year, 4))}
                       className={[
+                        `monthview-${Quarter(year, 4)->entryDateString}`,
                         " flex flex-row items-center justify-center",
                         hasQ4Entry->entryCheck,
                       ]->Array.join(" ")}
@@ -402,6 +418,7 @@ module Months = {
                         key={monthNum}
                         onClick={_ => onClick(Month(year, i + 1))}
                         className={[
+                          `monthview-${Month(year, i + 1)->entryDateString}`,
                           " flex flex-row items-center justify-center bg-black",
                         ]->Array.join(" ")}
                         style={{
@@ -445,7 +462,6 @@ module Day = {
           </div>
         : React.null}
       <div
-        id={`day-${Date(year, month, monthDay)->entryDateString}`}
         className="flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden">
         <div className=" h-6 w-5 flex flex-row flex-none">
           {true && beginningOfWeek
@@ -458,6 +474,7 @@ module Day = {
                   let hasWeekEntry = dateSet->Set.has(Week(year, weekNum)->entryDateString)
 
                   <button
+                    id={`dayview-${Week(year, weekNum)->entryDateString}`}
                     onClick={_ => onClick(Week(year, weekNum))}
                     style={{
                       color: hasWeekEntry ? monthColor : "#ddd",
@@ -476,6 +493,7 @@ module Day = {
           }}
         />
         <button
+          id={`dayview-${Date(year, month, monthDay)->entryDateString}`}
           onClick={_ => onClick(Date(year, month, monthDay))}
           style={{
             color: hasEntry ? monthColor : monthColorDim,
@@ -538,9 +556,15 @@ module Days = {
 
 let entryClassNameId = entryDate => {
   entryDate->Option.mapOr("", date => {
-    "entry-" ++ date->entryDateString
+    "entryview-" ++ date->entryDateString
   })
 }
+
+// let dayId = entryDate => {
+//   entryDate->Option.mapOr("", date => {
+//     "entry-" ++ date->entryDateString
+//   })
+// }
 
 module Entry = {
   @react.component
@@ -570,19 +594,45 @@ module Entry = {
     let isSelectedForSet = entryToSet->Option.mapOr(false, v => v == entry.id)
     let goToDay = () =>
       entry.date->Option.mapOr((), entryDate => {
-        getElementById(`day-${entryDate->entryDateString}`)
-        ->Js.Nullable.toOption
+        let dayMatch = switch entryDate {
+        | Date(y, m, d) => Date(y, m, d)
+        | Week(y, w) => Week(y, w)
+        | Year(y) => Date(y, 0, 1)
+        | Quarter(y, q) => Date(y, q - 1 * 3, 1)
+        | Month(y, m) => Date(y, m, 1)
+        }
+
+        `dayview-${dayMatch->entryDateString}`
+        ->getElementByIdOp
         ->Option.mapOr((), element => {
           element->scrollIntoView({
             "behavior": "smooth",
             "block": "center",
           })
-          element->focus
+        })
+
+        let monthMatch = switch entryDate {
+        | Date(y, m, _d) => Month(y, m)
+        | Week(y, w) => Month(y, getMonthForWeekOfYear(w, y))
+        | Year(y) => Year(y)
+        | Quarter(y, q) => Quarter(y, q)
+        | Month(y, m) => Month(y, m)
+        }
+        `monthview-${monthMatch->entryDateString}`
+        ->getElementByClassOp
+        ->Option.mapOr((), element => {
+          element->scrollIntoView({
+            "behavior": "smooth",
+            "block": "center",
+          })
         })
       })
-    <div className={entry.date->entryClassNameId} key={entry.id}>
+    <div key={entry.id}>
       <div
-        className={["heading py-2 border-b flex flex-row items-center pr-4"]->Array.join(" ")}
+        className={[
+          entry.date->entryClassNameId,
+          "heading py-2 border-b flex flex-row items-center pr-4",
+        ]->Array.join(" ")}
         style={{
           color: monthColor,
           borderColor: monthColor,
@@ -695,39 +745,13 @@ let make = () => {
 
   React.useEffectOnEveryRender(() => {
     scrollToRef.current
-    ->Option.flatMap(x =>
-      x
-      ->getElementsByClassName
-      ->Js.Nullable.toOption
-      ->Option.flatMap(x => x->Array.get(0))
-    )
+    ->Option.flatMap(x => x->getElementByClassOp)
     ->Option.mapOr((), element => {
-      element
-      ->querySelector(".heading")
-      ->Js.Nullable.toOption
-      ->Option.mapOr(
-        (),
-        headingElement => {
-          headingElement->scrollIntoView({
-            "behavior": "smooth",
-            "block": "center",
-          })
-        },
-      )
+      element->scrollIntoView({
+        "behavior": "smooth",
+        "block": "center",
+      })
 
-      // element
-      // ->querySelector(".editor")
-      // ->Js.Nullable.toOption
-      // ->Option.mapOr(
-      //   (),
-      //   editorElement => {
-      //     editorElement->focus
-      //     // element->selectionStart(element->textAreaLength)
-      //     // element->selectionEnd(element->textAreaLength)
-      //   },
-      // )
-
-      // element->focus
       scrollToRef.current = None
     })
 
@@ -798,43 +822,35 @@ let make = () => {
         entryDate
         ->Some
         ->entryClassNameId
-        ->getElementsByClassName
-        ->Js.Nullable.toOption
-        ->Option.flatMap(x => x->Array.get(0))
+        ->getElementByClassOp
         ->{
           x =>
             switch x {
             | Some(element) =>
-              // element
-              // ->querySelector(".editor")
-              // ->Js.Nullable.toOption
-              // ->Option.mapOr((), editorElement => {
-              //   // editorElement->focus
-              //   editorElement->scrollIntoView({
-              //     "behavior": "smooth",
-              //     "block": "start",
-              //   })
-
-              //   // element->selectionStart(element->textAreaLength)
-              //   // element->selectionEnd(element->textAreaLength)
-              // })
-
-              element
-              ->querySelector(".heading")
-              ->Js.Nullable.toOption
-              ->Option.mapOr((), headingElement => {
-                headingElement->scrollIntoView({
-                  "behavior": "smooth",
-                  "block": "center",
-                })
-                // headingElement->focus
+              element->scrollIntoView({
+                "behavior": "smooth",
+                "block": "center",
               })
+
             | None => {
                 makeNewEntry(entryDate)
                 scrollToRef.current = entryDate->Some->entryClassNameId->Some
               }
             }
         }
+
+        switch entryDate {
+        | Date(y, _m, _d) => `monthview-${Year(y)->entryDateString}`->getElementByClassOp
+        | Week(y, _w) => `monthview-${Year(y)->entryDateString}`->getElementByClassOp
+        | Year(y) => `dayview-${Date(y, 1, 1)->entryDateString}`->getElementByIdOp
+        | Quarter(y, q) => `dayview-${Date(y, (q - 1) * 3, 1)->entryDateString}`->getElementByIdOp
+        | Month(y, m) => `dayview-${Date(y, m, 1)->entryDateString}`->getElementByIdOp
+        }->Option.mapOr((), element => {
+          element->scrollIntoView({
+            "behavior": "smooth",
+            "block": "center",
+          })
+        })
       },
       entryId => {
         updateEntry(entryId, e => {
@@ -842,7 +858,6 @@ let make = () => {
           date: Some(entryDate),
         })
         setEntryToSet(_ => None)
-        // scrollToRef.current = entryDate->Some->entryClassNameId->Some
       },
     )
   }
