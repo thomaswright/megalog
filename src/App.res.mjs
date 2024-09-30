@@ -9,6 +9,7 @@ import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import MonacoJsx from "./Monaco.jsx";
 import * as Color from "@texel/color";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
+import DropdownJsx from "./Dropdown.jsx";
 import * as Tb from "react-icons/tb";
 import * as JsxRuntime from "react/jsx-runtime";
 import * as ExportFunctionsJs from "./exportFunctions.js";
@@ -22,11 +23,13 @@ function getElementByClassOp(s) {
 }
 
 function App$TextArea(props) {
+  var __disabled = props.disabled;
   var __readonly = props.readonly;
   var __className = props.className;
   var onChange = props.onChange;
   var className = __className !== undefined ? __className : "";
   var readonly = __readonly !== undefined ? __readonly : false;
+  var disabled = __disabled !== undefined ? __disabled : false;
   return JsxRuntime.jsx(ReactTextareaAutosize, {
               value: props.content,
               className: [
@@ -37,7 +40,8 @@ function App$TextArea(props) {
                   var value = e.target.value;
                   onChange(value);
                 }),
-              readOnly: readonly
+              readOnly: readonly,
+              disabled: disabled
             });
 }
 
@@ -435,7 +439,7 @@ function App$Day(props) {
                                 })
                             })
                       ],
-                      className: "flex flex-row items-center gap-1 h-5 max-h-5 whitespace-nowrap overflow-x-hidden"
+                      className: " flex flex-row items-center gap-1 h-5 max-h-5 whitespace-nowrap overflow-x-hidden"
                     })
               ]
             });
@@ -636,7 +640,8 @@ function App$Entry(props) {
                                                   date: v.date,
                                                   title: e.target.value,
                                                   content: v.content,
-                                                  lock: v.lock
+                                                  lock: v.lock,
+                                                  hide: v.hide
                                                 };
                                         }));
                                 })
@@ -658,7 +663,8 @@ function App$Entry(props) {
                                                           date: v.date,
                                                           title: v.title,
                                                           content: v.content,
-                                                          lock: false
+                                                          lock: false,
+                                                          hide: v.hide
                                                         };
                                                 }));
                                         })
@@ -691,6 +697,25 @@ function App$Entry(props) {
                                                 })
                                             }),
                                         JsxRuntime.jsx("button", {
+                                              children: entry.hide ? "Show" : "Hide",
+                                              className: [
+                                                  "mx-1",
+                                                  "bg-white text-black"
+                                                ].join(" "),
+                                              onClick: (function (param) {
+                                                  updateEntry(entry.id, (function (v) {
+                                                          return {
+                                                                  id: v.id,
+                                                                  date: v.date,
+                                                                  title: v.title,
+                                                                  content: v.content,
+                                                                  lock: v.lock,
+                                                                  hide: !v.hide
+                                                                };
+                                                        }));
+                                                })
+                                            }),
+                                        JsxRuntime.jsx("button", {
                                               children: JsxRuntime.jsx(Tb.TbLockOpen, {}),
                                               className: [
                                                   "mx-1",
@@ -703,7 +728,8 @@ function App$Entry(props) {
                                                                   date: v.date,
                                                                   title: v.title,
                                                                   content: v.content,
-                                                                  lock: true
+                                                                  lock: true,
+                                                                  hide: v.hide
                                                                 };
                                                         }));
                                                 })
@@ -724,22 +750,27 @@ function App$Entry(props) {
                     }),
                 JsxRuntime.jsx("div", {
                       children: JsxRuntime.jsx("div", {
-                            children: JsxRuntime.jsx(App$TextArea, {
-                                  content: entry.content,
-                                  onChange: (function (newContent) {
-                                      updateEntry(entry.id, (function (v) {
-                                              return {
-                                                      id: v.id,
-                                                      date: v.date,
-                                                      title: v.title,
-                                                      content: newContent,
-                                                      lock: v.lock
-                                                    };
-                                            }));
-                                    }),
-                                  className: "editor scroll-m-20 ",
-                                  readonly: entry.lock
-                                }),
+                            children: entry.hide ? null : JsxRuntime.jsx(App$TextArea, {
+                                    content: entry.content,
+                                    onChange: (function (newContent) {
+                                        updateEntry(entry.id, (function (v) {
+                                                return {
+                                                        id: v.id,
+                                                        date: v.date,
+                                                        title: v.title,
+                                                        content: newContent,
+                                                        lock: v.lock,
+                                                        hide: v.hide
+                                                      };
+                                              }));
+                                      }),
+                                    className: [
+                                        "editor scroll-m-20 ",
+                                        entry.hide ? "text-transparent select-none" : ""
+                                      ].join(" "),
+                                    readonly: entry.lock,
+                                    disabled: entry.hide
+                                  }),
                             className: "rounded overflow-hidden"
                           }),
                       className: "py-2"
@@ -755,7 +786,7 @@ var make$1 = React.memo(App$Entry, (function (a, b) {
             match !== undefined ? (
                 match$1 !== undefined ? entryDateString(match) === entryDateString(match$1) : false
               ) : match$1 === undefined
-          ) && a.entry.content === b.entry.content && a.entry.lock === b.entry.lock && a.entry.title === b.entry.title) {
+          ) && a.entry.content === b.entry.content && a.entry.lock === b.entry.lock && a.entry.hide === b.entry.hide && a.entry.title === b.entry.title) {
           return a.isSelectedForSet === b.isSelectedForSet;
         } else {
           return false;
@@ -783,6 +814,68 @@ function App$Entries(props) {
                                 });
                     })),
               className: "text-xs leading-none flex-1 h-full overflow-y-scroll max-w-xl"
+            });
+}
+
+function App$MenuBar(props) {
+  var onUnlock = props.onUnlock;
+  var onLock = props.onLock;
+  var onHide = props.onHide;
+  var onShow = props.onShow;
+  var onExportFolder = props.onExportFolder;
+  var onExportFile = props.onExportFile;
+  var onSort = props.onSort;
+  return JsxRuntime.jsxs("div", {
+              children: [
+                JsxRuntime.jsx("button", {
+                      children: "Sort",
+                      onClick: (function (param) {
+                          onSort();
+                        })
+                    }),
+                JsxRuntime.jsx("button", {
+                      children: "Export as File",
+                      onClick: (function (param) {
+                          onExportFile();
+                        })
+                    }),
+                JsxRuntime.jsx("button", {
+                      children: "Export as Folder",
+                      onClick: (function (param) {
+                          onExportFolder();
+                        })
+                    }),
+                JsxRuntime.jsxs("div", {
+                      children: [
+                        JsxRuntime.jsx("button", {
+                              children: JsxRuntime.jsx(Tb.TbEye, {}),
+                              onClick: (function (param) {
+                                  onShow();
+                                })
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: JsxRuntime.jsx(Tb.TbEyeClosed, {}),
+                              onClick: (function (param) {
+                                  onHide();
+                                })
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: JsxRuntime.jsx(Tb.TbLock, {}),
+                              onClick: (function (param) {
+                                  onLock();
+                                })
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: JsxRuntime.jsx(Tb.TbLockOpen, {}),
+                              onClick: (function (param) {
+                                  onUnlock();
+                                })
+                            })
+                      ],
+                      className: "flex flex-row justify-around gap-4"
+                    })
+              ],
+              className: "flex-none border-t border-plain-700 flex flex-row gap-4 items-center px-2"
             });
 }
 
@@ -866,7 +959,8 @@ function App(props) {
                                           date: entryDate,
                                           title: "",
                                           content: "",
-                                          lock: false
+                                          lock: false,
+                                          hide: false
                                         }]);
                           })));
         });
@@ -933,7 +1027,8 @@ function App(props) {
                             date: entryDate,
                             title: e.title,
                             content: e.content,
-                            lock: e.lock
+                            lock: e.lock,
+                            hide: e.hide
                           };
                   }));
             setEntryToSet(function (param) {
@@ -945,6 +1040,98 @@ function App(props) {
     return "Date: " + Core__Option.mapOr(entry.date, "", (function (x) {
                   return entryDateString(x);
                 })) + "\nTitle: " + entry.title + "\n\n" + entry.content;
+  };
+  var onSort = function () {
+    setEntries(function (v) {
+          return sortEntries(v);
+        });
+  };
+  var onExportFile = function () {
+    Core__Option.mapOr(entries, undefined, (function (entries) {
+            var prim = entries.map(function (v) {
+                    return formatContentForFile(v);
+                  }).join("\n\n");
+            ExportFunctionsJs.exportToFile(prim);
+          }));
+  };
+  var onExportFolder = function () {
+    Core__Option.mapOr(entries, undefined, (function (entries) {
+            var prim = entries.map(function (v) {
+                  return [
+                          Core__Option.mapOr(v.date, "", (function (x) {
+                                  return entryDateString(x);
+                                })) + (
+                            Core__Option.isSome(v.date) && v.title !== "" ? "_" : ""
+                          ) + v.title + ".txt",
+                          formatContentForFile(v)
+                        ];
+                });
+            ExportFunctionsJs.exportToFolder(prim);
+          }));
+  };
+  var onShow = function () {
+    setEntries(function (v) {
+          return Core__Option.map(v, (function (entries) {
+                        return entries.map(function (entry) {
+                                    return {
+                                            id: entry.id,
+                                            date: entry.date,
+                                            title: entry.title,
+                                            content: entry.content,
+                                            lock: entry.lock,
+                                            hide: false
+                                          };
+                                  });
+                      }));
+        });
+  };
+  var onHide = function () {
+    setEntries(function (v) {
+          return Core__Option.map(v, (function (entries) {
+                        return entries.map(function (entry) {
+                                    return {
+                                            id: entry.id,
+                                            date: entry.date,
+                                            title: entry.title,
+                                            content: entry.content,
+                                            lock: entry.lock,
+                                            hide: true
+                                          };
+                                  });
+                      }));
+        });
+  };
+  var onLock = function () {
+    setEntries(function (v) {
+          return Core__Option.map(v, (function (entries) {
+                        return entries.map(function (entry) {
+                                    return {
+                                            id: entry.id,
+                                            date: entry.date,
+                                            title: entry.title,
+                                            content: entry.content,
+                                            lock: true,
+                                            hide: entry.hide
+                                          };
+                                  });
+                      }));
+        });
+  };
+  var onUnlock = function () {
+    setEntries(function (v) {
+          return Core__Option.map(v, (function (entries) {
+                        return entries.map(function (entry) {
+                                    return {
+                                            id: entry.id,
+                                            date: entry.date,
+                                            title: entry.title,
+                                            content: entry.content,
+                                            lock: false,
+                                            hide: entry.hide
+                                          };
+                                  });
+                      }));
+        });
   };
   return JsxRuntime.jsxs("div", {
               children: [
@@ -986,83 +1173,14 @@ function App(props) {
                       ],
                       className: "flex flex-row flex-1 overflow-hidden"
                     }),
-                JsxRuntime.jsxs("div", {
-                      children: [
-                        JsxRuntime.jsx("button", {
-                              children: "Sort",
-                              onClick: (function (param) {
-                                  setEntries(function (v) {
-                                        return sortEntries(v);
-                                      });
-                                })
-                            }),
-                        JsxRuntime.jsx("button", {
-                              children: "Export File",
-                              onClick: (function (param) {
-                                  Core__Option.mapOr(entries, undefined, (function (entries) {
-                                          var prim = entries.map(function (v) {
-                                                  return formatContentForFile(v);
-                                                }).join("\n\n");
-                                          ExportFunctionsJs.exportToFile(prim);
-                                        }));
-                                })
-                            }),
-                        JsxRuntime.jsx("button", {
-                              children: "Export Folder",
-                              onClick: (function (param) {
-                                  Core__Option.mapOr(entries, undefined, (function (entries) {
-                                          var prim = entries.map(function (v) {
-                                                return [
-                                                        Core__Option.mapOr(v.date, "", (function (x) {
-                                                                return entryDateString(x);
-                                                              })) + (
-                                                          Core__Option.isSome(v.date) && v.title !== "" ? "_" : ""
-                                                        ) + v.title + ".txt",
-                                                        formatContentForFile(v)
-                                                      ];
-                                              });
-                                          ExportFunctionsJs.exportToFolder(prim);
-                                        }));
-                                })
-                            }),
-                        JsxRuntime.jsx("button", {
-                              children: JsxRuntime.jsx(Tb.TbLock, {}),
-                              onClick: (function (param) {
-                                  setEntries(function (v) {
-                                        return Core__Option.map(v, (function (entries) {
-                                                      return entries.map(function (entry) {
-                                                                  return {
-                                                                          id: entry.id,
-                                                                          date: entry.date,
-                                                                          title: entry.title,
-                                                                          content: entry.content,
-                                                                          lock: true
-                                                                        };
-                                                                });
-                                                    }));
-                                      });
-                                })
-                            }),
-                        JsxRuntime.jsx("button", {
-                              children: JsxRuntime.jsx(Tb.TbLockOpen, {}),
-                              onClick: (function (param) {
-                                  setEntries(function (v) {
-                                        return Core__Option.map(v, (function (entries) {
-                                                      return entries.map(function (entry) {
-                                                                  return {
-                                                                          id: entry.id,
-                                                                          date: entry.date,
-                                                                          title: entry.title,
-                                                                          content: entry.content,
-                                                                          lock: false
-                                                                        };
-                                                                });
-                                                    }));
-                                      });
-                                })
-                            })
-                      ],
-                      className: "flex-none border-t border-plain-700 flex flex-row gap-2 items-center px-2"
+                JsxRuntime.jsx(App$MenuBar, {
+                      onSort: onSort,
+                      onExportFile: onExportFile,
+                      onExportFolder: onExportFolder,
+                      onShow: onShow,
+                      onHide: onHide,
+                      onLock: onLock,
+                      onUnlock: onUnlock
                     })
               ],
               className: "relative font-mono h-dvh flex flex-col"

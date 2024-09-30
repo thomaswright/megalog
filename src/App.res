@@ -4,6 +4,19 @@ external exportToFolder: array<(string, string)> => unit = "exportToFolder"
 @module("./exportFunctions.js")
 external exportToFile: string => unit = "exportToFile"
 
+module Dropdown = {
+  @react.component @module("./Dropdown.jsx")
+  external make: (
+    ~onSort: unit => unit,
+    ~onExportFile: unit => unit,
+    ~onExportFolder: unit => unit,
+    ~onShow: unit => unit,
+    ~onHide: unit => unit,
+    ~onLock: unit => unit,
+    ~onUnlock: unit => unit,
+  ) => React.element = "default"
+}
+
 @val @scope("document")
 external getElementById: string => Js.Nullable.t<Dom.element> = "getElementById"
 
@@ -68,9 +81,17 @@ module Icons = {
     @react.component @module("react-icons/tb")
     external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbLock"
   }
-  module OpenLock = {
+  module LockOpen = {
     @react.component @module("react-icons/tb")
     external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbLockOpen"
+  }
+  module EyeClosed = {
+    @react.component @module("react-icons/tb")
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbEyeClosed"
+  }
+  module Eye = {
+    @react.component @module("react-icons/tb")
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbEye"
   }
 }
 
@@ -97,14 +118,22 @@ module TextareaAutosize = {
     ~className: string,
     ~onChange: ReactEvent.Form.t => unit,
     ~readOnly: bool,
+    ~disabled: bool,
   ) => React.element = "default"
 }
 
 module TextArea = {
   @react.component
-  let make = (~content: string, ~onChange: string => unit, ~className="", ~readonly=false) => {
+  let make = (
+    ~content: string,
+    ~onChange: string => unit,
+    ~className="",
+    ~readonly=false,
+    ~disabled=false,
+  ) => {
     <TextareaAutosize
       readOnly={readonly}
+      disabled={disabled}
       className={["bg-black w-full", className]->Array.join(" ")}
       value={content}
       onChange={e => {
@@ -144,6 +173,7 @@ type entry = {
   title: string,
   content: string,
   lock: bool,
+  hide: bool,
 }
 
 let getMonthForWeekOfYear = (weekNumber, year) => {
@@ -454,7 +484,7 @@ module Day = {
           </div>
         : React.null}
       <div
-        className="flex flex-row items-center gap-1 h-5 max-h-5 whitespace-nowrap overflow-x-hidden">
+        className=" flex flex-row items-center gap-1 h-5 max-h-5 whitespace-nowrap overflow-x-hidden">
         <div className=" h-5 w-5 flex flex-row flex-none">
           {beginningOfWeek
             ? {
@@ -678,9 +708,20 @@ module Entry = {
                   {"Delete"->React.string}
                 </button>
                 <button
+                  className={["mx-1", "bg-white text-black"]->Array.join(" ")}
+                  onClick={_ =>
+                    updateEntry(entry.id, v => {
+                      {
+                        ...v,
+                        hide: !v.hide,
+                      }
+                    })}>
+                  {(entry.hide ? "Show" : "Hide")->React.string}
+                </button>
+                <button
                   className={["mx-1", " text-plain-500"]->Array.join(" ")}
                   onClick={_ => updateEntry(entry.id, v => {...v, lock: true})}>
-                  <Icons.OpenLock />
+                  <Icons.LockOpen />
                   // {"Lock"->React.string}
                 </button>
               </React.Fragment>}
@@ -688,12 +729,18 @@ module Entry = {
       </div>
       <div className="py-2">
         <div className="rounded overflow-hidden">
-          <Editor
-            className={"editor scroll-m-20 "}
-            content={entry.content}
-            onChange={newContent => updateEntry(entry.id, v => {...v, content: newContent})}
-            readonly={entry.lock}
-          />
+          {entry.hide
+            ? React.null
+            : <Editor
+                className={[
+                  "editor scroll-m-20 ",
+                  entry.hide ? "text-transparent select-none" : "",
+                ]->Array.join(" ")}
+                content={entry.content}
+                onChange={newContent => updateEntry(entry.id, v => {...v, content: newContent})}
+                readonly={entry.lock}
+                disabled={entry.hide}
+              />}
         </div>
       </div>
     </div>
@@ -708,6 +755,7 @@ module Entry = {
     } &&
     a.entry.content == b.entry.content &&
     a.entry.lock == b.entry.lock &&
+    a.entry.hide == b.entry.hide &&
     a.entry.title == b.entry.title &&
     a.isSelectedForSet == b.isSelectedForSet
   })
@@ -732,6 +780,39 @@ module Entries = {
         })
         ->React.array
       })}
+    </div>
+  }
+}
+
+module MenuBar = {
+  @react.component
+  let make = (
+    ~onSort: unit => unit,
+    ~onExportFile: unit => unit,
+    ~onExportFolder: unit => unit,
+    ~onShow: unit => unit,
+    ~onHide: unit => unit,
+    ~onLock: unit => unit,
+    ~onUnlock: unit => unit,
+  ) => {
+    <div className="flex-none border-t border-plain-700 flex flex-row gap-4 items-center px-2">
+      <button onClick={_ => onSort()}> {"Sort"->React.string} </button>
+      <button onClick={_ => onExportFile()}> {"Export as File"->React.string} </button>
+      <button onClick={_ => onExportFolder()}> {"Export as Folder"->React.string} </button>
+      <div className="flex flex-row justify-around gap-4">
+        <button onClick={_ => onShow()}>
+          <Icons.Eye />
+        </button>
+        <button onClick={_ => onHide()}>
+          <Icons.EyeClosed />
+        </button>
+        <button onClick={_ => onLock()}>
+          <Icons.Lock />
+        </button>
+        <button onClick={_ => onUnlock()}>
+          <Icons.LockOpen />
+        </button>
+      </div>
     </div>
   }
 }
@@ -817,6 +898,7 @@ let make = () => {
               title: "",
               content: "",
               lock: false,
+              hide: false,
             },
           ],
         )
@@ -880,6 +962,53 @@ let make = () => {
     entry.content
   }
 
+  let onSort = () => {
+    setEntries(v => v->sortEntries)
+  }
+
+  let onExportFile = () => {
+    entries->Option.mapOr((), entries => {
+      entries
+      ->Array.map(v => v->formatContentForFile)
+      ->Array.join("\n\n")
+      ->exportToFile
+    })
+  }
+
+  let onExportFolder = () => {
+    entries->Option.mapOr((), entries => {
+      entries
+      ->Array.map(v => (
+        v.date->Option.mapOr("", x => x->entryDateString) ++
+        (v.date->Option.isSome && v.title != "" ? "_" : "") ++
+        v.title ++ ".txt",
+        v->formatContentForFile,
+      ))
+      ->exportToFolder
+    })
+  }
+
+  let onShow = () => {
+    setEntries(v => v->Option.map(entries => entries->Array.map(entry => {...entry, hide: false})))
+  }
+
+  let onHide = () => {
+    setEntries(v => v->Option.map(entries => entries->Array.map(entry => {...entry, hide: true})))
+  }
+
+  let onLock = () => {
+    setEntries(v => v->Option.map(entries => entries->Array.map(entry => {...entry, lock: true})))
+  }
+
+  let onUnlock = () => {
+    setEntries(v => v->Option.map(entries => entries->Array.map(entry => {...entry, lock: false})))
+  }
+
+  // let dropdown =
+  //   <div className="flex-none border-t border-plain-700 flex flex-row gap-2 items-center px-2">
+  //     <Dropdown onSort onExportFile onExportFolder onShow onHide onLock onUnlock />
+  //   </div>
+
   <div className="relative font-mono h-dvh flex flex-col">
     <div className="flex flex-row flex-1 overflow-hidden">
       <div className="flex flex-col h-full flex-none w-64 border-r-8 border-r-black">
@@ -898,49 +1027,7 @@ let make = () => {
         }}
       />
     </div>
-    <div className="flex-none border-t border-plain-700 flex flex-row gap-2 items-center px-2">
-      <button onClick={_ => setEntries(v => v->sortEntries)}> {"Sort"->React.string} </button>
-      <button
-        onClick={_ => {
-          entries->Option.mapOr((), entries => {
-            entries
-            ->Array.map(v => v->formatContentForFile)
-            ->Array.join("\n\n")
-            ->exportToFile
-          })
-        }}>
-        {"Export File"->React.string}
-      </button>
-      <button
-        onClick={_ => {
-          entries->Option.mapOr((), entries => {
-            entries
-            ->Array.map(v => (
-              v.date->Option.mapOr("", x => x->entryDateString) ++
-              (v.date->Option.isSome && v.title != "" ? "_" : "") ++
-              v.title ++ ".txt",
-              v->formatContentForFile,
-            ))
-            ->exportToFolder
-          })
-        }}>
-        {"Export Folder"->React.string}
-      </button>
-      <button
-        onClick={_ =>
-          setEntries(v =>
-            v->Option.map(entries => entries->Array.map(entry => {...entry, lock: true}))
-          )}>
-        <Icons.Lock />
-      </button>
-      <button
-        onClick={_ =>
-          setEntries(v =>
-            v->Option.map(entries => entries->Array.map(entry => {...entry, lock: false}))
-          )}>
-        <Icons.OpenLock />
-      </button>
-    </div>
+    <MenuBar onSort onExportFile onExportFolder onShow onHide onLock onUnlock />
   </div>
 }
 
