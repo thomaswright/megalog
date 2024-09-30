@@ -175,8 +175,8 @@ function App$Months(props) {
                                                   TAG: "Year",
                                                   _0: year
                                                 }),
-                                            " flex flex-row items-center justify-center",
-                                            hasYearEntry ? "text-lime-500 bg-black" : "text-plain-400 bg-black"
+                                            "font-medium text-sm leading-none flex flex-row items-center justify-center overflow-hidden",
+                                            hasYearEntry ? "text-white bg-black" : "text-inherit bg-black"
                                           ].join(" "),
                                         style: {
                                           gridArea: "year"
@@ -200,7 +200,7 @@ function App$Months(props) {
                                                   _1: 1
                                                 }),
                                             " flex flex-row items-center justify-center",
-                                            hasQ1Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
+                                            hasQ1Entry ? "text-white bg-black" : "text-inherit bg-black"
                                           ].join(" "),
                                         style: {
                                           gridArea: "q1"
@@ -225,7 +225,7 @@ function App$Months(props) {
                                                   _1: 2
                                                 }),
                                             " flex flex-row items-center justify-center",
-                                            hasQ2Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
+                                            hasQ2Entry ? "text-white bg-black" : "text-inherit bg-black"
                                           ].join(" "),
                                         style: {
                                           gridArea: "q2"
@@ -250,7 +250,7 @@ function App$Months(props) {
                                                   _1: 3
                                                 }),
                                             " flex flex-row items-center justify-center",
-                                            hasQ3Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
+                                            hasQ3Entry ? "text-white bg-black" : "text-inherit bg-black"
                                           ].join(" "),
                                         style: {
                                           gridArea: "q3"
@@ -275,7 +275,7 @@ function App$Months(props) {
                                                   _1: 4
                                                 }),
                                             " flex flex-row items-center justify-center",
-                                            hasQ4Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
+                                            hasQ4Entry ? "text-white bg-black" : "text-inherit bg-black"
                                           ].join(" "),
                                         style: {
                                           gridArea: "q4"
@@ -327,7 +327,7 @@ function App$Months(props) {
                                 style: {
                                   display: "grid",
                                   gridTemplateAreas: "\n                    \"year q1 m1 m2 m3\"\n                    \"year q2 m4 m5 m6\"\n                    \"year q3 m7 m8 m9\"\n                    \"year q4 m10 m11 m12\"\n                  \n                    ",
-                                  gridTemplateColumns: "1fr 1.25fr 2fr 2fr 2fr ",
+                                  gridTemplateColumns: "1.25fr 1.25fr 2fr 2fr 2fr ",
                                   gridTemplateRows: " repeat(4, 1.0fr)"
                                 }
                               });
@@ -391,10 +391,10 @@ function App$Day(props) {
                       children: [
                         JsxRuntime.jsx("div", {
                               children: tmp,
-                              className: " h-6 w-5 flex flex-row flex-none"
+                              className: " h-5 w-5 flex flex-row flex-none"
                             }),
                         JsxRuntime.jsx("div", {
-                              className: ["w-1 h-6 flex-none"].join(" "),
+                              className: ["w-1 h-5 flex-none"].join(" "),
                               style: {
                                 backgroundColor: monthColor$1
                               }
@@ -430,7 +430,7 @@ function App$Day(props) {
                               className: "text-plain-500 flex-none"
                             })
                       ],
-                      className: "flex flex-row items-center gap-1 h-6 max-h-6 whitespace-nowrap overflow-x-hidden"
+                      className: "flex flex-row items-center gap-1 h-5 max-h-5 whitespace-nowrap overflow-x-hidden"
                     })
               ]
             });
@@ -954,7 +954,7 @@ function App(props) {
                                       onClick: onClickDate
                                     })
                               ],
-                              className: "flex flex-col h-full flex-none w-64 "
+                              className: "flex flex-col h-full flex-none w-64 border-r-8 border-r-black"
                             }),
                         JsxRuntime.jsx(App$Entries, {
                               entries: entries,

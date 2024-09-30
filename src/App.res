@@ -318,13 +318,13 @@ module Months = {
         let hasQ2Entry = dateSet->Set.has(Quarter(year, 2)->entryDateString)
         let hasQ3Entry = dateSet->Set.has(Quarter(year, 3)->entryDateString)
         let hasQ4Entry = dateSet->Set.has(Quarter(year, 4)->entryDateString)
-        let entryCheck = x => x ? `text-lime-500 bg-black` : "text-inherit bg-black"
+        let entryCheck = x => x ? `text-white bg-black` : "text-inherit bg-black"
 
         <div
           className="gap-px text-xs bg-plain-800 border border-plain-700 text-plain-600"
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1.25fr 2fr 2fr 2fr ",
+            gridTemplateColumns: "1.25fr 1.25fr 2fr 2fr 2fr ",
             gridTemplateRows: " repeat(4, 1.0fr)",
             gridTemplateAreas: `
                     "year q1 m1 m2 m3"
@@ -338,8 +338,8 @@ module Months = {
             onClick={_ => onClick(Year(year))}
             className={[
               `monthview-${Year(year)->entryDateString}`,
-              " flex flex-row items-center justify-center",
-              hasYearEntry ? `text-lime-500 bg-black` : "text-plain-400 bg-black",
+              "font-medium text-sm leading-none flex flex-row items-center justify-center overflow-hidden",
+              hasYearEntry ? `text-white bg-black` : "text-inherit bg-black",
             ]->Array.join(" ")}
             style={{
               gridArea: "year",
@@ -448,8 +448,8 @@ module Day = {
           </div>
         : React.null}
       <div
-        className="flex flex-row items-center gap-1 h-6 max-h-6 whitespace-nowrap overflow-x-hidden">
-        <div className=" h-6 w-5 flex flex-row flex-none">
+        className="flex flex-row items-center gap-1 h-5 max-h-5 whitespace-nowrap overflow-x-hidden">
+        <div className=" h-5 w-5 flex flex-row flex-none">
           {true && beginningOfWeek
             ? {
                 let week = d->DateFns.format("w")
@@ -471,7 +471,7 @@ module Day = {
             : React.null}
         </div>
         <div
-          className={["w-1 h-6 flex-none"]->Array.join(" ")}
+          className={["w-1 h-5 flex-none"]->Array.join(" ")}
           style={{
             backgroundColor: monthColor,
           }}
@@ -849,7 +849,7 @@ let make = () => {
 
   <div className="relative font-mono h-dvh flex flex-col">
     <div className="flex flex-row flex-1 overflow-hidden">
-      <div className="flex flex-col h-full flex-none w-64 ">
+      <div className="flex flex-col h-full flex-none w-64 border-r-8 border-r-black">
         <Days
           start={startOfCal} end={endOfCal} dateSet={dateSet} dateEntries onClick={onClickDate}
         />
