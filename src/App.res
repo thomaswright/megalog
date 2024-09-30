@@ -1,3 +1,9 @@
+@module("./exportFunctions.js")
+external exportToFolder: array<(string, string)> => unit = "exportToFolder"
+
+@module("./exportFunctions.js")
+external exportToFile: string => unit = "exportToFile"
+
 @val @scope("document")
 external getElementById: string => Js.Nullable.t<Dom.element> = "getElementById"
 
@@ -864,6 +870,16 @@ let make = () => {
     )
   }
 
+  let formatContentForFile = entry => {
+    "Date: " ++
+    entry.date->Option.mapOr("", x => x->entryDateString) ++
+    "\n" ++
+    "Title: " ++
+    entry.title ++
+    "\n\n" ++
+    entry.content
+  }
+
   <div className="relative font-mono h-dvh flex flex-col">
     <div className="flex flex-row flex-1 overflow-hidden">
       <div className="flex flex-col h-full flex-none w-64 border-r-8 border-r-black">
@@ -884,6 +900,32 @@ let make = () => {
     </div>
     <div className="flex-none border-t border-plain-700 flex flex-row gap-2 items-center px-2">
       <button onClick={_ => setEntries(v => v->sortEntries)}> {"Sort"->React.string} </button>
+      <button
+        onClick={_ => {
+          entries->Option.mapOr((), entries => {
+            entries
+            ->Array.map(v => v->formatContentForFile)
+            ->Array.join("\n\n")
+            ->exportToFile
+          })
+        }}>
+        {"Export File"->React.string}
+      </button>
+      <button
+        onClick={_ => {
+          entries->Option.mapOr((), entries => {
+            entries
+            ->Array.map(v => (
+              v.date->Option.mapOr("", x => x->entryDateString) ++
+              (v.date->Option.isSome && v.title != "" ? "_" : "") ++
+              v.title ++ ".txt",
+              v->formatContentForFile,
+            ))
+            ->exportToFolder
+          })
+        }}>
+        {"Export Folder"->React.string}
+      </button>
       <button
         onClick={_ =>
           setEntries(v =>

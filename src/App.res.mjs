@@ -11,6 +11,7 @@ import * as Color from "@texel/color";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as Tb from "react-icons/tb";
 import * as JsxRuntime from "react/jsx-runtime";
+import * as ExportFunctionsJs from "./exportFunctions.js";
 import UseLocalStorageJs from "./useLocalStorage.js";
 import ReactTextareaAutosize from "react-textarea-autosize";
 
@@ -940,6 +941,11 @@ function App(props) {
                 });
           }));
   };
+  var formatContentForFile = function (entry) {
+    return "Date: " + Core__Option.mapOr(entry.date, "", (function (x) {
+                  return entryDateString(x);
+                })) + "\nTitle: " + entry.title + "\n\n" + entry.content;
+  };
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsxs("div", {
@@ -988,6 +994,35 @@ function App(props) {
                                   setEntries(function (v) {
                                         return sortEntries(v);
                                       });
+                                })
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: "Export File",
+                              onClick: (function (param) {
+                                  Core__Option.mapOr(entries, undefined, (function (entries) {
+                                          var prim = entries.map(function (v) {
+                                                  return formatContentForFile(v);
+                                                }).join("\n\n");
+                                          ExportFunctionsJs.exportToFile(prim);
+                                        }));
+                                })
+                            }),
+                        JsxRuntime.jsx("button", {
+                              children: "Export Folder",
+                              onClick: (function (param) {
+                                  Core__Option.mapOr(entries, undefined, (function (entries) {
+                                          var prim = entries.map(function (v) {
+                                                return [
+                                                        Core__Option.mapOr(v.date, "", (function (x) {
+                                                                return entryDateString(x);
+                                                              })) + (
+                                                          Core__Option.isSome(v.date) && v.title !== "" ? "_" : ""
+                                                        ) + v.title + ".txt",
+                                                        formatContentForFile(v)
+                                                      ];
+                                              });
+                                          ExportFunctionsJs.exportToFolder(prim);
+                                        }));
                                 })
                             }),
                         JsxRuntime.jsx("button", {
