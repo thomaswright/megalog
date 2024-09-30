@@ -170,7 +170,7 @@ function App$Months(props) {
                                                             _0: year
                                                           }),
                                                       " flex flex-row items-center justify-center",
-                                                      hasYearEntry ? "text-lime-500 bg-black" : "text-neutral-500 bg-black"
+                                                      hasYearEntry ? "text-lime-500 bg-black" : "text-plain-400 bg-black"
                                                     ].join(" "),
                                                   style: {
                                                     gridArea: "year"
@@ -194,7 +194,7 @@ function App$Months(props) {
                                                             _1: 1
                                                           }),
                                                       " flex flex-row items-center justify-center",
-                                                      hasQ1Entry ? "text-lime-500 bg-black" : "text-neutral-500 bg-black"
+                                                      hasQ1Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
                                                     ].join(" "),
                                                   style: {
                                                     gridArea: "q1"
@@ -219,7 +219,7 @@ function App$Months(props) {
                                                             _1: 2
                                                           }),
                                                       " flex flex-row items-center justify-center",
-                                                      hasQ2Entry ? "text-lime-500 bg-black" : "text-neutral-500 bg-black"
+                                                      hasQ2Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
                                                     ].join(" "),
                                                   style: {
                                                     gridArea: "q2"
@@ -244,7 +244,7 @@ function App$Months(props) {
                                                             _1: 3
                                                           }),
                                                       " flex flex-row items-center justify-center",
-                                                      hasQ3Entry ? "text-lime-500 bg-black" : "text-neutral-500 bg-black"
+                                                      hasQ3Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
                                                     ].join(" "),
                                                   style: {
                                                     gridArea: "q3"
@@ -269,7 +269,7 @@ function App$Months(props) {
                                                             _1: 4
                                                           }),
                                                       " flex flex-row items-center justify-center",
-                                                      hasQ4Entry ? "text-lime-500 bg-black" : "text-neutral-500 bg-black"
+                                                      hasQ4Entry ? "text-lime-500 bg-black" : "text-inherit bg-black"
                                                     ].join(" "),
                                                   style: {
                                                     gridArea: "q4"
@@ -304,7 +304,7 @@ function App$Months(props) {
                                                                   " flex flex-row items-center justify-center bg-black"
                                                                 ].join(" "),
                                                               style: {
-                                                                color: hasEntry ? monthColor(i + 1 | 0) : "#737373",
+                                                                color: hasEntry ? monthColor(i + 1 | 0) : "inherit",
                                                                 gridArea: "m" + monthNum
                                                               },
                                                               onClick: (function (param) {
@@ -317,7 +317,7 @@ function App$Months(props) {
                                                             }, monthNum);
                                                 })
                                           ],
-                                          className: "gap-px text-xs bg-neutral-800 border border-neutral-700",
+                                          className: "gap-px text-xs bg-plain-800 border border-plain-700 text-plain-600",
                                           style: {
                                             display: "grid",
                                             gridTemplateAreas: "\n                    \"year q1 m1 m2 m3\"\n                    \"year q2 m4 m5 m6\"\n                    \"year q3 m7 m8 m9\"\n                    \"year q4 m10 m11 m12\"\n                  \n                    ",
@@ -426,7 +426,7 @@ function App$Day(props) {
                             }),
                         JsxRuntime.jsx("div", {
                               children: "Singapore",
-                              className: "text-neutral-500 flex-none"
+                              className: "text-plain-500 flex-none"
                             })
                       ],
                       className: "flex flex-row items-center gap-1 h-6 max-h-6 whitespace-nowrap overflow-x-hidden"
@@ -634,7 +634,7 @@ function App$Entry(props) {
                                       children: JsxRuntime.jsx(Tb.TbLock, {}),
                                       className: [
                                           "mx-1",
-                                          "bg-black text-neutral-500"
+                                          "bg-black text-plain-500"
                                         ].join(" "),
                                       onClick: (function (param) {
                                           updateEntry(entry.id, (function (v) {
@@ -679,7 +679,7 @@ function App$Entry(props) {
                                               children: JsxRuntime.jsx(Tb.TbLockOpen, {}),
                                               className: [
                                                   "mx-1",
-                                                  " text-neutral-500"
+                                                  " text-plain-500"
                                                 ].join(" "),
                                               onClick: (function (param) {
                                                   updateEntry(entry.id, (function (v) {
@@ -986,7 +986,7 @@ function App(props) {
                                 })
                             })
                       ],
-                      className: "flex-none border-t border-neutral-700 flex flex-row gap-2 items-center px-2"
+                      className: "flex-none border-t border-plain-700 flex flex-row gap-2 items-center px-2"
                     })
               ],
               className: "relative font-mono h-dvh flex flex-col"

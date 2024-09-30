@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const tailwindColors = require("tailwindcss/colors");
+
 module.exports = {
   content: ["./index.html", "./src/**/*.res.mjs"],
   theme: {
@@ -14,6 +16,9 @@ module.exports = {
           "SFMono-Regular",
           "monospace",
         ],
+      },
+      colors: {
+        plain: tailwindColors["slate"],
       },
     },
   },

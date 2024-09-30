@@ -319,13 +319,13 @@ module Months = {
         let hasQ3Entry = dateSet->Set.has(Quarter(year, 3)->entryDateString)
         let hasQ4Entry = dateSet->Set.has(Quarter(year, 4)->entryDateString)
 
-        let entryCheck = x => x ? `text-lime-500 bg-black` : "text-neutral-500 bg-black"
+        let entryCheck = x => x ? `text-lime-500 bg-black` : "text-inherit bg-black"
 
         beginningOfMonth
           ? <React.Fragment>
               {beginningOfYear
                 ? <div
-                    className="gap-px text-xs bg-neutral-800 border border-neutral-700"
+                    className="gap-px text-xs bg-plain-800 border border-plain-700 text-plain-600"
                     style={{
                       display: "grid",
                       gridTemplateColumns: "1fr 1.25fr 2fr 2fr 2fr ",
@@ -343,7 +343,7 @@ module Months = {
                       className={[
                         `monthview-${Year(year)->entryDateString}`,
                         " flex flex-row items-center justify-center",
-                        hasYearEntry ? `text-lime-500 bg-black` : "text-neutral-500 bg-black",
+                        hasYearEntry ? `text-lime-500 bg-black` : "text-plain-400 bg-black",
                       ]->Array.join(" ")}
                       style={{
                         gridArea: "year",
@@ -412,7 +412,7 @@ module Months = {
                       let hasEntry = dateSet->Set.has(Month(year, i + 1)->entryDateString)
                       // let color = hasEntry
                       //   ? `bg-black `
-                      //   : "bg-black text-neutral-600"
+                      //   : "bg-black text-plain-600"
 
                       <button
                         key={monthNum}
@@ -423,7 +423,7 @@ module Months = {
                         ]->Array.join(" ")}
                         style={{
                           gridArea: "m" ++ monthNum,
-                          color: hasEntry ? monthColor(i + 1) : "#737373",
+                          color: hasEntry ? monthColor(i + 1) : "inherit",
                         }}>
                         <div className=""> {monthDate->DateFns.format("MMM")->React.string} </div>
                       </button>
@@ -504,7 +504,7 @@ module Day = {
           ]->Array.join(" ")}>
           {d->DateFns.format("y-MM-dd eee")->React.string}
         </button>
-        <div className="text-neutral-500 flex-none"> {"Singapore"->React.string} </div>
+        <div className="text-plain-500 flex-none"> {"Singapore"->React.string} </div>
       </div>
     </React.Fragment>
   }
@@ -662,7 +662,7 @@ module Entry = {
         <span className="flex flex-row items-center">
           {entry.lock
             ? <button
-                className={["mx-1", "bg-black text-neutral-500"]->Array.join(" ")}
+                className={["mx-1", "bg-black text-plain-500"]->Array.join(" ")}
                 onClick={_ => updateEntry(entry.id, v => {...v, lock: false})}>
                 <Icons.Lock />
               </button>
@@ -686,7 +686,7 @@ module Entry = {
                   {"Delete"->React.string}
                 </button>
                 <button
-                  className={["mx-1", " text-neutral-500"]->Array.join(" ")}
+                  className={["mx-1", " text-plain-500"]->Array.join(" ")}
                   onClick={_ => updateEntry(entry.id, v => {...v, lock: true})}>
                   <Icons.OpenLock />
                   // {"Lock"->React.string}
@@ -881,7 +881,7 @@ let make = () => {
         }}
       />
     </div>
-    <div className="flex-none border-t border-neutral-700 flex flex-row gap-2 items-center px-2">
+    <div className="flex-none border-t border-plain-700 flex flex-row gap-2 items-center px-2">
       <button onClick={_ => setEntries(v => v->sortEntries)}> {"Sort"->React.string} </button>
       <button
         onClick={_ =>
