@@ -650,7 +650,7 @@ function App$Entry(props) {
                                     }) : JsxRuntime.jsxs(React.Fragment, {
                                       children: [
                                         JsxRuntime.jsx("button", {
-                                              children: "Set",
+                                              children: isSelectedForSet ? "Cancel" : "Set",
                                               className: ["mx-1 text-black"].join(" "),
                                               style: {
                                                 backgroundColor: isSelectedForSet ? monthColor$1 : "white"

@@ -670,7 +670,7 @@ module Entry = {
                     backgroundColor: isSelectedForSet ? monthColor : "white",
                   }}
                   onClick={_ => setEntryToSet(v => v == Some(entry.id) ? None : Some(entry.id))}>
-                  {"Set"->React.string}
+                  {(isSelectedForSet ? "Cancel" : "Set")->React.string}
                 </button>
                 // <button
                 //   className={["mx-1", "bg-white text-black"]->Array.join(" ")}
