@@ -480,9 +480,11 @@ function entryClassNameId(entryDate) {
 
 function App$Entry(props) {
   var deleteEntry = props.deleteEntry;
+  var isSelectedForSet = props.isSelectedForSet;
   var setEntryToSet = props.setEntryToSet;
   var updateEntry = props.updateEntry;
   var entry = props.entry;
+  console.log("render");
   var monthColor$1 = Core__Option.mapOr(entry.date, "#fff", (function (date) {
           switch (date.TAG) {
             case "Year" :
@@ -502,9 +504,6 @@ function App$Entry(props) {
           } else {
             return entryDateString(date);
           }
-        }));
-  var isSelectedForSet = Core__Option.mapOr(props.entryToSet, false, (function (v) {
-          return v === entry.id;
         }));
   var goToDay = function () {
     Core__Option.mapOr(entry.date, undefined, (function (entryDate) {
@@ -733,8 +732,18 @@ function App$Entry(props) {
             }, entry.id);
 }
 
-var make$2 = React.memo(App$Entry, (function (_a, _b) {
-        return false;
+var make$2 = React.memo(App$Entry, (function (a, b) {
+        var match = a.entry.date;
+        var match$1 = b.entry.date;
+        if ((
+            match !== undefined ? (
+                match$1 !== undefined ? entryDateString(match) === entryDateString(match$1) : false
+              ) : match$1 === undefined
+          ) && a.entry.content === b.entry.content && a.entry.lock === b.entry.lock) {
+          return a.isSelectedForSet === b.isSelectedForSet;
+        } else {
+          return false;
+        }
       }));
 
 function App$Entries(props) {
@@ -745,11 +754,14 @@ function App$Entries(props) {
   return JsxRuntime.jsx("div", {
               children: Core__Option.mapOr(props.entries, null, (function (entries_) {
                       return entries_.map(function (entry) {
+                                  var isSelectedForSet = Core__Option.mapOr(entryToSet, false, (function (v) {
+                                          return v === entry.id;
+                                        }));
                                   return JsxRuntime.jsx(make$2, {
                                               entry: entry,
                                               updateEntry: updateEntry,
                                               setEntryToSet: setEntryToSet,
-                                              entryToSet: entryToSet,
+                                              isSelectedForSet: isSelectedForSet,
                                               deleteEntry: deleteEntry
                                             }, entry.id);
                                 });

@@ -575,9 +575,10 @@ module Entry = {
     ~entry,
     ~updateEntry: (string, entry => entry) => unit,
     ~setEntryToSet,
-    ~entryToSet,
+    ~isSelectedForSet,
     ~deleteEntry,
   ) => {
+    Console.log("render")
     let monthColor = entry.date->Option.mapOr("#fff", date => {
       switch date {
       | Date(_y, m, _d) => monthColor(m)
@@ -594,7 +595,6 @@ module Entry = {
       }
     })
 
-    let isSelectedForSet = entryToSet->Option.mapOr(false, v => v == entry.id)
     let goToDay = () =>
       entry.date->Option.mapOr((), entryDate => {
         let dayMatch = switch entryDate {
@@ -707,14 +707,16 @@ module Entry = {
     </div>
   }
 
-  let make = React.memoCustomCompareProps(make, (_a, _b) => {
-    false
-    // switch (a.entry.date, b.entry.date) {
-    // | (Some(x), Some(y)) => x->entryDateString == y->entryDateString
-    // | (None, None) => true
-    // | _ => false
-    // } &&
-    // a.entry.content == b.entry.content
+  let make = React.memoCustomCompareProps(make, (a, b) => {
+    // false
+    switch (a.entry.date, b.entry.date) {
+    | (Some(x), Some(y)) => x->entryDateString == y->entryDateString
+    | (None, None) => true
+    | _ => false
+    } &&
+    a.entry.content == b.entry.content &&
+    a.entry.lock == b.entry.lock &&
+    a.isSelectedForSet == b.isSelectedForSet
   })
 }
 
@@ -731,7 +733,9 @@ module Entries = {
       {entries->Option.mapOr(React.null, entries_ => {
         entries_
         ->Array.map(entry => {
-          <Entry key={entry.id} entry updateEntry setEntryToSet entryToSet deleteEntry />
+          let isSelectedForSet = entryToSet->Option.mapOr(false, v => v == entry.id)
+
+          <Entry key={entry.id} entry updateEntry setEntryToSet isSelectedForSet deleteEntry />
         })
         ->React.array
       })}
