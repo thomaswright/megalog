@@ -112,7 +112,7 @@ var monthColors = Core__Array.make(12, false).map(function (param, i) {
     });
 
 var monthColorsDim = Core__Array.make(12, false).map(function (param, i) {
-      return hsl(monthHue(i), 1.0, 0.3);
+      return hsl(monthHue(i), 1.0, 0.4);
     });
 
 function monthColor(monthInt) {
@@ -170,7 +170,7 @@ function App$Months(props) {
                                                             _0: year
                                                           }),
                                                       " flex flex-row items-center justify-center",
-                                                      hasYearEntry ? "text-lime-500 bg-black" : "text-neutral-300 bg-black"
+                                                      hasYearEntry ? "text-lime-500 bg-black" : "text-neutral-500 bg-black"
                                                     ].join(" "),
                                                   style: {
                                                     gridArea: "year"
@@ -194,7 +194,7 @@ function App$Months(props) {
                                                             _1: 1
                                                           }),
                                                       " flex flex-row items-center justify-center",
-                                                      hasQ1Entry ? "text-lime-500 bg-black" : "text-neutral-600 bg-black"
+                                                      hasQ1Entry ? "text-lime-500 bg-black" : "text-neutral-500 bg-black"
                                                     ].join(" "),
                                                   style: {
                                                     gridArea: "q1"
@@ -219,7 +219,7 @@ function App$Months(props) {
                                                             _1: 2
                                                           }),
                                                       " flex flex-row items-center justify-center",
-                                                      hasQ2Entry ? "text-lime-500 bg-black" : "text-neutral-600 bg-black"
+                                                      hasQ2Entry ? "text-lime-500 bg-black" : "text-neutral-500 bg-black"
                                                     ].join(" "),
                                                   style: {
                                                     gridArea: "q2"
@@ -244,7 +244,7 @@ function App$Months(props) {
                                                             _1: 3
                                                           }),
                                                       " flex flex-row items-center justify-center",
-                                                      hasQ3Entry ? "text-lime-500 bg-black" : "text-neutral-600 bg-black"
+                                                      hasQ3Entry ? "text-lime-500 bg-black" : "text-neutral-500 bg-black"
                                                     ].join(" "),
                                                   style: {
                                                     gridArea: "q3"
@@ -269,7 +269,7 @@ function App$Months(props) {
                                                             _1: 4
                                                           }),
                                                       " flex flex-row items-center justify-center",
-                                                      hasQ4Entry ? "text-lime-500 bg-black" : "text-neutral-600 bg-black"
+                                                      hasQ4Entry ? "text-lime-500 bg-black" : "text-neutral-500 bg-black"
                                                     ].join(" "),
                                                   style: {
                                                     gridArea: "q4"
@@ -304,7 +304,7 @@ function App$Months(props) {
                                                                   " flex flex-row items-center justify-center bg-black"
                                                                 ].join(" "),
                                                               style: {
-                                                                color: hasEntry ? monthColor(i + 1 | 0) : "#333",
+                                                                color: hasEntry ? monthColor(i + 1 | 0) : "#737373",
                                                                 gridArea: "m" + monthNum
                                                               },
                                                               onClick: (function (param) {
@@ -317,7 +317,7 @@ function App$Months(props) {
                                                             }, monthNum);
                                                 })
                                           ],
-                                          className: "gap-px text-xs bg-neutral-800 border border-neutral-800",
+                                          className: "gap-px text-xs bg-neutral-800 border border-neutral-700",
                                           style: {
                                             display: "grid",
                                             gridTemplateAreas: "\n                    \"year q1 m1 m2 m3\"\n                    \"year q2 m4 m5 m6\"\n                    \"year q3 m7 m8 m9\"\n                    \"year q4 m10 m11 m12\"\n                  \n                    ",
@@ -330,7 +330,7 @@ function App$Months(props) {
                       return null;
                     }
                   }),
-              className: "p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full"
+              className: "p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full font-black"
             });
 }
 
@@ -356,7 +356,7 @@ function App$Day(props) {
                     }));
             return JsxRuntime.jsx("button", {
                         children: week,
-                        className: "text-xs text-left  overflow-visible text-nowrap p-1",
+                        className: " text-left  overflow-visible text-nowrap p-1 font-black",
                         id: "dayview-" + entryDateString({
                               TAG: "Week",
                               _0: year,
@@ -403,7 +403,7 @@ function App$Day(props) {
                         JsxRuntime.jsx("button", {
                               children: DateFns.format(d, "y-MM-dd eee"),
                               className: [
-                                  "px-2 flex-none",
+                                  "font-black px-2 flex-none",
                                   isToday ? "border-r-4 border-white" : ""
                                 ].join(" "),
                               id: "dayview-" + entryDateString({
@@ -429,7 +429,7 @@ function App$Day(props) {
                               className: "text-neutral-500 flex-none"
                             })
                       ],
-                      className: "flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden"
+                      className: "flex flex-row items-center gap-1 h-6 max-h-6 whitespace-nowrap overflow-x-hidden"
                     })
               ]
             });
@@ -455,7 +455,7 @@ function App$Days(props) {
                                 hasEntry: dateSet.has(DateFns.format(d, "y-MM-dd"))
                               }, d.toString());
                   }),
-              className: "w-full flex-2 overflow-y-scroll "
+              className: "w-full flex-2 overflow-y-scroll text-xs"
             });
 }
 
@@ -606,7 +606,7 @@ function App$Entry(props) {
                         Core__Option.mapOr(dateDisplay, null, (function (dateDisplay_) {
                                 return JsxRuntime.jsx("span", {
                                             children: dateDisplay_,
-                                            className: "cursor-pointer mr-2",
+                                            className: "cursor-pointer mr-2 font-black",
                                             style: {
                                               backgroundColor: isSelectedForSet ? monthColor$1 : "transparent",
                                               color: isSelectedForSet ? "black" : monthColor$1
@@ -624,7 +624,7 @@ function App$Entry(props) {
                               })),
                         JsxRuntime.jsx("span", {
                               children: entry.title,
-                              className: " text-white"
+                              className: " text-white min-w-8 italic font-light"
                             }),
                         JsxRuntime.jsx("span", {
                               className: "flex-1"

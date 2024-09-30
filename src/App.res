@@ -287,7 +287,7 @@ let monthHue = monthInt => {
 let monthColors =
   Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.7))
 let monthColorsDim =
-  Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.3))
+  Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.4))
 
 let monthColor = monthInt => {
   monthColors->Array.getUnsafe(monthInt - 1)
@@ -300,7 +300,7 @@ let monthColorDim = monthInt => {
 module Months = {
   @react.component
   let make = (~start, ~end, ~dateSet, ~onClick) => {
-    <div className="p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full">
+    <div className="p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full font-black">
       {allDays(start, end)
       ->Array.map(d => {
         // let month = d->DateFns.format("M")->Int.fromString->Option.getOr(0)
@@ -319,13 +319,13 @@ module Months = {
         let hasQ3Entry = dateSet->Set.has(Quarter(year, 3)->entryDateString)
         let hasQ4Entry = dateSet->Set.has(Quarter(year, 4)->entryDateString)
 
-        let entryCheck = x => x ? `text-lime-500 bg-black` : "text-neutral-600 bg-black"
+        let entryCheck = x => x ? `text-lime-500 bg-black` : "text-neutral-500 bg-black"
 
         beginningOfMonth
           ? <React.Fragment>
               {beginningOfYear
                 ? <div
-                    className="gap-px text-xs bg-neutral-800 border border-neutral-800"
+                    className="gap-px text-xs bg-neutral-800 border border-neutral-700"
                     style={{
                       display: "grid",
                       gridTemplateColumns: "1fr 1.25fr 2fr 2fr 2fr ",
@@ -343,7 +343,7 @@ module Months = {
                       className={[
                         `monthview-${Year(year)->entryDateString}`,
                         " flex flex-row items-center justify-center",
-                        hasYearEntry ? `text-lime-500 bg-black` : "text-neutral-300 bg-black",
+                        hasYearEntry ? `text-lime-500 bg-black` : "text-neutral-500 bg-black",
                       ]->Array.join(" ")}
                       style={{
                         gridArea: "year",
@@ -423,7 +423,7 @@ module Months = {
                         ]->Array.join(" ")}
                         style={{
                           gridArea: "m" ++ monthNum,
-                          color: hasEntry ? monthColor(i + 1) : "#333",
+                          color: hasEntry ? monthColor(i + 1) : "#737373",
                         }}>
                         <div className=""> {monthDate->DateFns.format("MMM")->React.string} </div>
                       </button>
@@ -462,7 +462,7 @@ module Day = {
           </div>
         : React.null}
       <div
-        className="flex flex-row items-center gap-1 text-sm h-6 max-h-6 whitespace-nowrap overflow-x-hidden">
+        className="flex flex-row items-center gap-1 h-6 max-h-6 whitespace-nowrap overflow-x-hidden">
         <div className=" h-6 w-5 flex flex-row flex-none">
           {true && beginningOfWeek
             ? {
@@ -479,7 +479,7 @@ module Day = {
                     style={{
                       color: hasWeekEntry ? monthColor : "#ddd",
                     }}
-                    className="text-xs text-left  overflow-visible text-nowrap p-1">
+                    className=" text-left  overflow-visible text-nowrap p-1 font-black">
                     {("" ++ week)->React.string}
                   </button>
                 })
@@ -498,7 +498,10 @@ module Day = {
           style={{
             color: hasEntry ? monthColor : monthColorDim,
           }}
-          className={["px-2 flex-none", isToday ? "border-r-4 border-white" : ""]->Array.join(" ")}>
+          className={[
+            "font-black px-2 flex-none",
+            isToday ? "border-r-4 border-white" : "",
+          ]->Array.join(" ")}>
           {d->DateFns.format("y-MM-dd eee")->React.string}
         </button>
         <div className="text-neutral-500 flex-none"> {"Singapore"->React.string} </div>
@@ -516,7 +519,7 @@ module Day = {
 module Days = {
   @react.component
   let make = (~start, ~end, ~dateSet, ~onClick) => {
-    <div className="w-full flex-2 overflow-y-scroll ">
+    <div className="w-full flex-2 overflow-y-scroll text-xs">
       {allDays(start, end)
       ->Array.map(d => {
         <Day
@@ -639,7 +642,7 @@ module Entry = {
         }}>
         {dateDisplay->Option.mapOr(React.null, dateDisplay_ => {
           <span
-            className="cursor-pointer mr-2"
+            className="cursor-pointer mr-2 font-black"
             style={{
               color: isSelectedForSet ? "black" : monthColor,
               backgroundColor: isSelectedForSet ? monthColor : "transparent",
@@ -654,7 +657,7 @@ module Entry = {
             {dateDisplay_->React.string}
           </span>
         })}
-        <span className=" text-white"> {entry.title->React.string} </span>
+        <span className=" text-white min-w-8 italic font-light"> {entry.title->React.string} </span>
         <span className="flex-1" />
         <span className="flex flex-row items-center">
           {entry.lock

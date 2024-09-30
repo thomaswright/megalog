@@ -6,6 +6,15 @@ module.exports = {
       flex: {
         2: "2 2 0%",
       },
+      fontFamily: {
+        mono: [
+          "Roboto Mono",
+          "JetBrains Mono",
+          "ui-monospace",
+          "SFMono-Regular",
+          "monospace",
+        ],
+      },
     },
   },
   plugins: [],
