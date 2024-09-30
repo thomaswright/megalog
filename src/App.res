@@ -440,7 +440,7 @@ module Day = {
     let isToday = DateFns.isSameDay(Date.make(), d)
 
     <React.Fragment>
-      {true && beginningOfWeek
+      {beginningOfWeek
         ? <div className="relative h-0 ml-px">
             <div
               style={{background: monthColor}} className="h-px w-full absolute-translate-y-1/2"
@@ -450,7 +450,7 @@ module Day = {
       <div
         className="flex flex-row items-center gap-1 h-5 max-h-5 whitespace-nowrap overflow-x-hidden">
         <div className=" h-5 w-5 flex flex-row flex-none">
-          {true && beginningOfWeek
+          {beginningOfWeek
             ? {
                 let week = d->DateFns.format("w")
 
@@ -470,27 +470,30 @@ module Day = {
               }
             : React.null}
         </div>
-        <div
-          className={["w-1 h-5 flex-none"]->Array.join(" ")}
-          style={{
-            backgroundColor: monthColor,
-          }}
-        />
         <button
-          id={`dayview-${Date(year, month, monthDay)->entryDateString}`}
+          className="h-5 flex-1 flex flex-row whitespace-nowrap overflow-x-hidden"
           onClick={_ => onClick(Date(year, month, monthDay))}
-          style={{
-            color: entry->Option.isSome ? monthColor : monthColorDim,
-          }}
-          className={[
-            "font-black px-2 flex-none",
-            isToday ? "border-r-4 border-white" : "",
-          ]->Array.join(" ")}>
-          {d->DateFns.format("y-MM-dd eee")->React.string}
+          id={`dayview-${Date(year, month, monthDay)->entryDateString}`}>
+          <span
+            className={["w-1 h-5 flex-none"]->Array.join(" ")}
+            style={{
+              backgroundColor: monthColor,
+            }}
+          />
+          <span
+            style={{
+              color: entry->Option.isSome ? monthColor : monthColorDim,
+            }}
+            className={[
+              "font-black px-2 flex-none",
+              isToday ? "border-r-4 border-white" : "",
+            ]->Array.join(" ")}>
+            {d->DateFns.format("y-MM-dd eee")->React.string}
+          </span>
+          <span className="text-plain-500 flex-none">
+            {entry->Option.mapOr("", e => e.title)->React.string}
+          </span>
         </button>
-        <div className="text-plain-500 flex-none">
-          {entry->Option.mapOr("", e => e.title)->React.string}
-        </div>
       </div>
     </React.Fragment>
   }
@@ -525,18 +528,18 @@ module Days = {
     </div>
   }
 
-  let make = React.memoCustomCompareProps(make, (a, b) => {
-    let dateSetId = x =>
-      x
-      ->Set.values
-      ->Iterator.toArray
-      ->Array.toSorted((a, b) => String.localeCompare(a, b))
-      ->Array.join("")
+  // let make = React.memoCustomCompareProps(make, (a, b) => {
+  //   let dateSetId = x =>
+  //     x
+  //     ->Set.values
+  //     ->Iterator.toArray
+  //     ->Array.toSorted((a, b) => String.localeCompare(a, b))
+  //     ->Array.join("")
 
-    a.start->format(standardDateFormat) == b.start->format(standardDateFormat) &&
-    a.end->format(standardDateFormat) == b.end->format(standardDateFormat) &&
-    a.dateSet->dateSetId == b.dateSet->dateSetId
-  })
+  //   a.start->format(standardDateFormat) == b.start->format(standardDateFormat) &&
+  //   a.end->format(standardDateFormat) == b.end->format(standardDateFormat) &&
+  //   a.dateSet->dateSetId == b.dateSet->dateSetId
+  // })
 }
 
 let entryClassNameId = entryDate => {
@@ -636,7 +639,7 @@ module Entry = {
         <input
           readOnly={entry.lock}
           type_="text"
-          className={"bg-inherit text-white min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1"}
+          className={"flex-1 bg-inherit text-white min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1"}
           placeholder={""}
           value={entry.title}
           onChange={e => {
@@ -646,7 +649,7 @@ module Entry = {
             })
           }}
         />
-        <span className="flex-1" />
+        <span className="flex-none w-4" />
         <span className="flex flex-row items-center">
           {entry.lock
             ? <button
@@ -661,7 +664,7 @@ module Entry = {
                     backgroundColor: isSelectedForSet ? monthColor : "white",
                   }}
                   onClick={_ => setEntryToSet(v => v == Some(entry.id) ? None : Some(entry.id))}>
-                  {(isSelectedForSet ? "Cancel" : "Set Date")->React.string}
+                  {(isSelectedForSet ? "Cancel" : "Pick Date")->React.string}
                 </button>
                 <button
                   className={["mx-1", "bg-white text-black"]->Array.join(" ")}
@@ -680,7 +683,7 @@ module Entry = {
       <div className="py-2">
         <div className="rounded overflow-hidden">
           <Editor
-            className={"editor scroll-m-20"}
+            className={"editor scroll-m-20 "}
             content={entry.content}
             onChange={newContent => updateEntry(entry.id, v => {...v, content: newContent})}
             readonly={entry.lock}
@@ -713,7 +716,7 @@ module Entries = {
     ~entryToSet,
     ~deleteEntry,
   ) => {
-    <div className="text-xs leading-none flex-1 h-full overflow-y-scroll">
+    <div className="text-xs leading-none flex-1 h-full overflow-y-scroll max-w-xl">
       {entries->Option.mapOr(React.null, entries_ => {
         entries_
         ->Array.map(entry => {

@@ -349,7 +349,7 @@ function App$Day(props) {
   var monthColorDim$1 = monthColorDim(month);
   var isToday = DateFns.isSameDay(new Date(), d);
   var tmp;
-  if (true && beginningOfWeek) {
+  if (beginningOfWeek) {
     var week = DateFns.format(d, "w");
     tmp = Core__Option.mapOr(Core__Int.fromString(week, undefined), null, (function (weekNum) {
             return JsxRuntime.jsx("button", {
@@ -377,7 +377,7 @@ function App$Day(props) {
   }
   return JsxRuntime.jsxs(React.Fragment, {
               children: [
-                true && beginningOfWeek ? JsxRuntime.jsx("div", {
+                beginningOfWeek ? JsxRuntime.jsx("div", {
                         children: JsxRuntime.jsx("div", {
                               className: "h-px w-full absolute-translate-y-1/2",
                               style: {
@@ -392,27 +392,38 @@ function App$Day(props) {
                               children: tmp,
                               className: " h-5 w-5 flex flex-row flex-none"
                             }),
-                        JsxRuntime.jsx("div", {
-                              className: ["w-1 h-5 flex-none"].join(" "),
-                              style: {
-                                backgroundColor: monthColor$1
-                              }
-                            }),
-                        JsxRuntime.jsx("button", {
-                              children: DateFns.format(d, "y-MM-dd eee"),
-                              className: [
-                                  "font-black px-2 flex-none",
-                                  isToday ? "border-r-4 border-white" : ""
-                                ].join(" "),
+                        JsxRuntime.jsxs("button", {
+                              children: [
+                                JsxRuntime.jsx("span", {
+                                      className: ["w-1 h-5 flex-none"].join(" "),
+                                      style: {
+                                        backgroundColor: monthColor$1
+                                      }
+                                    }),
+                                JsxRuntime.jsx("span", {
+                                      children: DateFns.format(d, "y-MM-dd eee"),
+                                      className: [
+                                          "font-black px-2 flex-none",
+                                          isToday ? "border-r-4 border-white" : ""
+                                        ].join(" "),
+                                      style: {
+                                        color: Core__Option.isSome(entry) ? monthColor$1 : monthColorDim$1
+                                      }
+                                    }),
+                                JsxRuntime.jsx("span", {
+                                      children: Core__Option.mapOr(entry, "", (function (e) {
+                                              return e.title;
+                                            })),
+                                      className: "text-plain-500 flex-none"
+                                    })
+                              ],
+                              className: "h-5 flex-1 flex flex-row whitespace-nowrap overflow-x-hidden",
                               id: "dayview-" + entryDateString({
                                     TAG: "Date",
                                     _0: year,
                                     _1: month,
                                     _2: monthDay
                                   }),
-                              style: {
-                                color: Core__Option.isSome(entry) ? monthColor$1 : monthColorDim$1
-                              },
                               onClick: (function (param) {
                                   onClick({
                                         TAG: "Date",
@@ -421,12 +432,6 @@ function App$Day(props) {
                                         _2: monthDay
                                       });
                                 })
-                            }),
-                        JsxRuntime.jsx("div", {
-                              children: Core__Option.mapOr(entry, "", (function (e) {
-                                      return e.title;
-                                    })),
-                              className: "text-plain-500 flex-none"
                             })
                       ],
                       className: "flex flex-row items-center gap-1 h-5 max-h-5 whitespace-nowrap overflow-x-hidden"
@@ -467,19 +472,6 @@ function App$Days(props) {
               className: "w-full flex-2 overflow-y-scroll text-xs"
             });
 }
-
-var make$1 = React.memo(App$Days, (function (a, b) {
-        var dateSetId = function (x) {
-          return Array.from(x.values()).toSorted(function (a, b) {
-                        return a.localeCompare(b);
-                      }).join("");
-        };
-        if (DateFns.format(a.start, standardDateFormat) === DateFns.format(b.start, standardDateFormat) && DateFns.format(a.end, standardDateFormat) === DateFns.format(b.end, standardDateFormat)) {
-          return dateSetId(a.dateSet) === dateSetId(b.dateSet);
-        } else {
-          return false;
-        }
-      }));
 
 function entryClassNameId(entryDate) {
   return Core__Option.mapOr(entryDate, "", (function (date) {
@@ -631,7 +623,7 @@ function App$Entry(props) {
                                           });
                               })),
                         JsxRuntime.jsx("input", {
-                              className: "bg-inherit text-white min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1",
+                              className: "flex-1 bg-inherit text-white min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1",
                               placeholder: "",
                               readOnly: entry.lock,
                               type: "text",
@@ -649,7 +641,7 @@ function App$Entry(props) {
                                 })
                             }),
                         JsxRuntime.jsx("span", {
-                              className: "flex-1"
+                              className: "flex-none w-4"
                             }),
                         JsxRuntime.jsx("span", {
                               children: entry.lock ? JsxRuntime.jsx("button", {
@@ -672,7 +664,7 @@ function App$Entry(props) {
                                     }) : JsxRuntime.jsxs(React.Fragment, {
                                       children: [
                                         JsxRuntime.jsx("button", {
-                                              children: isSelectedForSet ? "Cancel" : "Set Date",
+                                              children: isSelectedForSet ? "Cancel" : "Pick Date",
                                               className: ["mx-1 text-black"].join(" "),
                                               style: {
                                                 backgroundColor: isSelectedForSet ? monthColor$1 : "white"
@@ -744,7 +736,7 @@ function App$Entry(props) {
                                                     };
                                             }));
                                     }),
-                                  className: "editor scroll-m-20",
+                                  className: "editor scroll-m-20 ",
                                   readonly: entry.lock
                                 }),
                             className: "rounded overflow-hidden"
@@ -755,7 +747,7 @@ function App$Entry(props) {
             }, entry.id);
 }
 
-var make$2 = React.memo(App$Entry, (function (a, b) {
+var make$1 = React.memo(App$Entry, (function (a, b) {
         var match = a.entry.date;
         var match$1 = b.entry.date;
         if ((
@@ -780,7 +772,7 @@ function App$Entries(props) {
                                   var isSelectedForSet = Core__Option.mapOr(entryToSet, false, (function (v) {
                                           return v === entry.id;
                                         }));
-                                  return JsxRuntime.jsx(make$2, {
+                                  return JsxRuntime.jsx(make$1, {
                                               entry: entry,
                                               updateEntry: updateEntry,
                                               setEntryToSet: setEntryToSet,
@@ -789,7 +781,7 @@ function App$Entries(props) {
                                             }, entry.id);
                                 });
                     })),
-              className: "text-xs leading-none flex-1 h-full overflow-y-scroll"
+              className: "text-xs leading-none flex-1 h-full overflow-y-scroll max-w-xl"
             });
 }
 
@@ -954,7 +946,7 @@ function App(props) {
                       children: [
                         JsxRuntime.jsxs("div", {
                               children: [
-                                JsxRuntime.jsx(make$1, {
+                                JsxRuntime.jsx(App$Days, {
                                       start: startOfCal,
                                       end: endOfCal,
                                       dateSet: dateSet,
@@ -1042,9 +1034,9 @@ function App(props) {
             });
 }
 
-var make$3 = App;
+var make$2 = App;
 
 export {
-  make$3 as make,
+  make$2 as make,
 }
 /*  Not a pure module */
