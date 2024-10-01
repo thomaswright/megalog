@@ -83,7 +83,7 @@ module Icons = {
   }
   module LockOpen = {
     @react.component @module("react-icons/tb")
-    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbLockOpen"
+    external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbLockOpen2"
   }
   module EyeClosed = {
     @react.component @module("react-icons/tb")
@@ -500,7 +500,7 @@ module Day = {
                     id={`dayview-${Week(year, weekNum)->entryDateString}`}
                     onClick={_ => onClick(Week(year, weekNum))}
                     style={{
-                      color: hasWeekEntry ? monthColor : "#ddd",
+                      color: hasWeekEntry ? monthColor : "#ccc",
                     }}
                     className="text-left overflow-visible text-nowrap px-1 font-normal">
                     {("" ++ week)->React.string}
@@ -796,11 +796,12 @@ module MenuBar = {
     ~onLock: unit => unit,
     ~onUnlock: unit => unit,
   ) => {
-    <div className="flex-none border-t border-plain-700 flex flex-row gap-4 items-center px-2">
+    <div
+      className="text-xs flex-none border-t border-plain-700 flex flex-row gap-6 items-center px-2 py-1">
       <button onClick={_ => onSort()}> {"Sort"->React.string} </button>
       <button onClick={_ => onExportFile()}> {"Export as File"->React.string} </button>
       <button onClick={_ => onExportFolder()}> {"Export as Folder"->React.string} </button>
-      <div className="flex flex-row justify-around gap-4">
+      <div className="flex flex-row justify-around gap-6">
         <button onClick={_ => onShow()}>
           <Icons.Eye />
         </button>

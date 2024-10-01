@@ -366,7 +366,7 @@ function App$Day(props) {
                               _1: weekNum
                             }),
                         style: {
-                          color: hasWeekEntry ? monthColor$1 : "#ddd"
+                          color: hasWeekEntry ? monthColor$1 : "#ccc"
                         },
                         onClick: (function (param) {
                             onClick({
@@ -715,7 +715,7 @@ function App$Entry(props) {
                                                 })
                                             }),
                                         JsxRuntime.jsx("button", {
-                                              children: JsxRuntime.jsx(Tb.TbLockOpen, {}),
+                                              children: JsxRuntime.jsx(Tb.TbLockOpen2, {}),
                                               className: [
                                                   "mx-1",
                                                   " text-plain-500"
@@ -865,16 +865,16 @@ function App$MenuBar(props) {
                                 })
                             }),
                         JsxRuntime.jsx("button", {
-                              children: JsxRuntime.jsx(Tb.TbLockOpen, {}),
+                              children: JsxRuntime.jsx(Tb.TbLockOpen2, {}),
                               onClick: (function (param) {
                                   onUnlock();
                                 })
                             })
                       ],
-                      className: "flex flex-row justify-around gap-4"
+                      className: "flex flex-row justify-around gap-6"
                     })
               ],
-              className: "flex-none border-t border-plain-700 flex flex-row gap-4 items-center px-2"
+              className: "text-xs flex-none border-t border-plain-700 flex flex-row gap-6 items-center px-2 py-1"
             });
 }
 
