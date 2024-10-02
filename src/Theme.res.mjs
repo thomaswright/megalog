@@ -130,14 +130,6 @@ function colorsByTheme(theme) {
   }
 }
 
-function Theme$Styling(props) {
-  return null;
-}
-
-var Styling = {
-  make: Theme$Styling
-};
-
 function useTheme() {
   var match = Common.useLocalStorage("theme", "dark");
   var theme = match[0];
@@ -180,7 +172,6 @@ export {
   monthDimVar ,
   getTheme ,
   colorsByTheme ,
-  Styling ,
   useTheme ,
 }
 /* monthColors Not a pure module */

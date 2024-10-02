@@ -217,7 +217,6 @@ let make = () => {
   //   </div>
 
   <div className="relative font-mono h-dvh flex flex-col dark:bg-black dark:text-white">
-    <Theme.Styling />
     <div className="flex flex-row flex-1 overflow-hidden">
       <div className="flex flex-col h-full flex-none w-64 border-r-8 border-r-transparent">
         <Days

@@ -108,29 +108,6 @@ let colorsByTheme = theme => {
   theme == "dark" ? (Dark.monthColor, Dark.monthDimColor) : (Light.monthColor, Light.monthDimColor)
 }
 
-module Styling = {
-  @react.component
-  let make = () => {
-    // let theme = Common.useLocalStorageListener("theme", "dark")
-    // let (monthColor, monthDimColor) = colorsByTheme(theme)
-    // let colors =
-    //   Array.make(~length=12, false)
-    //   ->Array.mapWithIndex((_, i) => {
-    //     `--m${(i + 1)->Int.toString}: ${monthColor(i + 1)};`
-    //   })
-    //   ->Array.join(" ")
-    // let colorsDim =
-    //   Array.make(~length=12, false)
-    //   ->Array.mapWithIndex((_, i) => {
-    //     `--m${(i + 1)->Int.toString}dim: ${monthDimColor(i + 1)};`
-    //   })
-    //   ->Array.join(" ")
-    // <style> {`:root {${colors} ${colorsDim}}`->React.string} </style>
-
-    React.null
-  }
-}
-
 let useTheme = () => {
   let (theme, setTheme) = Common.useLocalStorage("theme", Dark)
 
