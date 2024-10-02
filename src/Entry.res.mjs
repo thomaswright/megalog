@@ -88,19 +88,19 @@ function Entry$Entry(props) {
   var setEntryToSet = props.setEntryToSet;
   var updateEntry = props.updateEntry;
   var entry = props.entry;
-  var monthColor = Core__Option.mapOr(entry.date, "#fff", (function (date) {
-          switch (date.TAG) {
-            case "Year" :
-            case "Quarter" :
-                return "#fff";
-            case "Week" :
-                return Theme.monthVar(DateDerived.getMonthForWeekOfYear(date._1, date._0));
-            case "Month" :
-            case "Date" :
-                return Theme.monthVar(date._1);
-            
-          }
-        }));
+  var monthColor = Core__Option.getOr(Core__Option.flatMap(entry.date, (function (date) {
+              switch (date.TAG) {
+                case "Year" :
+                case "Quarter" :
+                    return ;
+                case "Week" :
+                    return Theme.monthVar(DateDerived.getMonthForWeekOfYear(date._1, date._0));
+                case "Month" :
+                case "Date" :
+                    return Theme.monthVar(date._1);
+                
+              }
+            })), Theme.monthVar(0));
   var dateDisplay = Core__Option.flatMap(entry.date, (function (date) {
           if (date.TAG === "Date") {
             return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), "y-MM-dd eee");
@@ -224,7 +224,7 @@ function Entry$Entry(props) {
                                           });
                               })),
                         JsxRuntime.jsx("input", {
-                              className: "flex-1 bg-inherit text-white min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1",
+                              className: "flex-1 bg-inherit text-black dark:text-white min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1",
                               placeholder: "",
                               readOnly: entry.lock,
                               type: "text",

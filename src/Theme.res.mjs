@@ -67,11 +67,19 @@ var monthColorsDim = Core__Array.make(12, false).map(function (param, i) {
     });
 
 function monthColor(monthInt) {
-  return monthColors[monthInt - 1 | 0];
+  if (monthInt === 0) {
+    return "#000";
+  } else {
+    return monthColors[monthInt - 1 | 0];
+  }
 }
 
 function monthDimColor(monthInt) {
-  return monthColorsDim[monthInt - 1 | 0];
+  if (monthInt === 0) {
+    return "#000";
+  } else {
+    return monthColorsDim[monthInt - 1 | 0];
+  }
 }
 
 var Light = {
@@ -90,11 +98,19 @@ var monthColorsDim$1 = Core__Array.make(12, false).map(function (param, i) {
     });
 
 function monthColor$1(monthInt) {
-  return monthColors$1[monthInt - 1 | 0];
+  if (monthInt === 0) {
+    return "#fff";
+  } else {
+    return monthColors$1[monthInt - 1 | 0];
+  }
 }
 
 function monthDimColor$1(monthInt) {
-  return monthColorsDim$1[monthInt - 1 | 0];
+  if (monthInt === 0) {
+    return "#fff";
+  } else {
+    return monthColorsDim$1[monthInt - 1 | 0];
+  }
 }
 
 var Dark = {
@@ -149,7 +165,7 @@ function useTheme() {
           var c1 = match[2];
           document.documentElement.classList.remove(match[0]);
           document.documentElement.classList.add(match[1]);
-          for(var i = 1; i <= 12; ++i){
+          for(var i = 0; i <= 12; ++i){
             document.documentElement.style.setProperty("--m" + i.toString(), c1(i));
             document.documentElement.style.setProperty("--m" + i.toString() + "dim", c2(i));
           }

@@ -69,11 +69,19 @@ module Light = {
     Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.8))
 
   let monthColor = monthInt => {
-    monthColors->Array.getUnsafe(monthInt - 1)
+    if monthInt == 0 {
+      "#000"
+    } else {
+      monthColors->Array.getUnsafe(monthInt - 1)
+    }
   }
 
   let monthDimColor = monthInt => {
-    monthColorsDim->Array.getUnsafe(monthInt - 1)
+    if monthInt == 0 {
+      "#000"
+    } else {
+      monthColorsDim->Array.getUnsafe(monthInt - 1)
+    }
   }
 }
 
@@ -84,11 +92,19 @@ module Dark = {
     Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.4))
 
   let monthColor = monthInt => {
-    monthColors->Array.getUnsafe(monthInt - 1)
+    if monthInt == 0 {
+      "#fff"
+    } else {
+      monthColors->Array.getUnsafe(monthInt - 1)
+    }
   }
 
   let monthDimColor = monthInt => {
-    monthColorsDim->Array.getUnsafe(monthInt - 1)
+    if monthInt == 0 {
+      "#fff"
+    } else {
+      monthColorsDim->Array.getUnsafe(monthInt - 1)
+    }
   }
 }
 
@@ -119,7 +135,8 @@ let useTheme = () => {
 
     Global.removeClassToHtmlElement(remove)
     Global.addClassToHtmlElement(add)
-    for i in 1 to 12 {
+
+    for i in 0 to 12 {
       Global.setStyleProperty(`--m${i->Int.toString}`, c1(i))
       Global.setStyleProperty(`--m${i->Int.toString}dim`, c2(i))
     }

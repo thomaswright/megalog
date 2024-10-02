@@ -49,10 +49,10 @@ function Months(props) {
                                                   TAG: "Year",
                                                   _0: year
                                                 }),
-                                            "font-medium text-sm leading-none flex flex-row items-center justify-center overflow-hidden",
-                                            hasYearEntry ? "text-white " : "text-inherit "
+                                            "font-medium text-sm leading-none flex flex-row items-center justify-center overflow-hidden"
                                           ].join(" "),
                                         style: {
+                                          color: hasYearEntry ? "var(--m0)" : "inherit",
                                           gridArea: "year"
                                         },
                                         onClick: (function (param) {
@@ -73,10 +73,10 @@ function Months(props) {
                                                   _0: year,
                                                   _1: 1
                                                 }),
-                                            " flex flex-row items-center justify-center",
-                                            hasQ1Entry ? "text-white " : "text-inherit "
+                                            " flex flex-row items-center justify-center"
                                           ].join(" "),
                                         style: {
+                                          color: hasQ1Entry ? "var(--m0)" : "inherit",
                                           gridArea: "q1"
                                         },
                                         onClick: (function (param) {
@@ -98,10 +98,10 @@ function Months(props) {
                                                   _0: year,
                                                   _1: 2
                                                 }),
-                                            " flex flex-row items-center justify-center",
-                                            hasQ2Entry ? "text-white " : "text-inherit "
+                                            " flex flex-row items-center justify-center"
                                           ].join(" "),
                                         style: {
+                                          color: hasQ2Entry ? "var(--m0)" : "inherit",
                                           gridArea: "q2"
                                         },
                                         onClick: (function (param) {
@@ -123,10 +123,10 @@ function Months(props) {
                                                   _0: year,
                                                   _1: 3
                                                 }),
-                                            " flex flex-row items-center justify-center",
-                                            hasQ3Entry ? "text-white " : "text-inherit "
+                                            " flex flex-row items-center justify-center"
                                           ].join(" "),
                                         style: {
+                                          color: hasQ3Entry ? "var(--m0)" : "inherit",
                                           gridArea: "q3"
                                         },
                                         onClick: (function (param) {
@@ -148,10 +148,10 @@ function Months(props) {
                                                   _0: year,
                                                   _1: 4
                                                 }),
-                                            " flex flex-row items-center justify-center",
-                                            hasQ4Entry ? "text-white " : "text-inherit "
+                                            " flex flex-row items-center justify-center"
                                           ].join(" "),
                                         style: {
+                                          color: hasQ4Entry ? "var(--m0)" : "inherit",
                                           gridArea: "q4"
                                         },
                                         onClick: (function (param) {
@@ -197,7 +197,7 @@ function Months(props) {
                                                   }, monthNum);
                                       })
                                 ],
-                                className: "gap-px text-xs  border border-plain-700 text-plain-600",
+                                className: "gap-px text-xs  border border-plain-400 dark:border-plain-700 text-plain-300 dark:text-plain-600",
                                 style: {
                                   display: "grid",
                                   gridTemplateAreas: "\n                    \"year q1 m1 m2 m3\"\n                    \"year q2 m4 m5 m6\"\n                    \"year q3 m7 m8 m9\"\n                    \"year q4 m10 m11 m12\"\n                  \n                    ",

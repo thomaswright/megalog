@@ -11,11 +11,10 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
       let hasQ2Entry = dateSet->Set.has(Quarter(year, 2)->entryDateString)
       let hasQ3Entry = dateSet->Set.has(Quarter(year, 3)->entryDateString)
       let hasQ4Entry = dateSet->Set.has(Quarter(year, 4)->entryDateString)
-      let entryCheck = x => x ? `text-white ` : "text-inherit "
 
       <div
         key={year->Int.toString}
-        className="gap-px text-xs  border border-plain-700 text-plain-600"
+        className="gap-px text-xs  border border-plain-400 dark:border-plain-700 text-plain-300 dark:text-plain-600"
         style={{
           display: "grid",
           gridTemplateColumns: "1.25fr 1.25fr 2fr 2fr 2fr ",
@@ -33,10 +32,10 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
           className={[
             `monthview-${Year(year)->entryDateString}`,
             "font-medium text-sm leading-none flex flex-row items-center justify-center overflow-hidden",
-            hasYearEntry->entryCheck,
           ]->Array.join(" ")}
           style={{
             gridArea: "year",
+            color: hasYearEntry ? "var(--m0)" : "inherit",
           }}>
           <div className="-rotate-90"> {d->DateFns.format("y")->React.string} </div>
         </button>
@@ -45,9 +44,9 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
           className={[
             `monthview-${Quarter(year, 1)->entryDateString}`,
             " flex flex-row items-center justify-center",
-            hasQ1Entry->entryCheck,
           ]->Array.join(" ")}
           style={{
+            color: hasQ1Entry ? "var(--m0)" : "inherit",
             gridArea: "q1",
           }}>
           <div className=""> {"Q1"->React.string} </div>
@@ -58,9 +57,9 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
           className={[
             `monthview-${Quarter(year, 2)->entryDateString}`,
             " flex flex-row items-center justify-center",
-            hasQ2Entry->entryCheck,
           ]->Array.join(" ")}
           style={{
+            color: hasQ2Entry ? "var(--m0)" : "inherit",
             gridArea: "q2",
           }}>
           <div className=""> {"Q2"->React.string} </div>
@@ -71,9 +70,9 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
           className={[
             `monthview-${Quarter(year, 3)->entryDateString}`,
             " flex flex-row items-center justify-center",
-            hasQ3Entry->entryCheck,
           ]->Array.join(" ")}
           style={{
+            color: hasQ3Entry ? "var(--m0)" : "inherit",
             gridArea: "q3",
           }}>
           <div className=""> {"Q3"->React.string} </div>
@@ -84,9 +83,9 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
           className={[
             `monthview-${Quarter(year, 4)->entryDateString}`,
             " flex flex-row items-center justify-center",
-            hasQ4Entry->entryCheck,
           ]->Array.join(" ")}
           style={{
+            color: hasQ4Entry ? "var(--m0)" : "inherit",
             gridArea: "q4",
           }}>
           <div className=""> {"Q4"->React.string} </div>

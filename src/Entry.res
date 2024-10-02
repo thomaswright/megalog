@@ -88,14 +88,17 @@ module Entry = {
     ~isSelectedForSet,
     ~deleteEntry,
   ) => {
-    let monthColor = entry.date->Option.mapOr("#fff", date => {
-      switch date {
-      | Date(_y, m, _d) => Theme.monthVar(m)
-      | Month(_y, m) => Theme.monthVar(m)
-      | Week(y, w) => DateDerived.getMonthForWeekOfYear(w, y)->Theme.monthVar
-      | _ => "#fff"
-      }
-    })
+    let monthColor =
+      entry.date
+      ->Option.flatMap(date => {
+        switch date {
+        | Date(_y, m, _d) => Theme.monthVar(m)->Some
+        | Month(_y, m) => Theme.monthVar(m)->Some
+        | Week(y, w) => DateDerived.getMonthForWeekOfYear(w, y)->Theme.monthVar->Some
+        | _ => None
+        }
+      })
+      ->Option.getOr(Theme.monthVar(0))
 
     let dateDisplay = entry.date->Option.flatMap(date => {
       switch date {
@@ -170,7 +173,7 @@ module Entry = {
         <input
           readOnly={entry.lock}
           type_="text"
-          className={"flex-1 bg-inherit text-white min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1"}
+          className={"flex-1 bg-inherit text-black dark:text-white min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1"}
           placeholder={""}
           value={entry.title}
           onChange={e => {
