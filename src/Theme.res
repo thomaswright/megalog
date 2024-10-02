@@ -127,9 +127,7 @@ let colorsByTheme = theme => {
 @module("./other.js")
 external setCSSRuleProps: array<(string, array<(string, string)>)> => unit = "setCSSRuleProps"
 
-let useTheme = () => {
-  let (theme, setTheme) = Common.useLocalStorage("theme", Dark)
-
+let initiate = () => {
   React.useEffect0(() => {
     let lights =
       Array.make(~length=13, false)
@@ -155,6 +153,10 @@ let useTheme = () => {
 
     None
   })
+}
+
+let useTheme = () => {
+  let (theme, setTheme) = Common.useLocalStorage("theme", Dark)
 
   React.useEffect1(() => {
     let (remove, add, _c1, _c2) =

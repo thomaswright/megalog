@@ -18,6 +18,7 @@ let concatArray = x => {
 
 @react.component
 let make = () => {
+  Theme.initiate()
   let (entries, setEntries) = Common.useLocalStorage("data", None)
 
   let (entryToSet: option<string>, setEntryToSet, getEntryToSet) = Common.useStateWithGetter(() =>

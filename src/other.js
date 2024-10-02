@@ -1,17 +1,23 @@
 export function setCSSRuleProps(ruleSet) {
-  const styleSheet = document.styleSheets[0];
+  const styleSheets = document.styleSheets;
 
-  const rules = styleSheet.cssRules || styleSheet.rules;
+  if (styleSheets.length > 0) {
+    const lastStyleSheet = styleSheets[styleSheets.length - 1];
 
-  for (let i = 0; i < rules.length; i++) {
-    const rule = rules[i];
+    if (lastStyleSheet instanceof CSSStyleSheet) {
+      const rules = lastStyleSheet.cssRules || lastStyleSheet.rules;
 
-    ruleSet.forEach(([ruleMatch, properties]) => {
-      if (rule.selectorText === ruleMatch) {
-        properties.forEach(([name, value]) => {
-          rule.style.setProperty(name, value);
+      for (let i = 0; i < rules.length; i++) {
+        const rule = rules[i];
+
+        ruleSet.forEach(([ruleMatch, properties]) => {
+          if (rule.selectorText === ruleMatch) {
+            properties.forEach(([name, value]) => {
+              rule.style.setProperty(name, value);
+            });
+          }
         });
       }
-    });
+    }
   }
 }

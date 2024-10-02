@@ -151,9 +151,7 @@ function setCSSRuleProps(prim) {
   OtherJs.setCSSRuleProps(prim);
 }
 
-function useTheme() {
-  var match = Common.useLocalStorage("theme", "dark");
-  var theme = match[0];
+function initiate() {
   React.useEffect((function () {
           var lights = Common.concatArray(Core__Array.make(13, false).map(function (param, i) {
                     return [
@@ -190,6 +188,11 @@ function useTheme() {
                 ]
               ]);
         }), []);
+}
+
+function useTheme() {
+  var match = Common.useLocalStorage("theme", "dark");
+  var theme = match[0];
   React.useEffect((function () {
           var match = theme === "dark" ? [
               "light",
@@ -224,6 +227,7 @@ export {
   getTheme ,
   colorsByTheme ,
   setCSSRuleProps ,
+  initiate ,
   useTheme ,
 }
 /* monthColors Not a pure module */
