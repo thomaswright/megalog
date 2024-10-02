@@ -150,6 +150,19 @@ function useTheme() {
   var match = Common.useLocalStorage("theme", "dark");
   var theme = match[0];
   React.useEffect((function () {
+          var lights = Core__Array.make(13, false).map(function (param, i) {
+                  return "--m" + i.toString() + ": " + monthColor(i) + "; --m" + i.toString() + "dim: " + monthDimColor(i) + ";";
+                }).join("");
+          var darks = Core__Array.make(13, false).map(function (param, i) {
+                  return "--m" + i.toString() + ": " + monthColor$1(i) + "; --m" + i.toString() + "dim: " + monthDimColor$1(i) + ";";
+                }).join("");
+          var el = document.createElement("style");
+          var innerHtml = "\n  html {\n   " + lights + "\n  }\n\n  .dark {\n  " + darks + "\n  }\n  ";
+          el.innerText = innerHtml;
+          console.log(el);
+          document.head.appendChild(el);
+        }), []);
+  React.useEffect((function () {
           var match = theme === "dark" ? [
               "light",
               "dark",
@@ -161,14 +174,8 @@ function useTheme() {
               monthColor,
               monthDimColor
             ];
-          var c2 = match[3];
-          var c1 = match[2];
           document.documentElement.classList.remove(match[0]);
           document.documentElement.classList.add(match[1]);
-          for(var i = 0; i <= 12; ++i){
-            document.documentElement.style.setProperty("--m" + i.toString(), c1(i));
-            document.documentElement.style.setProperty("--m" + i.toString() + "dim", c2(i));
-          }
         }), [theme]);
   return [
           theme,

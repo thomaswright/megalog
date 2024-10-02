@@ -49,6 +49,12 @@ external fetch: string => promise<response> = "fetch"
 @val @scope(("document", "documentElement", "style"))
 external setStyleProperty: (string, string) => unit = "setProperty"
 
+@val @scope("document") external createElement: string => Dom.element = "createElement"
+
+@set external setInnerHtml: (Dom.element, string) => unit = "innerText"
+
+@val @scope(("document", "head")) external appendToHead: Dom.element => unit = "appendChild"
+
 module Derived = {
   let getElementByClassOp = s =>
     s

@@ -7,7 +7,7 @@ html {
   color: black;
 }
 
-html .dark {
+.dark {
   background-color: black;
   color: white;
 }

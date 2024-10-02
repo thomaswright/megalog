@@ -127,8 +127,45 @@ let colorsByTheme = theme => {
 let useTheme = () => {
   let (theme, setTheme) = Common.useLocalStorage("theme", Dark)
 
+  React.useEffect0(() => {
+    let lights =
+      Array.make(~length=13, false)
+      ->Array.mapWithIndex((_, i) => {
+        `--m${i->Int.toString}: ${Light.monthColor(
+            i,
+          )}; --m${i->Int.toString}dim: ${Light.monthDimColor(i)};`
+      })
+      ->Array.join("")
+
+    let darks =
+      Array.make(~length=13, false)
+      ->Array.mapWithIndex((_, i) => {
+        `--m${i->Int.toString}: ${Dark.monthColor(
+            i,
+          )}; --m${i->Int.toString}dim: ${Dark.monthDimColor(i)};`
+      })
+      ->Array.join("")
+
+    let el = Global.createElement("style")
+
+    let innerHtml = `
+  html {
+   ${lights}
+  }
+
+  .dark {
+  ${darks}
+  }
+  `
+    el->Global.setInnerHtml(innerHtml)
+    Console.log(el)
+
+    el->Global.appendToHead
+    None
+  })
+
   React.useEffect1(() => {
-    let (remove, add, c1, c2) =
+    let (remove, add, _c1, _c2) =
       theme == Dark
         ? ("light", "dark", Dark.monthColor, Dark.monthDimColor)
         : ("dark", "light", Light.monthColor, Light.monthDimColor)
@@ -136,10 +173,10 @@ let useTheme = () => {
     Global.removeClassToHtmlElement(remove)
     Global.addClassToHtmlElement(add)
 
-    for i in 0 to 12 {
-      Global.setStyleProperty(`--m${i->Int.toString}`, c1(i))
-      Global.setStyleProperty(`--m${i->Int.toString}dim`, c2(i))
-    }
+    // for i in 0 to 12 {
+    //   Global.setStyleProperty(`--m${i->Int.toString}`, c1(i))
+    //   Global.setStyleProperty(`--m${i->Int.toString}dim`, c2(i))
+    // }
 
     None
   }, [theme])
