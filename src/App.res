@@ -375,14 +375,15 @@ let getTheme = () => {
   useLocalStorageListener("theme", "light")
 }
 
+let colorsByTheme = theme => {
+  theme == "dark" ? (Dark.monthColor, Dark.monthColorDim) : (Light.monthColor, Light.monthColorDim)
+}
+
 module Months = {
   @react.component
   let make = (~start, ~end, ~dateSet, ~onClick) => {
     let theme = getTheme()
-    let (monthColor, monthColorDim) =
-      theme == "dark"
-        ? (Dark.monthColor, Dark.monthColorDim)
-        : (Light.monthColor, Light.monthColorDim)
+    let (monthColor, _) = colorsByTheme(theme)
 
     <div className="p-4  flex-1 overflow-y-scroll flex flex-col gap-2 w-full font-black">
       {allYears(start, end)
@@ -506,10 +507,7 @@ module Day = {
   @react.component
   let make = (~d, ~onClick, ~hasWeekEntry, ~entry: option<entry>) => {
     let theme = getTheme()
-    let (monthColor, monthColorDim) =
-      theme == "dark"
-        ? (Dark.monthColor, Dark.monthColorDim)
-        : (Light.monthColor, Light.monthColorDim)
+    let (monthColor, monthColorDim) = colorsByTheme(theme)
     Console.log2("render", theme)
 
     let beginningOfWeek = d->Date.getDay == 0
@@ -642,7 +640,7 @@ module Entry = {
     ~deleteEntry,
   ) => {
     let theme = getTheme()
-    let monthColor = theme == "dark" ? Dark.monthColor : Light.monthColor
+    let (monthColor, _) = colorsByTheme(theme)
 
     let monthColor = entry.date->Option.mapOr("#fff", date => {
       switch date {
@@ -890,11 +888,6 @@ let make = () => {
 
     None
   }, [theme])
-
-  let (monthColor, monthColorDim) =
-    theme == "dark"
-      ? (Dark.monthColor, Dark.monthColorDim)
-      : (Light.monthColor, Light.monthColorDim)
 
   let (entryToSet: option<string>, setEntryToSet, getEntryToSet) = useStateWithGetter(() => None)
 
