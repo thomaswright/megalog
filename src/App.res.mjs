@@ -135,7 +135,7 @@ function monthColor(monthInt) {
   return monthColors[monthInt - 1 | 0];
 }
 
-function monthColorDim(monthInt) {
+function monthDimColor(monthInt) {
   return monthColorsDim[monthInt - 1 | 0];
 }
 
@@ -151,30 +151,21 @@ function monthColor$1(monthInt) {
   return monthColors$1[monthInt - 1 | 0];
 }
 
-function monthColorDim$1(monthInt) {
+function monthDimColor$1(monthInt) {
   return monthColorsDim$1[monthInt - 1 | 0];
 }
 
-function colorsByTheme(theme) {
-  if (theme === "dark") {
-    return [
-            monthColor$1,
-            monthColorDim$1
-          ];
-  } else {
-    return [
-            monthColor,
-            monthColorDim
-          ];
-  }
+function monthVar(month) {
+  return "var(--m" + month.toString() + ")";
+}
+
+function monthDimVar(month) {
+  return "var(--m" + month.toString() + "dim)";
 }
 
 function App$Months(props) {
   var onClick = props.onClick;
   var dateSet = props.dateSet;
-  var theme = UseLocalStorageJs.useLocalStorageListener("theme", "light");
-  var match = colorsByTheme(theme);
-  var monthColor = match[0];
   return JsxRuntime.jsx("div", {
               children: allYears(props.start, props.end).map(function (d) {
                     var year = d.getFullYear();
@@ -349,7 +340,7 @@ function App$Months(props) {
                                                         " flex flex-row items-center justify-center"
                                                       ].join(" "),
                                                     style: {
-                                                      color: hasEntry ? monthColor(i + 1 | 0) : "inherit",
+                                                      color: hasEntry ? monthVar(i + 1 | 0) : "inherit",
                                                       gridArea: "m" + monthNum
                                                     },
                                                     onClick: (function (param) {
@@ -380,15 +371,13 @@ function App$Day(props) {
   var hasWeekEntry = props.hasWeekEntry;
   var onClick = props.onClick;
   var d = props.d;
-  var theme = UseLocalStorageJs.useLocalStorageListener("theme", "light");
-  var match = colorsByTheme(theme);
-  console.log("render", theme);
+  console.log("render");
   var beginningOfWeek = d.getDay() === 0;
   var year = d.getFullYear();
   var month = d.getMonth() + 1 | 0;
   var monthDay = d.getDate();
-  var monthColor = match[0](month);
-  var monthColorDim = match[1](month);
+  var monthColor = monthVar(month);
+  var monthDimColor = monthDimVar(month);
   var isToday = DateFns.isSameDay(new Date(), d);
   var tmp;
   if (beginningOfWeek) {
@@ -439,7 +428,7 @@ function App$Day(props) {
                                 JsxRuntime.jsx("span", {
                                       className: ["w-1 h-full flex-none"].join(" "),
                                       style: {
-                                        backgroundColor: monthColor
+                                        background: monthColor
                                       }
                                     }),
                                 JsxRuntime.jsx("span", {
@@ -449,7 +438,7 @@ function App$Day(props) {
                                           isToday ? "border-r-4 border-white" : ""
                                         ].join(" "),
                                       style: {
-                                        color: Core__Option.isSome(entry) ? monthColor : monthColorDim
+                                        color: Core__Option.isSome(entry) ? monthColor : monthDimColor
                                       }
                                     }),
                                 JsxRuntime.jsx("span", {
@@ -527,19 +516,16 @@ function App$Entry(props) {
   var setEntryToSet = props.setEntryToSet;
   var updateEntry = props.updateEntry;
   var entry = props.entry;
-  var theme = UseLocalStorageJs.useLocalStorageListener("theme", "light");
-  var match = colorsByTheme(theme);
-  var monthColor = match[0];
-  var monthColor$1 = Core__Option.mapOr(entry.date, "#fff", (function (date) {
+  var monthColor = Core__Option.mapOr(entry.date, "#fff", (function (date) {
           switch (date.TAG) {
             case "Year" :
             case "Quarter" :
                 return "#fff";
             case "Week" :
-                return monthColor(getMonthForWeekOfYear(date._1, date._0));
+                return monthVar(getMonthForWeekOfYear(date._1, date._0));
             case "Month" :
             case "Date" :
-                return monthColor(date._1);
+                return monthVar(date._1);
             
           }
         }));
@@ -652,8 +638,8 @@ function App$Entry(props) {
                                             children: dateDisplay_,
                                             className: "cursor-pointer mr-2 font-black",
                                             style: {
-                                              backgroundColor: isSelectedForSet ? monthColor$1 : "transparent",
-                                              color: isSelectedForSet ? "black" : monthColor$1
+                                              backgroundColor: isSelectedForSet ? monthColor : "transparent",
+                                              color: isSelectedForSet ? "black" : monthColor
                                             },
                                             onClick: (function (param) {
                                                 if (isSelectedForSet) {
@@ -713,7 +699,7 @@ function App$Entry(props) {
                                               children: isSelectedForSet ? "Cancel" : "Pick Date",
                                               className: ["mx-1 "].join(" "),
                                               style: {
-                                                backgroundColor: isSelectedForSet ? monthColor$1 : "white",
+                                                backgroundColor: isSelectedForSet ? monthColor : "white",
                                                 color: "black"
                                               },
                                               onClick: (function (param) {
@@ -784,8 +770,8 @@ function App$Entry(props) {
                           "heading py-2 border-b flex flex-row items-center pr-4"
                         ].join(" "),
                       style: {
-                        borderColor: monthColor$1,
-                        color: monthColor$1
+                        borderColor: monthColor,
+                        color: monthColor
                       }
                     }),
                 JsxRuntime.jsx("div", {
@@ -929,6 +915,36 @@ function App$MenuBar(props) {
                     })
               ],
               className: "text-xs flex-none border-t border-plain-700 flex flex-row gap-6 items-center px-2 py-1"
+            });
+}
+
+function colorsByTheme(theme) {
+  if (theme === "dark") {
+    return [
+            monthColor$1,
+            monthDimColor$1
+          ];
+  } else {
+    return [
+            monthColor,
+            monthDimColor
+          ];
+  }
+}
+
+function App$ThemeStyling(props) {
+  var theme = UseLocalStorageJs.useLocalStorageListener("theme", "dark");
+  var match = colorsByTheme(theme);
+  var monthDimColor = match[1];
+  var monthColor = match[0];
+  var colors = Core__Array.make(12, false).map(function (param, i) {
+          return "--m" + (i + 1 | 0).toString() + ": " + monthColor(i + 1 | 0) + ";";
+        }).join(" ");
+  var colorsDim = Core__Array.make(12, false).map(function (param, i) {
+          return "--m" + (i + 1 | 0).toString() + "dim: " + monthDimColor(i + 1 | 0) + ";";
+        }).join(" ");
+  return JsxRuntime.jsx("style", {
+              children: ":root {" + colors + " " + colorsDim + "}"
             });
 }
 
@@ -1199,6 +1215,7 @@ function App(props) {
   };
   return JsxRuntime.jsxs("div", {
               children: [
+                JsxRuntime.jsx(App$ThemeStyling, {}),
                 JsxRuntime.jsxs("div", {
                       children: [
                         JsxRuntime.jsxs("div", {

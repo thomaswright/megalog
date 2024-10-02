@@ -188,6 +188,10 @@ type entry = {
   hide: bool,
 }
 
+type theme =
+  | @as("dark") Dark
+  | @as("light") Light
+
 let getMonthForWeekOfYear = (weekNumber, year) => {
   let firstDayOfYear = Date.makeWithYMD(~year, ~month=0, ~date=1)
 
@@ -351,7 +355,7 @@ module Light = {
     monthColors->Array.getUnsafe(monthInt - 1)
   }
 
-  let monthColorDim = monthInt => {
+  let monthDimColor = monthInt => {
     monthColorsDim->Array.getUnsafe(monthInt - 1)
   }
 }
@@ -366,25 +370,22 @@ module Dark = {
     monthColors->Array.getUnsafe(monthInt - 1)
   }
 
-  let monthColorDim = monthInt => {
+  let monthDimColor = monthInt => {
     monthColorsDim->Array.getUnsafe(monthInt - 1)
   }
 }
 
-let getTheme = () => {
-  useLocalStorageListener("theme", "light")
+let monthVar = month => {
+  `var(--m${month->Int.toString})`
 }
 
-let colorsByTheme = theme => {
-  theme == "dark" ? (Dark.monthColor, Dark.monthColorDim) : (Light.monthColor, Light.monthColorDim)
+let monthDimVar = month => {
+  `var(--m${month->Int.toString}dim)`
 }
 
 module Months = {
   @react.component
   let make = (~start, ~end, ~dateSet, ~onClick) => {
-    let theme = getTheme()
-    let (monthColor, _) = colorsByTheme(theme)
-
     <div className="p-4  flex-1 overflow-y-scroll flex flex-col gap-2 w-full font-black">
       {allYears(start, end)
       ->Array.map(d => {
@@ -490,7 +491,7 @@ module Months = {
               ]->Array.join(" ")}
               style={{
                 gridArea: "m" ++ monthNum,
-                color: hasEntry ? monthColor(i + 1) : "inherit",
+                color: hasEntry ? monthVar(i + 1) : "inherit",
               }}>
               <div className=""> {monthDate->DateFns.format("MMM")->React.string} </div>
             </button>
@@ -506,17 +507,14 @@ module Months = {
 module Day = {
   @react.component
   let make = (~d, ~onClick, ~hasWeekEntry, ~entry: option<entry>) => {
-    let theme = getTheme()
-    let (monthColor, monthColorDim) = colorsByTheme(theme)
-    Console.log2("render", theme)
-
+    Console.log("render")
     let beginningOfWeek = d->Date.getDay == 0
 
     let year = d->Date.getFullYear
     let month = d->Date.getMonth + 1
     let monthDay = d->Date.getDate
-    let monthColor = monthColor(month)
-    let monthColorDim = monthColorDim(month)
+    let monthColor = monthVar(month)
+    let monthDimColor = monthDimVar(month)
     let isToday = DateFns.isSameDay(Date.make(), d)
 
     <React.Fragment>
@@ -560,12 +558,12 @@ module Day = {
           <span
             className={["w-1 h-full flex-none"]->Array.join(" ")}
             style={{
-              backgroundColor: monthColor,
+              background: monthColor,
             }}
           />
           <span
             style={{
-              color: entry->Option.isSome ? monthColor : monthColorDim,
+              color: entry->Option.isSome ? monthColor : monthDimColor,
             }}
             className={[" px-2 flex-none", isToday ? "border-r-4 border-white" : ""]->Array.join(
               " ",
@@ -639,14 +637,11 @@ module Entry = {
     ~isSelectedForSet,
     ~deleteEntry,
   ) => {
-    let theme = getTheme()
-    let (monthColor, _) = colorsByTheme(theme)
-
     let monthColor = entry.date->Option.mapOr("#fff", date => {
       switch date {
-      | Date(_y, m, _d) => monthColor(m)
-      | Month(_y, m) => monthColor(m)
-      | Week(y, w) => getMonthForWeekOfYear(w, y)->monthColor
+      | Date(_y, m, _d) => monthVar(m)
+      | Month(_y, m) => monthVar(m)
+      | Week(y, w) => getMonthForWeekOfYear(w, y)->monthVar
       | _ => "#fff"
       }
     })
@@ -864,21 +859,50 @@ module MenuBar = {
         <button onClick={_ => onUnlock()}>
           <Icons.LockOpen />
         </button>
-        <button onClick={_ => setTheme(t => t == "dark" ? "light" : "dark")}>
-          {(theme == "dark" ? "Dark Mode" : "Light Mode")->React.string}
+        <button onClick={_ => setTheme(t => t == Dark ? Light : Dark)}>
+          {(theme == Dark ? "Dark Mode" : "Light Mode")->React.string}
         </button>
       </div>
     </div>
   }
 }
 
+let getTheme = () => {
+  useLocalStorageListener("theme", "light")
+}
+
+let colorsByTheme = theme => {
+  theme == "dark" ? (Dark.monthColor, Dark.monthDimColor) : (Light.monthColor, Light.monthDimColor)
+}
+
+module ThemeStyling = {
+  @react.component
+  let make = () => {
+    let theme = useLocalStorageListener("theme", "dark")
+    let (monthColor, monthDimColor) = colorsByTheme(theme)
+    let colors =
+      Array.make(~length=12, false)
+      ->Array.mapWithIndex((_, i) => {
+        `--m${(i + 1)->Int.toString}: ${monthColor(i + 1)};`
+      })
+      ->Array.join(" ")
+    let colorsDim =
+      Array.make(~length=12, false)
+      ->Array.mapWithIndex((_, i) => {
+        `--m${(i + 1)->Int.toString}dim: ${monthDimColor(i + 1)};`
+      })
+      ->Array.join(" ")
+    <style> {`:root {${colors} ${colorsDim}}`->React.string} </style>
+  }
+}
+
 @react.component
 let make = () => {
   let (entries, setEntries) = useLocalStorage("data", None)
-  let (theme, setTheme) = useLocalStorage("theme", "dark")
+  let (theme, setTheme) = useLocalStorage("theme", Dark)
 
   React.useEffect1(() => {
-    if theme == "dark" {
+    if theme == Dark {
       removeClassToHtmlElement("light")
       addClassToHtmlElement("dark")
     } else {
@@ -1079,6 +1103,7 @@ let make = () => {
   //   </div>
 
   <div className="relative font-mono h-dvh flex flex-col dark:bg-black dark:text-white">
+    <ThemeStyling />
     <div className="flex flex-row flex-1 overflow-hidden">
       <div className="flex flex-col h-full flex-none w-64 border-r-8 border-r-transparent">
         <Days
