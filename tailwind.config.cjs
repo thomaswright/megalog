@@ -2,6 +2,7 @@
 const tailwindColors = require("tailwindcss/colors");
 
 module.exports = {
+  darkMode: "selector",
   content: ["./index.html", "./src/**/*.res.mjs"],
   theme: {
     extend: {

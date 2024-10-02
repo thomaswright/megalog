@@ -70,3 +70,19 @@ export default function useLocalStorage(key, initialValue) {
 
   return [currentValue, setState];
 }
+
+export function useLocalStorageListener(key, defaultValue) {
+  const getSnapshot = React.useCallback(() => getLocalStorageItem(key), [key]);
+
+  const store = React.useSyncExternalStore(
+    useLocalStorageSubscribe,
+    getSnapshot,
+    getLocalStorageServerSnapshot
+  );
+
+  const currentValue = React.useMemo(() => {
+    return store ? JSON.parse(store) : defaultValue;
+  }, [store, defaultValue]);
+
+  return currentValue;
+}

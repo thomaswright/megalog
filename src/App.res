@@ -24,6 +24,15 @@ external getElementById: string => Js.Nullable.t<Dom.element> = "getElementById"
 external getElementsByClassName: string => Js.Nullable.t<array<Dom.element>> =
   "getElementsByClassName"
 
+@val @scope(("document", "documentElement", "classList"))
+external addClassToHtmlElement: string => unit = "add"
+
+@val @scope(("document", "documentElement", "classList"))
+external removeClassToHtmlElement: string => unit = "remove"
+
+@val @scope(("window", "localStorage"))
+external localStorageGetItem: string => string = "getItem"
+
 let getElementByClassOp = s =>
   s
   ->getElementsByClassName
@@ -134,7 +143,7 @@ module TextArea = {
     <TextareaAutosize
       readOnly={readonly}
       disabled={disabled}
-      className={["bg-black w-full", className]->Array.join(" ")}
+      className={["w-full bg-transparent", className]->Array.join(" ")}
       value={content}
       onChange={e => {
         let value = (e->ReactEvent.Form.target)["value"]
@@ -150,6 +159,9 @@ module Editor = TextArea
 
 @module("./useLocalStorage.js")
 external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "default"
+
+@module("./useLocalStorage.js")
+external useLocalStorageListener: (string, 'a) => 'a = "useLocalStorageListener"
 
 let standardDateFormat = "y-MM-dd"
 
@@ -329,23 +341,50 @@ let monthHue = monthInt => {
   Float.mod(360. /. 12. *. ((monthInt - 3) * 5)->Int.toFloat, 360.0)
 }
 
-let monthColors =
-  Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.7))
-let monthColorsDim =
-  Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.4))
+module Light = {
+  let monthColors =
+    Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.55))
+  let monthColorsDim =
+    Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.8))
 
-let monthColor = monthInt => {
-  monthColors->Array.getUnsafe(monthInt - 1)
+  let monthColor = monthInt => {
+    monthColors->Array.getUnsafe(monthInt - 1)
+  }
+
+  let monthColorDim = monthInt => {
+    monthColorsDim->Array.getUnsafe(monthInt - 1)
+  }
 }
 
-let monthColorDim = monthInt => {
-  monthColorsDim->Array.getUnsafe(monthInt - 1)
+module Dark = {
+  let monthColors =
+    Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.7))
+  let monthColorsDim =
+    Array.make(~length=12, false)->Array.mapWithIndex((_, i) => hsl(monthHue(i), 1.0, 0.4))
+
+  let monthColor = monthInt => {
+    monthColors->Array.getUnsafe(monthInt - 1)
+  }
+
+  let monthColorDim = monthInt => {
+    monthColorsDim->Array.getUnsafe(monthInt - 1)
+  }
+}
+
+let getTheme = () => {
+  useLocalStorageListener("theme", "light")
 }
 
 module Months = {
   @react.component
   let make = (~start, ~end, ~dateSet, ~onClick) => {
-    <div className="p-4 bg-black flex-1 overflow-y-scroll flex flex-col gap-2 w-full font-black">
+    let theme = getTheme()
+    let (monthColor, monthColorDim) =
+      theme == "dark"
+        ? (Dark.monthColor, Dark.monthColorDim)
+        : (Light.monthColor, Light.monthColorDim)
+
+    <div className="p-4  flex-1 overflow-y-scroll flex flex-col gap-2 w-full font-black">
       {allYears(start, end)
       ->Array.map(d => {
         let year = d->Date.getFullYear
@@ -354,11 +393,11 @@ module Months = {
         let hasQ2Entry = dateSet->Set.has(Quarter(year, 2)->entryDateString)
         let hasQ3Entry = dateSet->Set.has(Quarter(year, 3)->entryDateString)
         let hasQ4Entry = dateSet->Set.has(Quarter(year, 4)->entryDateString)
-        let entryCheck = x => x ? `text-white bg-black` : "text-inherit bg-black"
+        let entryCheck = x => x ? `text-white ` : "text-inherit "
 
         <div
           key={year->Int.toString}
-          className="gap-px text-xs bg-plain-800 border border-plain-700 text-plain-600"
+          className="gap-px text-xs  border border-plain-700 text-plain-600"
           style={{
             display: "grid",
             gridTemplateColumns: "1.25fr 1.25fr 2fr 2fr 2fr ",
@@ -376,7 +415,7 @@ module Months = {
             className={[
               `monthview-${Year(year)->entryDateString}`,
               "font-medium text-sm leading-none flex flex-row items-center justify-center overflow-hidden",
-              hasYearEntry ? `text-white bg-black` : "text-inherit bg-black",
+              hasYearEntry->entryCheck,
             ]->Array.join(" ")}
             style={{
               gridArea: "year",
@@ -446,7 +485,7 @@ module Months = {
               onClick={_ => onClick(Month(year, i + 1))}
               className={[
                 `monthview-${Month(year, i + 1)->entryDateString}`,
-                " flex flex-row items-center justify-center bg-black",
+                " flex flex-row items-center justify-center",
               ]->Array.join(" ")}
               style={{
                 gridArea: "m" ++ monthNum,
@@ -466,6 +505,13 @@ module Months = {
 module Day = {
   @react.component
   let make = (~d, ~onClick, ~hasWeekEntry, ~entry: option<entry>) => {
+    let theme = getTheme()
+    let (monthColor, monthColorDim) =
+      theme == "dark"
+        ? (Dark.monthColor, Dark.monthColorDim)
+        : (Light.monthColor, Light.monthColorDim)
+    Console.log2("render", theme)
+
     let beginningOfWeek = d->Date.getDay == 0
 
     let year = d->Date.getFullYear
@@ -595,6 +641,9 @@ module Entry = {
     ~isSelectedForSet,
     ~deleteEntry,
   ) => {
+    let theme = getTheme()
+    let monthColor = theme == "dark" ? Dark.monthColor : Light.monthColor
+
     let monthColor = entry.date->Option.mapOr("#fff", date => {
       switch date {
       | Date(_y, m, _d) => monthColor(m)
@@ -690,14 +739,15 @@ module Entry = {
         <span className="flex flex-row items-center">
           {entry.lock
             ? <button
-                className={["mx-1", "bg-black text-plain-500"]->Array.join(" ")}
+                className={["mx-1", " text-plain-500"]->Array.join(" ")}
                 onClick={_ => updateEntry(entry.id, v => {...v, lock: false})}>
                 <Icons.Lock />
               </button>
             : <React.Fragment>
                 <button
-                  className={["mx-1 text-black"]->Array.join(" ")}
+                  className={["mx-1 "]->Array.join(" ")}
                   style={{
+                    color: "black",
                     backgroundColor: isSelectedForSet ? monthColor : "white",
                   }}
                   onClick={_ => setEntryToSet(v => v == Some(entry.id) ? None : Some(entry.id))}>
@@ -795,6 +845,8 @@ module MenuBar = {
     ~onHide: unit => unit,
     ~onLock: unit => unit,
     ~onUnlock: unit => unit,
+    ~theme,
+    ~setTheme,
   ) => {
     <div
       className="text-xs flex-none border-t border-plain-700 flex flex-row gap-6 items-center px-2 py-1">
@@ -814,6 +866,9 @@ module MenuBar = {
         <button onClick={_ => onUnlock()}>
           <Icons.LockOpen />
         </button>
+        <button onClick={_ => setTheme(t => t == "dark" ? "light" : "dark")}>
+          {(theme == "dark" ? "Dark Mode" : "Light Mode")->React.string}
+        </button>
       </div>
     </div>
   }
@@ -822,6 +877,25 @@ module MenuBar = {
 @react.component
 let make = () => {
   let (entries, setEntries) = useLocalStorage("data", None)
+  let (theme, setTheme) = useLocalStorage("theme", "dark")
+
+  React.useEffect1(() => {
+    if theme == "dark" {
+      removeClassToHtmlElement("light")
+      addClassToHtmlElement("dark")
+    } else {
+      removeClassToHtmlElement("dark")
+      addClassToHtmlElement("light")
+    }
+
+    None
+  }, [theme])
+
+  let (monthColor, monthColorDim) =
+    theme == "dark"
+      ? (Dark.monthColor, Dark.monthColorDim)
+      : (Light.monthColor, Light.monthColorDim)
+
   let (entryToSet: option<string>, setEntryToSet, getEntryToSet) = useStateWithGetter(() => None)
 
   let scrollToRef = React.useRef(None)
@@ -1011,9 +1085,9 @@ let make = () => {
   //     <Dropdown onSort onExportFile onExportFolder onShow onHide onLock onUnlock />
   //   </div>
 
-  <div className="relative font-mono h-dvh flex flex-col">
+  <div className="relative font-mono h-dvh flex flex-col dark:bg-black dark:text-white">
     <div className="flex flex-row flex-1 overflow-hidden">
-      <div className="flex flex-col h-full flex-none w-64 border-r-8 border-r-black">
+      <div className="flex flex-col h-full flex-none w-64 border-r-8 border-r-transparent">
         <Days
           start={startOfCal} end={endOfCal} dateSet={dateSet} dateEntries onClick={onClickDate}
         />
@@ -1029,7 +1103,7 @@ let make = () => {
         }}
       />
     </div>
-    <MenuBar onSort onExportFile onExportFolder onShow onHide onLock onUnlock />
+    <MenuBar onSort onExportFile onExportFolder onShow onHide onLock onUnlock theme setTheme />
   </div>
 }
 

@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 html {
+  background-color: white;
+  color: black;
+}
+
+html .dark {
   background-color: black;
   color: white;
 }
