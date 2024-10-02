@@ -4,7 +4,6 @@ import * as React from "react";
 import * as Common from "./Common.res.mjs";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import * as Color from "@texel/color";
-import * as JsxRuntime from "react/jsx-runtime";
 
 function hsv(h, s, v) {
   return Color.RGBToHex(Color.convert([
@@ -132,19 +131,7 @@ function colorsByTheme(theme) {
 }
 
 function Theme$Styling(props) {
-  var theme = Common.useLocalStorageListener("theme", "dark");
-  var match = colorsByTheme(theme);
-  var monthDimColor = match[1];
-  var monthColor = match[0];
-  var colors = Core__Array.make(12, false).map(function (param, i) {
-          return "--m" + (i + 1 | 0).toString() + ": " + monthColor(i + 1 | 0) + ";";
-        }).join(" ");
-  var colorsDim = Core__Array.make(12, false).map(function (param, i) {
-          return "--m" + (i + 1 | 0).toString() + "dim: " + monthDimColor(i + 1 | 0) + ";";
-        }).join(" ");
-  return JsxRuntime.jsx("style", {
-              children: ":root {" + colors + " " + colorsDim + "}"
-            });
+  return null;
 }
 
 var Styling = {
@@ -155,12 +142,24 @@ function useTheme() {
   var match = Common.useLocalStorage("theme", "dark");
   var theme = match[0];
   React.useEffect((function () {
-          if (theme === "dark") {
-            document.documentElement.classList.remove("light");
-            document.documentElement.classList.add("dark");
-          } else {
-            document.documentElement.classList.remove("dark");
-            document.documentElement.classList.add("light");
+          var match = theme === "dark" ? [
+              "light",
+              "dark",
+              monthColor$1,
+              monthDimColor$1
+            ] : [
+              "dark",
+              "light",
+              monthColor,
+              monthDimColor
+            ];
+          var c2 = match[3];
+          var c1 = match[2];
+          document.documentElement.classList.remove(match[0]);
+          document.documentElement.classList.add(match[1]);
+          for(var i = 1; i <= 12; ++i){
+            document.documentElement.style.setProperty("--m" + i.toString(), c1(i));
+            document.documentElement.style.setProperty("--m" + i.toString() + "dim", c2(i));
           }
         }), [theme]);
   return [

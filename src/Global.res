@@ -46,6 +46,9 @@ external fetch: string => promise<response> = "fetch"
 
 @val external isInvalidDate: Date.t => bool = "isNaN"
 
+@val @scope(("document", "documentElement", "style"))
+external setStyleProperty: (string, string) => unit = "setProperty"
+
 module Derived = {
   let getElementByClassOp = s =>
     s

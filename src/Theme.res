@@ -111,21 +111,23 @@ let colorsByTheme = theme => {
 module Styling = {
   @react.component
   let make = () => {
-    let theme = Common.useLocalStorageListener("theme", "dark")
-    let (monthColor, monthDimColor) = colorsByTheme(theme)
-    let colors =
-      Array.make(~length=12, false)
-      ->Array.mapWithIndex((_, i) => {
-        `--m${(i + 1)->Int.toString}: ${monthColor(i + 1)};`
-      })
-      ->Array.join(" ")
-    let colorsDim =
-      Array.make(~length=12, false)
-      ->Array.mapWithIndex((_, i) => {
-        `--m${(i + 1)->Int.toString}dim: ${monthDimColor(i + 1)};`
-      })
-      ->Array.join(" ")
-    <style> {`:root {${colors} ${colorsDim}}`->React.string} </style>
+    // let theme = Common.useLocalStorageListener("theme", "dark")
+    // let (monthColor, monthDimColor) = colorsByTheme(theme)
+    // let colors =
+    //   Array.make(~length=12, false)
+    //   ->Array.mapWithIndex((_, i) => {
+    //     `--m${(i + 1)->Int.toString}: ${monthColor(i + 1)};`
+    //   })
+    //   ->Array.join(" ")
+    // let colorsDim =
+    //   Array.make(~length=12, false)
+    //   ->Array.mapWithIndex((_, i) => {
+    //     `--m${(i + 1)->Int.toString}dim: ${monthDimColor(i + 1)};`
+    //   })
+    //   ->Array.join(" ")
+    // <style> {`:root {${colors} ${colorsDim}}`->React.string} </style>
+
+    React.null
   }
 }
 
@@ -133,12 +135,16 @@ let useTheme = () => {
   let (theme, setTheme) = Common.useLocalStorage("theme", Dark)
 
   React.useEffect1(() => {
-    if theme == Dark {
-      Global.removeClassToHtmlElement("light")
-      Global.addClassToHtmlElement("dark")
-    } else {
-      Global.removeClassToHtmlElement("dark")
-      Global.addClassToHtmlElement("light")
+    let (remove, add, c1, c2) =
+      theme == Dark
+        ? ("light", "dark", Dark.monthColor, Dark.monthDimColor)
+        : ("dark", "light", Light.monthColor, Light.monthDimColor)
+
+    Global.removeClassToHtmlElement(remove)
+    Global.addClassToHtmlElement(add)
+    for i in 1 to 12 {
+      Global.setStyleProperty(`--m${i->Int.toString}`, c1(i))
+      Global.setStyleProperty(`--m${i->Int.toString}dim`, c2(i))
     }
 
     None
