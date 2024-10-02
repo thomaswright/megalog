@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as Common from "./Common.res.mjs";
+import * as OtherJs from "./other.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import * as Color from "@texel/color";
 
@@ -146,21 +147,48 @@ function colorsByTheme(theme) {
   }
 }
 
+function setCSSRuleProps(prim) {
+  OtherJs.setCSSRuleProps(prim);
+}
+
 function useTheme() {
   var match = Common.useLocalStorage("theme", "dark");
   var theme = match[0];
   React.useEffect((function () {
-          var lights = Core__Array.make(13, false).map(function (param, i) {
-                  return "--m" + i.toString() + ": " + monthColor(i) + "; --m" + i.toString() + "dim: " + monthDimColor(i) + ";";
-                }).join("");
-          var darks = Core__Array.make(13, false).map(function (param, i) {
-                  return "--m" + i.toString() + ": " + monthColor$1(i) + "; --m" + i.toString() + "dim: " + monthDimColor$1(i) + ";";
-                }).join("");
-          var el = document.createElement("style");
-          var innerHtml = "\n  html {\n   " + lights + "\n  }\n\n  .dark {\n  " + darks + "\n  }\n  ";
-          el.innerText = innerHtml;
-          console.log(el);
-          document.head.appendChild(el);
+          var lights = Common.concatArray(Core__Array.make(13, false).map(function (param, i) {
+                    return [
+                            [
+                              "--m" + i.toString(),
+                              monthColor(i)
+                            ],
+                            [
+                              "--m" + i.toString() + "dim",
+                              monthDimColor(i)
+                            ]
+                          ];
+                  }));
+          var darks = Common.concatArray(Core__Array.make(13, false).map(function (param, i) {
+                    return [
+                            [
+                              "--m" + i.toString(),
+                              monthColor$1(i)
+                            ],
+                            [
+                              "--m" + i.toString() + "dim",
+                              monthDimColor$1(i)
+                            ]
+                          ];
+                  }));
+          OtherJs.setCSSRuleProps([
+                [
+                  "html",
+                  lights
+                ],
+                [
+                  ".dark",
+                  darks
+                ]
+              ]);
         }), []);
   React.useEffect((function () {
           var match = theme === "dark" ? [
@@ -195,6 +223,7 @@ export {
   monthDimVar ,
   getTheme ,
   colorsByTheme ,
+  setCSSRuleProps ,
   useTheme ,
 }
 /* monthColors Not a pure module */

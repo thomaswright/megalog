@@ -124,6 +124,9 @@ let colorsByTheme = theme => {
   theme == "dark" ? (Dark.monthColor, Dark.monthDimColor) : (Light.monthColor, Light.monthDimColor)
 }
 
+@module("./other.js")
+external setCSSRuleProps: array<(string, array<(string, string)>)> => unit = "setCSSRuleProps"
+
 let useTheme = () => {
   let (theme, setTheme) = Common.useLocalStorage("theme", Dark)
 
@@ -131,36 +134,25 @@ let useTheme = () => {
     let lights =
       Array.make(~length=13, false)
       ->Array.mapWithIndex((_, i) => {
-        `--m${i->Int.toString}: ${Light.monthColor(
-            i,
-          )}; --m${i->Int.toString}dim: ${Light.monthDimColor(i)};`
+        [
+          (`--m${i->Int.toString}`, Light.monthColor(i)),
+          (`--m${i->Int.toString}dim`, Light.monthDimColor(i)),
+        ]
       })
-      ->Array.join("")
+      ->Common.concatArray
 
     let darks =
       Array.make(~length=13, false)
       ->Array.mapWithIndex((_, i) => {
-        `--m${i->Int.toString}: ${Dark.monthColor(
-            i,
-          )}; --m${i->Int.toString}dim: ${Dark.monthDimColor(i)};`
+        [
+          (`--m${i->Int.toString}`, Dark.monthColor(i)),
+          (`--m${i->Int.toString}dim`, Dark.monthDimColor(i)),
+        ]
       })
-      ->Array.join("")
+      ->Common.concatArray
 
-    let el = Global.createElement("style")
+    [("html", lights), (".dark", darks)]->setCSSRuleProps
 
-    let innerHtml = `
-  html {
-   ${lights}
-  }
-
-  .dark {
-  ${darks}
-  }
-  `
-    el->Global.setInnerHtml(innerHtml)
-    Console.log(el)
-
-    el->Global.appendToHead
     None
   })
 

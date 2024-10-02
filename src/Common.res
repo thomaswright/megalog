@@ -1,3 +1,9 @@
+let concatArray = x => {
+  x->Array.reduce([], (a, c) => {
+    Array.concat(a, c)
+  })
+}
+
 @module("marked") external parseMd: string => string = "parse"
 
 @module("./useLocalStorage.js")
