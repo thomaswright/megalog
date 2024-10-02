@@ -17,7 +17,6 @@ import * as JsxRuntime from "react/jsx-runtime";
 import * as ExportFunctionsJs from "./exportFunctions.js";
 
 function App(props) {
-  Theme.initiate();
   var match = Common.useLocalStorage("data", undefined);
   var setEntries = match[1];
   var entries = match[0];

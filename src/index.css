@@ -5,9 +5,61 @@
 html {
   background-color: white;
   color: black;
+  --m0: #000;
+  --m1: #5674ff;
+  --m2: #c16b00;
+  --m3: #0095a7;
+  --m4: #ed007e;
+  --m5: #009e48;
+  --m6: #9f4dff;
+  --m7: #a17f00;
+  --m8: #008dcf;
+  --m9: #f41400;
+  --m10: #009986;
+  --m11: #d700d0;
+  --m12: #798f00;
+  --m0dim: #000;
+  --m1dim: #b1c5ff;
+  --m2dim: #ffb475;
+  --m3dim: #00dffa;
+  --m4dim: #ffaac4;
+  --m5dim: #00ed70;
+  --m6dim: #d1b8ff;
+  --m7dim: #f1c000;
+  --m8dim: #8ccfff;
+  --m9dim: #ffafa2;
+  --m10dim: #00e6ca;
+  --m11dim: #ff9ff7;
+  --m12dim: #b7d800;
 }
 
 .dark {
   background-color: black;
   color: white;
+  --m0: #fff;
+  --m1: #8ba6ff;
+  --m2: #f98c00;
+  --m3: #00c1d8;
+  --m4: #ff77a7;
+  --m5: #00cd5f;
+  --m6: #bb92ff;
+  --m7: #d0a600;
+  --m8: #3cb6ff;
+  --m9: #ff816e;
+  --m10: #00c7af;
+  --m11: #ff5cf6;
+  --m12: #9eba00;
+  --m0dim: #fff;
+  --m1dim: #3122ff;
+  --m2dim: #8b4c00;
+  --m3dim: #006a78;
+  --m4dim: #ac0059;
+  --m5dim: #007232;
+  --m6dim: #7a00d5;
+  --m7dim: #745b00;
+  --m8dim: #006495;
+  --m9dim: #b10b00;
+  --m10dim: #006e60;
+  --m11dim: #9b0097;
+  --m12dim: #566700;
 }
