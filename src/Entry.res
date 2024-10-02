@@ -1,6 +1,5 @@
 type entryDate =
   | Year(int)
-  // | Half(int, int)
   | Quarter(int, int)
   | Month(int, int)
   | Week(int, int)
@@ -28,7 +27,6 @@ let entryDateString = date =>
   | Date(y, m, d) =>
     Date.makeWithYMD(~year=y, ~month=m - 1, ~date=d)->DateFns.format(Common.standardDateFormat)
   | Year(y) => y->Int.toString->String.padStart(4, "0")
-  // | Half(y, h) => y->Int.toString->String.padStart(4, "0") ++ "-H" ++ h->Int.toString
   | Quarter(y, q) => y->Int.toString->String.padStart(4, "0") ++ "-Q" ++ q->Int.toString
   | Month(y, m) =>
     y->Int.toString->String.padStart(4, "0") ++ "-" ++ m->Int.toString->String.padStart(2, "0")
