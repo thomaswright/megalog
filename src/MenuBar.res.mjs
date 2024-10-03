@@ -78,10 +78,10 @@ function MenuBar(props) {
                                 })
                             })
                       ],
-                      className: "flex flex-row justify-around gap-6"
+                      className: "flex flex-row justify-around gap-6 text-base"
                     })
               ],
-              className: "text-xs flex-none border-t border-[--foreground-300] flex flex-row gap-6 items-center px-2 py-1"
+              className: "text-xs flex-none border-t border-[--foreground-300] flex flex-row gap-6 items-center px-2 py-2"
             });
 }
 

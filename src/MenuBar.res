@@ -24,11 +24,11 @@ let make = (
   ~setTheme,
 ) => {
   <div
-    className="text-xs flex-none border-t border-[--foreground-300] flex flex-row gap-6 items-center px-2 py-1">
+    className="text-xs flex-none border-t border-[--foreground-300] flex flex-row gap-6 items-center px-2 py-2">
     <button onClick={_ => onSort()}> {"Sort"->React.string} </button>
     <button onClick={_ => onExportFile()}> {"Export as File"->React.string} </button>
     <button onClick={_ => onExportFolder()}> {"Export as Folder"->React.string} </button>
-    <div className="flex flex-row justify-around gap-6">
+    <div className="flex flex-row justify-around gap-6 text-base">
       <button onClick={_ => onShow()}>
         <Icons.Eye />
       </button>
