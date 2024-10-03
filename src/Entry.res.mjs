@@ -248,7 +248,7 @@ function Entry$Entry(props) {
                         JsxRuntime.jsx("span", {
                               children: entry.lock ? JsxRuntime.jsx("button", {
                                       children: JsxRuntime.jsx(Tb.TbLock, {}),
-                                      className: "text-xs text-[--foreground-500]",
+                                      className: "text-[--foreground-300]",
                                       onClick: (function (param) {
                                           updateEntry(entry.id, (function (v) {
                                                   return {
@@ -301,7 +301,7 @@ function Entry$Entry(props) {
                                             }),
                                         JsxRuntime.jsx("button", {
                                               children: JsxRuntime.jsx(Tb.TbLockOpen2, {}),
-                                              className: " text-[--foreground-500]",
+                                              className: "text-[--foreground-500]",
                                               onClick: (function (param) {
                                                   updateEntry(entry.id, (function (v) {
                                                           return {

@@ -187,7 +187,7 @@ module Entry = {
         <span className="flex flex-row items-center gap-4 text-base">
           {entry.lock
             ? <button
-                className={"text-xs text-[--foreground-500]"}
+                className={"text-[--foreground-300]"}
                 onClick={_ => updateEntry(entry.id, v => {...v, lock: false})}>
                 <Icons.Lock />
               </button>
@@ -213,7 +213,7 @@ module Entry = {
                   {entry.hide ? <Icons.EyeClosed /> : <Icons.Eye />}
                 </button>
                 <button
-                  className={" text-[--foreground-500]"}
+                  className={"text-[--foreground-500]"}
                   onClick={_ => updateEntry(entry.id, v => {...v, lock: true})}>
                   <Icons.LockOpen />
                   // {"Lock"->React.string}

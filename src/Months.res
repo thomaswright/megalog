@@ -2,7 +2,7 @@ open Entry
 
 @react.component
 let make = (~start, ~end, ~dateSet, ~onClick) => {
-  <div className="p-4  flex-1 overflow-y-scroll flex flex-col gap-2 w-full font-black">
+  <div className="py-2  flex-1 overflow-y-scroll flex flex-col w-full font-black">
     {DateDerived.allYears(start, end)
     ->Array.map(d => {
       let year = d->Date.getFullYear
@@ -14,7 +14,7 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
 
       <div
         key={year->Int.toString}
-        className="gap-px text-xs  border border-[--foreground-400]  text-[--foreground-300] "
+        className="gap-px text-xs [&:first-child]:border-t border-b border-[--foreground-400]  text-[--foreground-300] py-1"
         style={{
           display: "grid",
           gridTemplateColumns: "1.25fr 1.25fr 2fr 2fr 2fr ",
