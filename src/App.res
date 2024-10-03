@@ -221,6 +221,9 @@ let make = () => {
   <div className="relative font-mono h-dvh flex flex-col bg-[--background] text-[--foreground]">
     <div className="flex flex-row flex-1 overflow-hidden">
       <div className="flex flex-col h-full flex-none w-64 border-r-transparent">
+        <MenuBar.SmallBar
+          onSort onExportFile onExportFolder onShow onHide onLock onUnlock theme setTheme
+        />
         <Days
           start={startOfCal} end={endOfCal} dateSet={dateSet} dateEntries onClick={onClickDate}
         />
@@ -236,7 +239,7 @@ let make = () => {
         }}
       />
     </div>
-    <MenuBar onSort onExportFile onExportFolder onShow onHide onLock onUnlock theme setTheme />
+    // <MenuBar onSort onExportFile onExportFolder onShow onHide onLock onUnlock theme setTheme />
   </div>
 }
 

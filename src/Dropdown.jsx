@@ -6,6 +6,8 @@ import {
   TbEyeClosed,
   TbLock,
   TbLockOpen,
+  TbSun,
+  TbMoon,
 } from "react-icons/tb";
 import "./dropdown.css";
 
@@ -17,12 +19,14 @@ const Dropdown = ({
   onHide,
   onLock,
   onUnlock,
+  theme,
+  setTheme,
 }) => {
   return (
-    <DropdownMenu.Root>
+    <DropdownMenu.Root modal={false}>
       <DropdownMenu.Trigger asChild>
         <button className="IconButton" aria-label="Customise options">
-          <TbChevronDown />
+          {"Megalog"}
         </button>
       </DropdownMenu.Trigger>
 
@@ -51,6 +55,26 @@ const Dropdown = ({
           >
             {"Export as Folder"}
           </DropdownMenu.Item>
+          <DropdownMenu.Item
+            key={"theme"}
+            onSelect={(_) => setTheme((v) => (v == "dark" ? "light" : "dark"))}
+            className="DropdownMenuItem"
+          >
+            {theme == "dark" ? (
+              <div className="flex flex-row gap-2 items-center w-full ">
+                <TbSun />
+                <span>{"Light Mode"}</span>
+              </div>
+            ) : (
+              <div className="flex flex-row gap-2 items-center w-full">
+                <TbMoon />
+                <span>{"Dark Mode"}</span>
+              </div>
+            )}
+          </DropdownMenu.Item>
+          <div className="text-xs font-medium text-[--foreground-700] pt-2 pb-1 px-2 text-center">
+            {"Apply to all"}
+          </div>
           <div className="flex flex-row justify-around">
             <DropdownMenu.Item
               key={"show"}

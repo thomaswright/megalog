@@ -8,7 +8,29 @@ module Dropdown = {
     ~onHide: unit => unit,
     ~onLock: unit => unit,
     ~onUnlock: unit => unit,
+    ~theme: Theme.theme,
+    ~setTheme: (Theme.theme => Theme.theme) => unit,
   ) => React.element = "default"
+}
+
+module SmallBar = {
+  @react.component
+  let make = (
+    ~onSort: unit => unit,
+    ~onExportFile: unit => unit,
+    ~onExportFolder: unit => unit,
+    ~onShow: unit => unit,
+    ~onHide: unit => unit,
+    ~onLock: unit => unit,
+    ~onUnlock: unit => unit,
+    ~theme,
+    ~setTheme,
+  ) => {
+    <div
+      className="text-xs flex-none border-b border-[--foreground-300] flex flex-row items-center">
+      <Dropdown onSort onExportFile onExportFolder onShow onHide onLock onUnlock theme setTheme />
+    </div>
+  }
 }
 
 @react.component
@@ -45,5 +67,6 @@ let make = (
         {theme == Theme.Dark ? <Icons.Moon /> : <Icons.Sun />}
       </button>
     </div>
+    <Dropdown onSort onExportFile onExportFolder onShow onHide onLock onUnlock theme setTheme />
   </div>
 }

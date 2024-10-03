@@ -3,7 +3,7 @@ const tailwindColors = require("tailwindcss/colors");
 
 module.exports = {
   darkMode: "selector",
-  content: ["./index.html", "./src/**/*.res.mjs"],
+  content: ["./index.html", "./src/**/*.res.mjs", "./src/**/*.jsx"],
   theme: {
     extend: {
       flex: {

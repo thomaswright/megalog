@@ -268,58 +268,56 @@ function App(props) {
                       }));
         });
   };
-  return JsxRuntime.jsxs("div", {
-              children: [
-                JsxRuntime.jsxs("div", {
-                      children: [
-                        JsxRuntime.jsxs("div", {
-                              children: [
-                                JsxRuntime.jsx(Days.make, {
-                                      start: startOfCal,
-                                      end: endOfCal,
-                                      dateSet: dateSet,
-                                      onClick: onClickDate,
-                                      dateEntries: dateEntries
-                                    }),
-                                JsxRuntime.jsx(Months.make, {
-                                      start: startOfCal,
-                                      end: endOfCal,
-                                      dateSet: dateSet,
-                                      onClick: onClickDate
-                                    })
-                              ],
-                              className: "flex flex-col h-full flex-none w-64 border-r-transparent"
-                            }),
-                        JsxRuntime.jsx(Entry.Entries.make, {
-                              entries: entries,
-                              updateEntry: updateEntry,
-                              setEntryToSet: setEntryToSet,
-                              entryToSet: match$1[0],
-                              deleteEntry: (function (id) {
-                                  setEntries(function (v) {
-                                        return Core__Option.map(v, (function (entries) {
-                                                      return entries.filter(function (entry) {
-                                                                  return entry.id !== id;
-                                                                });
-                                                    }));
-                                      });
-                                })
-                            })
-                      ],
-                      className: "flex flex-row flex-1 overflow-hidden"
-                    }),
-                JsxRuntime.jsx(MenuBar.make, {
-                      onSort: onSort,
-                      onExportFile: onExportFile,
-                      onExportFolder: onExportFolder,
-                      onShow: onShow,
-                      onHide: onHide,
-                      onLock: onLock,
-                      onUnlock: onUnlock,
-                      theme: match$2[0],
-                      setTheme: match$2[1]
-                    })
-              ],
+  return JsxRuntime.jsx("div", {
+              children: JsxRuntime.jsxs("div", {
+                    children: [
+                      JsxRuntime.jsxs("div", {
+                            children: [
+                              JsxRuntime.jsx(MenuBar.SmallBar.make, {
+                                    onSort: onSort,
+                                    onExportFile: onExportFile,
+                                    onExportFolder: onExportFolder,
+                                    onShow: onShow,
+                                    onHide: onHide,
+                                    onLock: onLock,
+                                    onUnlock: onUnlock,
+                                    theme: match$2[0],
+                                    setTheme: match$2[1]
+                                  }),
+                              JsxRuntime.jsx(Days.make, {
+                                    start: startOfCal,
+                                    end: endOfCal,
+                                    dateSet: dateSet,
+                                    onClick: onClickDate,
+                                    dateEntries: dateEntries
+                                  }),
+                              JsxRuntime.jsx(Months.make, {
+                                    start: startOfCal,
+                                    end: endOfCal,
+                                    dateSet: dateSet,
+                                    onClick: onClickDate
+                                  })
+                            ],
+                            className: "flex flex-col h-full flex-none w-64 border-r-transparent"
+                          }),
+                      JsxRuntime.jsx(Entry.Entries.make, {
+                            entries: entries,
+                            updateEntry: updateEntry,
+                            setEntryToSet: setEntryToSet,
+                            entryToSet: match$1[0],
+                            deleteEntry: (function (id) {
+                                setEntries(function (v) {
+                                      return Core__Option.map(v, (function (entries) {
+                                                    return entries.filter(function (entry) {
+                                                                return entry.id !== id;
+                                                              });
+                                                  }));
+                                    });
+                              })
+                          })
+                    ],
+                    className: "flex flex-row flex-1 overflow-hidden"
+                  }),
               className: "relative font-mono h-dvh flex flex-col bg-[--background] text-[--foreground]"
             });
 }
