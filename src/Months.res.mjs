@@ -206,7 +206,7 @@ function Months(props) {
                                 }
                               }, year.toString());
                   }),
-              className: "py-2  flex-1 overflow-y-scroll flex flex-col w-full font-black"
+              className: "py-2  flex-1 overflow-y-scroll flex flex-col w-full font-black pr-3"
             });
 }
 

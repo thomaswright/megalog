@@ -19,31 +19,31 @@ module Day = {
               }}
               className="h-px w-full absolute -translate-y-1/2"
             />
+            {
+              let week = d->DateFns.format("w")
+
+              week
+              ->Int.fromString
+              ->Option.mapOr(React.null, weekNum => {
+                <div
+                  className="absolute right-0 p-0.5 border-l border-b border-r"
+                  style={{borderColor: monthColor}}>
+                  <button
+                    id={` dayview-${Week(year, weekNum)->Entry.entryDateString}`}
+                    onClick={_ => onClick(Entry.Week(year, weekNum))}
+                    style={{
+                      color: hasWeekEntry ? monthColor : monthDimColor,
+                    }}
+                    className="text-left overflow-visible text-nowrap px-1 font-black">
+                    {("" ++ week)->React.string}
+                  </button>
+                </div>
+              })
+            }
           </div>
         : React.null}
       <div
         className="text-xs font-black flex flex-row items-center gap-1 h-5 whitespace-nowrap overflow-x-hidden">
-        <div className=" h-full w-5 flex flex-row flex-none items-center">
-          {beginningOfWeek
-            ? {
-                let week = d->DateFns.format("w")
-
-                week
-                ->Int.fromString
-                ->Option.mapOr(React.null, weekNum => {
-                  <button
-                    id={`dayview-${Week(year, weekNum)->Entry.entryDateString}`}
-                    onClick={_ => onClick(Entry.Week(year, weekNum))}
-                    style={{
-                      color: hasWeekEntry ? monthColor : "var(--foreground-700)",
-                    }}
-                    className="text-left overflow-visible text-nowrap px-1 font-normal">
-                    {("" ++ week)->React.string}
-                  </button>
-                })
-              }
-            : React.null}
-        </div>
         <button
           className="h-full flex-1 flex flex-row items-center whitespace-nowrap overflow-x-hidden"
           onClick={_ => onClick(Date(year, month, monthDay))}
@@ -85,7 +85,7 @@ module Day = {
 
 @react.component
 let make = (~start, ~end, ~dateSet, ~onClick, ~dateEntries) => {
-  <div className="w-full flex-2 overflow-y-scroll text-xs">
+  <div className="w-full flex-2 overflow-y-scroll text-xs pr-3">
     {DateDerived.allDays(start, end)
     ->Array.map(d => {
       <Day

@@ -288,7 +288,7 @@ function App(props) {
                                       onClick: onClickDate
                                     })
                               ],
-                              className: "flex flex-col h-full flex-none w-64 border-r-8 border-r-transparent"
+                              className: "flex flex-col h-full flex-none w-64 border-r-transparent"
                             }),
                         JsxRuntime.jsx(Entry.Entries.make, {
                               entries: entries,

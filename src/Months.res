@@ -2,7 +2,7 @@ open Entry
 
 @react.component
 let make = (~start, ~end, ~dateSet, ~onClick) => {
-  <div className="py-2  flex-1 overflow-y-scroll flex flex-col w-full font-black">
+  <div className="py-2  flex-1 overflow-y-scroll flex flex-col w-full font-black pr-3">
     {DateDerived.allYears(start, end)
     ->Array.map(d => {
       let year = d->Date.getFullYear
