@@ -147,7 +147,7 @@ module Entry = {
       <div
         className={[
           entry.date->entryClassNameId,
-          "heading py-2 border-b flex flex-row items-center pr-4",
+          "heading py-1 border-b flex flex-row items-center pr-4",
         ]->Array.join(" ")}
         style={{
           color: monthColor,
@@ -155,7 +155,7 @@ module Entry = {
         }}>
         {dateDisplay->Option.mapOr(React.null, dateDisplay_ => {
           <span
-            className="cursor-pointer mr-2 font-black"
+            className="cursor-pointer mr-2 font-black py-1.5"
             style={{
               color: isSelectedForSet ? "var(--background)" : monthColor,
               backgroundColor: isSelectedForSet ? monthColor : "transparent",
@@ -184,30 +184,25 @@ module Entry = {
           }}
         />
         <span className="flex-none w-4" />
-        <span className="flex flex-row items-center">
+        <span className="flex flex-row items-center gap-4 text-base">
           {entry.lock
             ? <button
-                className={["mx-1", " text-[--foreground-500]"]->Array.join(" ")}
+                className={"text-xs text-[--foreground-500]"}
                 onClick={_ => updateEntry(entry.id, v => {...v, lock: false})}>
                 <Icons.Lock />
               </button>
             : <React.Fragment>
                 <button
-                  className={["mx-1 "]->Array.join(" ")}
                   style={{
-                    color: "var(--background)",
-                    backgroundColor: isSelectedForSet ? monthColor : "var(--foreground)",
+                    color: isSelectedForSet ? "var(--foreground)" : monthColor,
                   }}
                   onClick={_ => setEntryToSet(v => v == Some(entry.id) ? None : Some(entry.id))}>
-                  {(isSelectedForSet ? "Cancel" : "Pick Date")->React.string}
+                  {isSelectedForSet ? <Icons.CalendarX /> : <Icons.Calendar />}
+                </button>
+                <button onClick={_ => deleteEntry(entry.id)}>
+                  <Icons.Trash />
                 </button>
                 <button
-                  className={["mx-1", "bg-[--foreground] text-[--background]"]->Array.join(" ")}
-                  onClick={_ => deleteEntry(entry.id)}>
-                  {"Delete"->React.string}
-                </button>
-                <button
-                  className={["mx-1", "bg-[--foreground] text-[--background]"]->Array.join(" ")}
                   onClick={_ =>
                     updateEntry(entry.id, v => {
                       {
@@ -215,10 +210,10 @@ module Entry = {
                         hide: !v.hide,
                       }
                     })}>
-                  {(entry.hide ? "Show" : "Hide")->React.string}
+                  {entry.hide ? <Icons.EyeClosed /> : <Icons.Eye />}
                 </button>
                 <button
-                  className={["mx-1", " text-[--foreground-500]"]->Array.join(" ")}
+                  className={" text-[--foreground-500]"}
                   onClick={_ => updateEntry(entry.id, v => {...v, lock: true})}>
                   <Icons.LockOpen />
                   // {"Lock"->React.string}

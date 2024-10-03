@@ -207,7 +207,7 @@ function Entry$Entry(props) {
                         Core__Option.mapOr(dateDisplay, null, (function (dateDisplay_) {
                                 return JsxRuntime.jsx("span", {
                                             children: dateDisplay_,
-                                            className: "cursor-pointer mr-2 font-black",
+                                            className: "cursor-pointer mr-2 font-black py-1.5",
                                             style: {
                                               backgroundColor: isSelectedForSet ? monthColor : "transparent",
                                               color: isSelectedForSet ? "var(--background)" : monthColor
@@ -248,10 +248,7 @@ function Entry$Entry(props) {
                         JsxRuntime.jsx("span", {
                               children: entry.lock ? JsxRuntime.jsx("button", {
                                       children: JsxRuntime.jsx(Tb.TbLock, {}),
-                                      className: [
-                                          "mx-1",
-                                          " text-[--foreground-500]"
-                                        ].join(" "),
+                                      className: "text-xs text-[--foreground-500]",
                                       onClick: (function (param) {
                                           updateEntry(entry.id, (function (v) {
                                                   return {
@@ -267,11 +264,9 @@ function Entry$Entry(props) {
                                     }) : JsxRuntime.jsxs(React.Fragment, {
                                       children: [
                                         JsxRuntime.jsx("button", {
-                                              children: isSelectedForSet ? "Cancel" : "Pick Date",
-                                              className: ["mx-1 "].join(" "),
+                                              children: isSelectedForSet ? JsxRuntime.jsx(Tb.TbCalendarX, {}) : JsxRuntime.jsx(Tb.TbCalendar, {}),
                                               style: {
-                                                backgroundColor: isSelectedForSet ? monthColor : "var(--foreground)",
-                                                color: "var(--background)"
+                                                color: isSelectedForSet ? "var(--foreground)" : monthColor
                                               },
                                               onClick: (function (param) {
                                                   setEntryToSet(function (v) {
@@ -284,21 +279,13 @@ function Entry$Entry(props) {
                                                 })
                                             }),
                                         JsxRuntime.jsx("button", {
-                                              children: "Delete",
-                                              className: [
-                                                  "mx-1",
-                                                  "bg-[--foreground] text-[--background]"
-                                                ].join(" "),
+                                              children: JsxRuntime.jsx(Tb.TbTrash, {}),
                                               onClick: (function (param) {
                                                   deleteEntry(entry.id);
                                                 })
                                             }),
                                         JsxRuntime.jsx("button", {
-                                              children: entry.hide ? "Show" : "Hide",
-                                              className: [
-                                                  "mx-1",
-                                                  "bg-[--foreground] text-[--background]"
-                                                ].join(" "),
+                                              children: entry.hide ? JsxRuntime.jsx(Tb.TbEyeClosed, {}) : JsxRuntime.jsx(Tb.TbEye, {}),
                                               onClick: (function (param) {
                                                   updateEntry(entry.id, (function (v) {
                                                           return {
@@ -314,10 +301,7 @@ function Entry$Entry(props) {
                                             }),
                                         JsxRuntime.jsx("button", {
                                               children: JsxRuntime.jsx(Tb.TbLockOpen2, {}),
-                                              className: [
-                                                  "mx-1",
-                                                  " text-[--foreground-500]"
-                                                ].join(" "),
+                                              className: " text-[--foreground-500]",
                                               onClick: (function (param) {
                                                   updateEntry(entry.id, (function (v) {
                                                           return {
@@ -333,12 +317,12 @@ function Entry$Entry(props) {
                                             })
                                       ]
                                     }),
-                              className: "flex flex-row items-center"
+                              className: "flex flex-row items-center gap-4 text-base"
                             })
                       ],
                       className: [
                           entryClassNameId(entry.date),
-                          "heading py-2 border-b flex flex-row items-center pr-4"
+                          "heading py-1 border-b flex flex-row items-center pr-4"
                         ].join(" "),
                       style: {
                         borderColor: monthColor,

@@ -42,7 +42,7 @@ let make = (
         <Icons.LockOpen />
       </button>
       <button onClick={_ => setTheme(t => t == Theme.Dark ? Theme.Light : Theme.Dark)}>
-        {(theme == Theme.Dark ? "Dark Mode" : "Light Mode")->React.string}
+        {theme == Theme.Dark ? <Icons.Moon /> : <Icons.Sun />}
       </button>
     </div>
   </div>

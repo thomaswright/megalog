@@ -17,6 +17,16 @@ var EyeClosed = {};
 
 var Eye = {};
 
+var Sun = {};
+
+var Moon = {};
+
+var Trash = {};
+
+var Calendar = {};
+
+var CalendarX = {};
+
 export {
   Flower ,
   Snowflake ,
@@ -26,5 +36,10 @@ export {
   LockOpen ,
   EyeClosed ,
   Eye ,
+  Sun ,
+  Moon ,
+  Trash ,
+  Calendar ,
+  CalendarX ,
 }
 /* No side effect */

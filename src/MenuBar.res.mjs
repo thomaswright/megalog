@@ -66,7 +66,7 @@ function MenuBar(props) {
                                 })
                             }),
                         JsxRuntime.jsx("button", {
-                              children: props.theme === "dark" ? "Dark Mode" : "Light Mode",
+                              children: props.theme === "dark" ? JsxRuntime.jsx(Tb.TbMoon, {}) : JsxRuntime.jsx(Tb.TbSun, {}),
                               onClick: (function (param) {
                                   setTheme(function (t) {
                                         if (t === "dark") {
