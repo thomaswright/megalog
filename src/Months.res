@@ -14,7 +14,7 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
 
       <div
         key={year->Int.toString}
-        className="gap-px text-xs  border border-plain-400 dark:border-plain-700 text-plain-300 dark:text-plain-600"
+        className="gap-px text-xs  border border-[--foreground-400]  text-[--foreground-300] "
         style={{
           display: "grid",
           gridTemplateColumns: "1.25fr 1.25fr 2fr 2fr 2fr ",

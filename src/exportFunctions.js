@@ -9,12 +9,10 @@ function downloadBlob(blob, extension) {
     new Date(),
     "hh.mm.ss a"
   )}${extension}`;
-  document.body.appendChild(a);
   a.click();
 
   // Clean up
   setTimeout(() => {
-    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }, 0);
 }

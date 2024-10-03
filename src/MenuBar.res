@@ -24,7 +24,7 @@ let make = (
   ~setTheme,
 ) => {
   <div
-    className="text-xs flex-none border-t border-plain-700 flex flex-row gap-6 items-center px-2 py-1">
+    className="text-xs flex-none border-t border-[--foreground-300] flex flex-row gap-6 items-center px-2 py-1">
     <button onClick={_ => onSort()}> {"Sort"->React.string} </button>
     <button onClick={_ => onExportFile()}> {"Export as File"->React.string} </button>
     <button onClick={_ => onExportFolder()}> {"Export as Folder"->React.string} </button>

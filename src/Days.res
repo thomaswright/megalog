@@ -35,7 +35,7 @@ module Day = {
                     id={`dayview-${Week(year, weekNum)->Entry.entryDateString}`}
                     onClick={_ => onClick(Entry.Week(year, weekNum))}
                     style={{
-                      color: hasWeekEntry ? monthColor : "#ccc",
+                      color: hasWeekEntry ? monthColor : "var(--foreground-700)",
                     }}
                     className="text-left overflow-visible text-nowrap px-1 font-normal">
                     {("" ++ week)->React.string}

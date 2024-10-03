@@ -320,7 +320,7 @@ function App(props) {
                       setTheme: match$2[1]
                     })
               ],
-              className: "relative font-mono h-dvh flex flex-col dark:bg-black dark:text-white"
+              className: "relative font-mono h-dvh flex flex-col bg-[--background] text-[--foreground]"
             });
 }
 

@@ -157,7 +157,7 @@ module Entry = {
           <span
             className="cursor-pointer mr-2 font-black"
             style={{
-              color: isSelectedForSet ? "black" : monthColor,
+              color: isSelectedForSet ? "var(--background)" : monthColor,
               backgroundColor: isSelectedForSet ? monthColor : "transparent",
             }}
             onClick={_ => {
@@ -173,7 +173,7 @@ module Entry = {
         <input
           readOnly={entry.lock}
           type_="text"
-          className={"flex-1 bg-inherit text-black dark:text-white min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1"}
+          className={"flex-1 bg-inherit text-[--foreground] min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1"}
           placeholder={""}
           value={entry.title}
           onChange={e => {
@@ -187,7 +187,7 @@ module Entry = {
         <span className="flex flex-row items-center">
           {entry.lock
             ? <button
-                className={["mx-1", " text-plain-500"]->Array.join(" ")}
+                className={["mx-1", " text-[--foreground-500]"]->Array.join(" ")}
                 onClick={_ => updateEntry(entry.id, v => {...v, lock: false})}>
                 <Icons.Lock />
               </button>
@@ -195,19 +195,19 @@ module Entry = {
                 <button
                   className={["mx-1 "]->Array.join(" ")}
                   style={{
-                    color: "black",
-                    backgroundColor: isSelectedForSet ? monthColor : "white",
+                    color: "var(--background)",
+                    backgroundColor: isSelectedForSet ? monthColor : "var(--foreground)",
                   }}
                   onClick={_ => setEntryToSet(v => v == Some(entry.id) ? None : Some(entry.id))}>
                   {(isSelectedForSet ? "Cancel" : "Pick Date")->React.string}
                 </button>
                 <button
-                  className={["mx-1", "bg-white text-black"]->Array.join(" ")}
+                  className={["mx-1", "bg-[--foreground] text-[--background]"]->Array.join(" ")}
                   onClick={_ => deleteEntry(entry.id)}>
                   {"Delete"->React.string}
                 </button>
                 <button
-                  className={["mx-1", "bg-white text-black"]->Array.join(" ")}
+                  className={["mx-1", "bg-[--foreground] text-[--background]"]->Array.join(" ")}
                   onClick={_ =>
                     updateEntry(entry.id, v => {
                       {
@@ -218,7 +218,7 @@ module Entry = {
                   {(entry.hide ? "Show" : "Hide")->React.string}
                 </button>
                 <button
-                  className={["mx-1", " text-plain-500"]->Array.join(" ")}
+                  className={["mx-1", " text-[--foreground-500]"]->Array.join(" ")}
                   onClick={_ => updateEntry(entry.id, v => {...v, lock: true})}>
                   <Icons.LockOpen />
                   // {"Lock"->React.string}

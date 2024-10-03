@@ -35,7 +35,7 @@ function Days$Day(props) {
                               _1: weekNum
                             }),
                         style: {
-                          color: hasWeekEntry ? monthColor : "#ccc"
+                          color: hasWeekEntry ? monthColor : "var(--foreground-700)"
                         },
                         onClick: (function (param) {
                             onClick({

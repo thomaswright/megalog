@@ -210,7 +210,7 @@ function Entry$Entry(props) {
                                             className: "cursor-pointer mr-2 font-black",
                                             style: {
                                               backgroundColor: isSelectedForSet ? monthColor : "transparent",
-                                              color: isSelectedForSet ? "black" : monthColor
+                                              color: isSelectedForSet ? "var(--background)" : monthColor
                                             },
                                             onClick: (function (param) {
                                                 if (isSelectedForSet) {
@@ -224,7 +224,7 @@ function Entry$Entry(props) {
                                           });
                               })),
                         JsxRuntime.jsx("input", {
-                              className: "flex-1 bg-inherit text-black dark:text-white min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1",
+                              className: "flex-1 bg-inherit text-[--foreground] min-w-8 italic font-light outline-none leading-none padding-none border-none h-5 -my-1",
                               placeholder: "",
                               readOnly: entry.lock,
                               type: "text",
@@ -250,7 +250,7 @@ function Entry$Entry(props) {
                                       children: JsxRuntime.jsx(Tb.TbLock, {}),
                                       className: [
                                           "mx-1",
-                                          " text-plain-500"
+                                          " text-[--foreground-500]"
                                         ].join(" "),
                                       onClick: (function (param) {
                                           updateEntry(entry.id, (function (v) {
@@ -270,8 +270,8 @@ function Entry$Entry(props) {
                                               children: isSelectedForSet ? "Cancel" : "Pick Date",
                                               className: ["mx-1 "].join(" "),
                                               style: {
-                                                backgroundColor: isSelectedForSet ? monthColor : "white",
-                                                color: "black"
+                                                backgroundColor: isSelectedForSet ? monthColor : "var(--foreground)",
+                                                color: "var(--background)"
                                               },
                                               onClick: (function (param) {
                                                   setEntryToSet(function (v) {
@@ -287,7 +287,7 @@ function Entry$Entry(props) {
                                               children: "Delete",
                                               className: [
                                                   "mx-1",
-                                                  "bg-white text-black"
+                                                  "bg-[--foreground] text-[--background]"
                                                 ].join(" "),
                                               onClick: (function (param) {
                                                   deleteEntry(entry.id);
@@ -297,7 +297,7 @@ function Entry$Entry(props) {
                                               children: entry.hide ? "Show" : "Hide",
                                               className: [
                                                   "mx-1",
-                                                  "bg-white text-black"
+                                                  "bg-[--foreground] text-[--background]"
                                                 ].join(" "),
                                               onClick: (function (param) {
                                                   updateEntry(entry.id, (function (v) {
@@ -316,7 +316,7 @@ function Entry$Entry(props) {
                                               children: JsxRuntime.jsx(Tb.TbLockOpen2, {}),
                                               className: [
                                                   "mx-1",
-                                                  " text-plain-500"
+                                                  " text-[--foreground-500]"
                                                 ].join(" "),
                                               onClick: (function (param) {
                                                   updateEntry(entry.id, (function (v) {

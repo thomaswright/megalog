@@ -10,16 +10,7 @@ module.exports = {
         2: "2 2 0%",
       },
       fontFamily: {
-        mono: [
-          "Roboto Mono",
-          "JetBrains Mono",
-          "ui-monospace",
-          "SFMono-Regular",
-          "monospace",
-        ],
-      },
-      colors: {
-        plain: tailwindColors["slate"],
+        mono: ["Roboto Mono", "ui-monospace", "SFMono-Regular", "monospace"],
       },
     },
   },
