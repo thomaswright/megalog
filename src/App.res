@@ -151,6 +151,7 @@ let make = () => {
       ->sortEntries
     })
   }
+
   let onClickDate = (entryDate, withMetaKey) => {
     getEntryToSet()->Option.mapOr(
       {
@@ -170,6 +171,7 @@ let make = () => {
             | None =>
               if !withMetaKey {
                 makeNewEntry(entryDate)
+
                 scrollToRef.current = entryDate->Some->entryClassNameId->Some
               } else {
                 // scroll To closest date
@@ -193,6 +195,7 @@ let make = () => {
                   }
                 })
                 ->Option.mapOr((), closestDate => {
+                  // Scroll Entry View
                   closestDate
                   ->Some
                   ->entryClassNameId
@@ -303,24 +306,44 @@ let make = () => {
         <Days
           start={startOfCal} end={endOfCal} dateSet={dateSet} dateEntries onClick={onClickDate}
         />
-        <div
-          className="flex flex-row justify-between w-full border-y border-[--foreground-500] text-xs py-1">
-          <div className="flex-1 px-2 ">
-            <ControlledInput
-              initialValue={startYear->Int.toString}
-              onSave={v => setStartYear(old => v->Int.fromString->Option.getOr(old))}
-              className={"bg-inherit  w-full  text-center"}
-              placeholder={"start year"}
-            />
-          </div>
-          <div className="flex-none"> {"-"->React.string} </div>
-          <div className="flex-1 px-2">
-            <ControlledInput
-              initialValue={endYear->Int.toString}
-              onSave={v => setEndYear(old => v->Int.fromString->Option.getOr(old))}
-              className={"bg-inherit  w-full   text-center"}
-              placeholder={"end year"}
-            />
+        <div className="pr-3">
+          <div
+            className="flex flex-row justify-between w-full border-y border-[--foreground-500] text-xs py-1 items-center ">
+            <div className="flex-1 px-2 ">
+              <ControlledInput
+                initialValue={startYear->Int.toString}
+                onSave={v => setStartYear(old => v->Int.fromString->Option.getOr(old))}
+                className={"bg-inherit  w-full  text-center"}
+                placeholder={"start year"}
+              />
+            </div>
+            <div className="flex-none"> {"-"->React.string} </div>
+            <div className="flex-1 px-2 ">
+              <ControlledInput
+                initialValue={endYear->Int.toString}
+                onSave={v => setEndYear(old => v->Int.fromString->Option.getOr(old))}
+                className={"bg-inherit  w-full   text-center"}
+                placeholder={"end year"}
+              />
+            </div>
+            <div className="flex-none text-base -my-1 ">
+              <button
+                className="px-2"
+                onClick={e => {
+                  let entryDate = Date.make()->dateToEntryDate
+                  onClickDate(entryDate, e->ReactEvent.Mouse.metaKey)
+                  `dayview-${entryDate->entryDateString}`
+                  ->Global.Derived.getElementByIdOp
+                  ->Option.mapOr((), element => {
+                    element->Global.scrollIntoView({
+                      "behavior": "smooth",
+                      "block": "center",
+                    })
+                  })
+                }}>
+                <Icons.CalendarDot />
+              </button>
+            </div>
           </div>
         </div>
         <Months start={startOfCal} end={endOfCal} dateSet={dateSet} onClick={onClickDate} />

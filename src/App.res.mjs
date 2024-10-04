@@ -14,6 +14,7 @@ import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
+import * as Tb from "react-icons/tb";
 import * as JsxRuntime from "react/jsx-runtime";
 import * as ExportFunctionsJs from "./exportFunctions.js";
 
@@ -367,40 +368,60 @@ function App(props) {
                                     onClick: onClickDate,
                                     dateEntries: dateEntries
                                   }),
-                              JsxRuntime.jsxs("div", {
-                                    children: [
-                                      JsxRuntime.jsx("div", {
-                                            children: JsxRuntime.jsx(App$ControlledInput, {
-                                                  initialValue: startYear.toString(),
-                                                  onSave: (function (v) {
-                                                      setStartYear(function (old) {
-                                                            return Core__Option.getOr(Core__Int.fromString(v, undefined), old);
-                                                          });
-                                                    }),
-                                                  className: "bg-inherit  w-full  text-center",
-                                                  placeholder: "start year"
+                              JsxRuntime.jsx("div", {
+                                    children: JsxRuntime.jsxs("div", {
+                                          children: [
+                                            JsxRuntime.jsx("div", {
+                                                  children: JsxRuntime.jsx(App$ControlledInput, {
+                                                        initialValue: startYear.toString(),
+                                                        onSave: (function (v) {
+                                                            setStartYear(function (old) {
+                                                                  return Core__Option.getOr(Core__Int.fromString(v, undefined), old);
+                                                                });
+                                                          }),
+                                                        className: "bg-inherit  w-full  text-center",
+                                                        placeholder: "start year"
+                                                      }),
+                                                  className: "flex-1 px-2 "
                                                 }),
-                                            className: "flex-1 px-2 "
-                                          }),
-                                      JsxRuntime.jsx("div", {
-                                            children: "-",
-                                            className: "flex-none"
-                                          }),
-                                      JsxRuntime.jsx("div", {
-                                            children: JsxRuntime.jsx(App$ControlledInput, {
-                                                  initialValue: endYear.toString(),
-                                                  onSave: (function (v) {
-                                                      setEndYear(function (old) {
-                                                            return Core__Option.getOr(Core__Int.fromString(v, undefined), old);
-                                                          });
-                                                    }),
-                                                  className: "bg-inherit  w-full   text-center",
-                                                  placeholder: "end year"
+                                            JsxRuntime.jsx("div", {
+                                                  children: "-",
+                                                  className: "flex-none"
                                                 }),
-                                            className: "flex-1 px-2"
-                                          })
-                                    ],
-                                    className: "flex flex-row justify-between w-full border-y border-[--foreground-500] text-xs py-1"
+                                            JsxRuntime.jsx("div", {
+                                                  children: JsxRuntime.jsx(App$ControlledInput, {
+                                                        initialValue: endYear.toString(),
+                                                        onSave: (function (v) {
+                                                            setEndYear(function (old) {
+                                                                  return Core__Option.getOr(Core__Int.fromString(v, undefined), old);
+                                                                });
+                                                          }),
+                                                        className: "bg-inherit  w-full   text-center",
+                                                        placeholder: "end year"
+                                                      }),
+                                                  className: "flex-1 px-2 "
+                                                }),
+                                            JsxRuntime.jsx("div", {
+                                                  children: JsxRuntime.jsx("button", {
+                                                        children: JsxRuntime.jsx(Tb.TbCalendarDue, {}),
+                                                        className: "px-2",
+                                                        onClick: (function (e) {
+                                                            var entryDate = Entry.dateToEntryDate(new Date());
+                                                            onClickDate(entryDate, e.metaKey);
+                                                            Core__Option.mapOr(Global.Derived.getElementByIdOp("dayview-" + Entry.entryDateString(entryDate)), undefined, (function (element) {
+                                                                    element.scrollIntoView({
+                                                                          behavior: "smooth",
+                                                                          block: "center"
+                                                                        });
+                                                                  }));
+                                                          })
+                                                      }),
+                                                  className: "flex-none text-base -my-1 "
+                                                })
+                                          ],
+                                          className: "flex flex-row justify-between w-full border-y border-[--foreground-500] text-xs py-1 items-center "
+                                        }),
+                                    className: "pr-3"
                                   }),
                               JsxRuntime.jsx(Months.make, {
                                     start: startOfCal,

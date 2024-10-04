@@ -29,6 +29,8 @@ var CalendarX = {};
 
 var ChevronRightCompact = {};
 
+var CalendarDot = {};
+
 export {
   Flower ,
   Snowflake ,
@@ -44,5 +46,6 @@ export {
   Calendar ,
   CalendarX ,
   ChevronRightCompact ,
+  CalendarDot ,
 }
 /* No side effect */
