@@ -246,21 +246,28 @@ function Entry$Entry(props) {
                               className: "flex-none w-4"
                             }),
                         JsxRuntime.jsx("span", {
-                              children: entry.lock ? JsxRuntime.jsx("button", {
-                                      children: JsxRuntime.jsx(Tb.TbLock, {}),
-                                      className: "text-[--foreground-300]",
-                                      onClick: (function (param) {
-                                          updateEntry(entry.id, (function (v) {
-                                                  return {
-                                                          id: v.id,
-                                                          date: v.date,
-                                                          title: v.title,
-                                                          content: v.content,
-                                                          lock: false,
-                                                          hide: v.hide
-                                                        };
-                                                }));
-                                        })
+                              children: entry.lock ? JsxRuntime.jsxs(React.Fragment, {
+                                      children: [
+                                        entry.hide ? JsxRuntime.jsx(Tb.TbEyeClosed, {
+                                                className: "text-[--foreground-300]"
+                                              }) : null,
+                                        JsxRuntime.jsx("button", {
+                                              children: JsxRuntime.jsx(Tb.TbLock, {}),
+                                              className: "text-[--foreground-300]",
+                                              onClick: (function (param) {
+                                                  updateEntry(entry.id, (function (v) {
+                                                          return {
+                                                                  id: v.id,
+                                                                  date: v.date,
+                                                                  title: v.title,
+                                                                  content: v.content,
+                                                                  lock: false,
+                                                                  hide: v.hide
+                                                                };
+                                                        }));
+                                                })
+                                            })
+                                      ]
                                     }) : JsxRuntime.jsxs(React.Fragment, {
                                       children: [
                                         JsxRuntime.jsx("button", {
@@ -301,7 +308,7 @@ function Entry$Entry(props) {
                                             }),
                                         JsxRuntime.jsx("button", {
                                               children: JsxRuntime.jsx(Tb.TbLockOpen2, {}),
-                                              className: "text-[--foreground-500]",
+                                              className: "text-[--foreground]",
                                               onClick: (function (param) {
                                                   updateEntry(entry.id, (function (v) {
                                                           return {
