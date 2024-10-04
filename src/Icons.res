@@ -55,3 +55,9 @@ module CalendarX = {
   @react.component @module("react-icons/tb")
   external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element = "TbCalendarX"
 }
+
+module ChevronRightCompact = {
+  @react.component @module("react-icons/tb")
+  external make: (~className: string=?, ~style: JsxDOM.style=?) => React.element =
+    "TbChevronCompactRight"
+}

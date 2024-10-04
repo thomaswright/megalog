@@ -45,7 +45,10 @@ module Day = {
       <div
         className="text-xs font-black flex flex-row items-center gap-1 h-5 whitespace-nowrap overflow-x-hidden">
         <button
-          className="h-full flex-1 flex flex-row items-center whitespace-nowrap overflow-x-hidden"
+          className={[
+            "h-full flex-1 flex flex-row items-center whitespace-nowrap overflow-x-hidden",
+            isToday ? "bg-[--foreground-200]" : "",
+          ]->Array.join(" ")}
           onClick={_ => onClick(Date(year, month, monthDay))}
           id={`dayview-${Date(year, month, monthDay)->Entry.entryDateString}`}>
           <span
@@ -59,14 +62,9 @@ module Day = {
               color: entry->Option.isSome ? monthColor : monthDimColor,
             }}
             className={["relative px-2 flex-none"]->Array.join(" ")}>
-            {isToday
-              ? <div
-                  className="absolute w-1 h-full  bg-[--foreground] left-0 rounded-r-full top-px"
-                />
-              : React.null}
             {d->DateFns.format("y-MM-dd eee")->React.string}
           </span>
-          <span className="font-light text-white flex-none italic">
+          <span className="font-light text-[--foreground] flex-none italic">
             {entry->Option.mapOr("", e => e.title)->React.string}
           </span>
         </button>
