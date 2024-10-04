@@ -81,7 +81,7 @@ function App(props) {
                 scrollToRef.current = undefined;
               }));
       });
-  var match$3 = Common.useLocalStorage("start-year", 2010);
+  var match$3 = Common.useLocalStorage("start-year", 2020);
   var setStartYear = match$3[1];
   var startYear = match$3[0];
   var match$4 = Common.useLocalStorage("end-year", 2030);
