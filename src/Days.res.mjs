@@ -46,12 +46,12 @@ function Days$Day(props) {
                                       style: {
                                         color: hasWeekEntry ? monthColor : monthDimColor
                                       },
-                                      onClick: (function (param) {
+                                      onClick: (function (e) {
                                           onClick({
                                                 TAG: "Week",
                                                 _0: year,
                                                 _1: weekNum
-                                              });
+                                              }, e.metaKey);
                                         })
                                     }),
                                 className: "absolute right-0 p-0.5 border-l border-b border-r",
@@ -102,13 +102,13 @@ function Days$Day(props) {
                                   _1: month,
                                   _2: monthDay
                                 }),
-                            onClick: (function (param) {
+                            onClick: (function (e) {
                                 onClick({
                                       TAG: "Date",
                                       _0: year,
                                       _1: month,
                                       _2: monthDay
-                                    });
+                                    }, e.metaKey);
                               })
                           }),
                       className: "text-xs font-black flex flex-row items-center gap-1 h-5 whitespace-nowrap overflow-x-hidden"

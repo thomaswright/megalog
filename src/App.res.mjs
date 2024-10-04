@@ -103,7 +103,7 @@ function App(props) {
                           })));
         });
   };
-  var onClickDate = function (entryDate) {
+  var onClickDate = function (entryDate, withMetaKey) {
     ((function (x) {
             if (x !== undefined) {
               Caml_option.valFromOption(x).scrollIntoView({
@@ -111,7 +111,9 @@ function App(props) {
                     block: "center"
                   });
             } else {
-              makeNewEntry(entryDate);
+              if (!withMetaKey) {
+                makeNewEntry(entryDate);
+              }
               scrollToRef.current = Entry.entryClassNameId(entryDate);
             }
           })(Global.Derived.getElementByClassOp(Entry.entryClassNameId(entryDate))));

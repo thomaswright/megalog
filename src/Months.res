@@ -1,7 +1,7 @@
 open Entry
 
 @react.component
-let make = (~start, ~end, ~dateSet, ~onClick) => {
+let make = (~start, ~end, ~dateSet, ~onClick: (entryDate, bool) => unit) => {
   <div className="py-2  flex-1 overflow-y-scroll flex flex-col w-full font-black pr-3">
     {DateDerived.allYears(start, end)
     ->Array.map(d => {
@@ -28,7 +28,7 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
                     `,
         }}>
         <button
-          onClick={_ => onClick(Year(year))}
+          onClick={e => onClick(Year(year), e->ReactEvent.Mouse.metaKey)}
           className={[
             `monthview-${Year(year)->entryDateString}`,
             "font-medium text-sm leading-none flex flex-row items-center justify-center overflow-hidden",
@@ -40,7 +40,7 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
           <div className="-rotate-90"> {d->DateFns.format("y")->React.string} </div>
         </button>
         <button
-          onClick={_ => onClick(Quarter(year, 1))}
+          onClick={e => onClick(Quarter(year, 1), e->ReactEvent.Mouse.metaKey)}
           className={[
             `monthview-${Quarter(year, 1)->entryDateString}`,
             " flex flex-row items-center justify-center",
@@ -53,7 +53,7 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
           // <Icons.Snowflake />
         </button>
         <button
-          onClick={_ => onClick(Quarter(year, 2))}
+          onClick={e => onClick(Quarter(year, 2), e->ReactEvent.Mouse.metaKey)}
           className={[
             `monthview-${Quarter(year, 2)->entryDateString}`,
             " flex flex-row items-center justify-center",
@@ -66,7 +66,7 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
           // <Icons.Flower />
         </button>
         <button
-          onClick={_ => onClick(Quarter(year, 3))}
+          onClick={e => onClick(Quarter(year, 3), e->ReactEvent.Mouse.metaKey)}
           className={[
             `monthview-${Quarter(year, 3)->entryDateString}`,
             " flex flex-row items-center justify-center",
@@ -79,7 +79,7 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
           // <Icons.Umbrella />
         </button>
         <button
-          onClick={_ => onClick(Quarter(year, 4))}
+          onClick={e => onClick(Quarter(year, 4), e->ReactEvent.Mouse.metaKey)}
           className={[
             `monthview-${Quarter(year, 4)->entryDateString}`,
             " flex flex-row items-center justify-center",
@@ -99,7 +99,7 @@ let make = (~start, ~end, ~dateSet, ~onClick) => {
 
           <button
             key={monthNum}
-            onClick={_ => onClick(Month(year, i + 1))}
+            onClick={e => onClick(Month(year, i + 1), e->ReactEvent.Mouse.metaKey)}
             className={[
               `monthview-${Month(year, i + 1)->entryDateString}`,
               " flex flex-row items-center justify-center",

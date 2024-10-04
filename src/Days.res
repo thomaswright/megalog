@@ -30,7 +30,7 @@ module Day = {
                   style={{borderColor: monthColor}}>
                   <button
                     id={` dayview-${Week(year, weekNum)->Entry.entryDateString}`}
-                    onClick={_ => onClick(Entry.Week(year, weekNum))}
+                    onClick={e => onClick(Entry.Week(year, weekNum), e->ReactEvent.Mouse.metaKey)}
                     style={{
                       color: hasWeekEntry ? monthColor : monthDimColor,
                     }}
@@ -49,7 +49,7 @@ module Day = {
             "h-full flex-1 flex flex-row items-center whitespace-nowrap overflow-x-hidden",
             isToday ? "bg-[--foreground-200]" : "",
           ]->Array.join(" ")}
-          onClick={_ => onClick(Date(year, month, monthDay))}
+          onClick={e => onClick(Date(year, month, monthDay), e->ReactEvent.Mouse.metaKey)}
           id={`dayview-${Date(year, month, monthDay)->Entry.entryDateString}`}>
           <span
             className={["w-1 h-full flex-none"]->Array.join(" ")}

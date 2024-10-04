@@ -55,11 +55,11 @@ function Months(props) {
                                           color: hasYearEntry ? "var(--m0)" : "inherit",
                                           gridArea: "year"
                                         },
-                                        onClick: (function (param) {
+                                        onClick: (function (e) {
                                             onClick({
                                                   TAG: "Year",
                                                   _0: year
-                                                });
+                                                }, e.metaKey);
                                           })
                                       }),
                                   JsxRuntime.jsx("button", {
@@ -79,12 +79,12 @@ function Months(props) {
                                           color: hasQ1Entry ? "var(--m0)" : "inherit",
                                           gridArea: "q1"
                                         },
-                                        onClick: (function (param) {
+                                        onClick: (function (e) {
                                             onClick({
                                                   TAG: "Quarter",
                                                   _0: year,
                                                   _1: 1
-                                                });
+                                                }, e.metaKey);
                                           })
                                       }),
                                   JsxRuntime.jsx("button", {
@@ -104,12 +104,12 @@ function Months(props) {
                                           color: hasQ2Entry ? "var(--m0)" : "inherit",
                                           gridArea: "q2"
                                         },
-                                        onClick: (function (param) {
+                                        onClick: (function (e) {
                                             onClick({
                                                   TAG: "Quarter",
                                                   _0: year,
                                                   _1: 2
-                                                });
+                                                }, e.metaKey);
                                           })
                                       }),
                                   JsxRuntime.jsx("button", {
@@ -129,12 +129,12 @@ function Months(props) {
                                           color: hasQ3Entry ? "var(--m0)" : "inherit",
                                           gridArea: "q3"
                                         },
-                                        onClick: (function (param) {
+                                        onClick: (function (e) {
                                             onClick({
                                                   TAG: "Quarter",
                                                   _0: year,
                                                   _1: 3
-                                                });
+                                                }, e.metaKey);
                                           })
                                       }),
                                   JsxRuntime.jsx("button", {
@@ -154,12 +154,12 @@ function Months(props) {
                                           color: hasQ4Entry ? "var(--m0)" : "inherit",
                                           gridArea: "q4"
                                         },
-                                        onClick: (function (param) {
+                                        onClick: (function (e) {
                                             onClick({
                                                   TAG: "Quarter",
                                                   _0: year,
                                                   _1: 4
-                                                });
+                                                }, e.metaKey);
                                           })
                                       }),
                                   Core__Array.make(12, false).map(function (_v, i) {
@@ -187,12 +187,12 @@ function Months(props) {
                                                       color: hasEntry ? Theme.monthVar(i + 1 | 0) : "inherit",
                                                       gridArea: "m" + monthNum
                                                     },
-                                                    onClick: (function (param) {
+                                                    onClick: (function (e) {
                                                         onClick({
                                                               TAG: "Month",
                                                               _0: year,
                                                               _1: i + 1 | 0
-                                                            });
+                                                            }, e.metaKey);
                                                       })
                                                   }, monthNum);
                                       })

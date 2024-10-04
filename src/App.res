@@ -112,7 +112,7 @@ let make = () => {
       ->sortEntries
     })
   }
-  let onClickDate = entryDate => {
+  let onClickDate = (entryDate, withMetaKey) => {
     getEntryToSet()->Option.mapOr(
       {
         entryDate
@@ -129,7 +129,9 @@ let make = () => {
               })
 
             | None => {
-                makeNewEntry(entryDate)
+                if !withMetaKey {
+                  makeNewEntry(entryDate)
+                }
                 scrollToRef.current = entryDate->Some->entryClassNameId->Some
               }
             }
