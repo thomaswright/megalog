@@ -81,8 +81,8 @@ let make = () => {
     None
   })
 
-  let (startYear, setStartYear) = React.useState(() => 2010)
-  let (endYear, setEndYear) = React.useState(() => 2012)
+  let (startYear, setStartYear, _) = Common.useLocalStorage("start-year", 2010)
+  let (endYear, setEndYear, _) = Common.useLocalStorage("end-year", 2030)
 
   let startOfCal = Date.makeWithYMD(~year=startYear, ~month=0, ~date=1)
   let endOfCal = Date.makeWithYMD(~year=endYear + 1, ~month=0, ~date=1)

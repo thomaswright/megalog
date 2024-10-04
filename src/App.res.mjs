@@ -81,14 +81,10 @@ function App(props) {
                 scrollToRef.current = undefined;
               }));
       });
-  var match$3 = React.useState(function () {
-        return 2010;
-      });
+  var match$3 = Common.useLocalStorage("start-year", 2010);
   var setStartYear = match$3[1];
   var startYear = match$3[0];
-  var match$4 = React.useState(function () {
-        return 2012;
-      });
+  var match$4 = Common.useLocalStorage("end-year", 2030);
   var setEndYear = match$4[1];
   var endYear = match$4[0];
   var startOfCal = new Date(startYear, 0, 1);
