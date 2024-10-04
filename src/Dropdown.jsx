@@ -75,7 +75,7 @@ const Dropdown = ({
               </div>
             )}
           </DropdownMenu.Item>
-          <div className="text-xs font-medium text-[--foreground-700] pt-2 pb-1 px-2 text-center">
+          <div className="text-xs font-medium text-[--foreground-700] pt-2 pb-1 px-2 ">
             {"Apply to all"}
           </div>
           <div className="flex flex-row justify-around">

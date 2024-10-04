@@ -18,6 +18,40 @@ let concatArray = x => {
   })
 }
 
+module ControlledInput = {
+  @react.component
+  let make = (~initialValue, ~onSave, ~className="", ~placeholder="Untitled", ~editable=true) => {
+    let (value, setValue) = React.useState(() => initialValue)
+    let inputRef = React.useRef(Js.Nullable.null)
+
+    let saveInput = () => {
+      onSave(value)
+    }
+
+    let cancelInput = () => {
+      setValue(_ => initialValue)
+    }
+    <input
+      ref={ReactDOM.Ref.domRef(inputRef)}
+      type_="text"
+      className={className}
+      placeholder={placeholder}
+      onKeyDown={e => {
+        switch e->ReactEvent.Keyboard.key {
+        | "Enter" => saveInput()
+        | "Escape" => cancelInput()
+        | _ => ()
+        }
+      }}
+      value={value}
+      onBlur={_ => saveInput()}
+      onChange={e => {
+        setValue(ReactEvent.Form.target(e)["value"])
+      }}
+    />
+  }
+}
+
 @react.component
 let make = () => {
   // Theme.initiate()
@@ -47,8 +81,11 @@ let make = () => {
     None
   })
 
-  let startOfCal = Date.makeWithYMD(~year=2010, ~month=0, ~date=1)
-  let endOfCal = Date.makeWithYMD(~year=2030, ~month=0, ~date=1)
+  let (startYear, setStartYear) = React.useState(() => 2010)
+  let (endYear, setEndYear) = React.useState(() => 2012)
+
+  let startOfCal = Date.makeWithYMD(~year=startYear, ~month=0, ~date=1)
+  let endOfCal = Date.makeWithYMD(~year=endYear + 1, ~month=0, ~date=1)
 
   let updateEntry = React.useCallback0((id, f) => {
     setEntries(v =>
@@ -266,6 +303,26 @@ let make = () => {
         <Days
           start={startOfCal} end={endOfCal} dateSet={dateSet} dateEntries onClick={onClickDate}
         />
+        <div
+          className="flex flex-row justify-between w-full border-y border-[--foreground-500] text-xs py-1">
+          <div className="flex-1 px-2 ">
+            <ControlledInput
+              initialValue={startYear->Int.toString}
+              onSave={v => setStartYear(old => v->Int.fromString->Option.getOr(old))}
+              className={"bg-inherit  w-full  text-center"}
+              placeholder={"start year"}
+            />
+          </div>
+          <div className="flex-none"> {"-"->React.string} </div>
+          <div className="flex-1 px-2">
+            <ControlledInput
+              initialValue={endYear->Int.toString}
+              onSave={v => setEndYear(old => v->Int.fromString->Option.getOr(old))}
+              className={"bg-inherit  w-full   text-center"}
+              placeholder={"end year"}
+            />
+          </div>
+        </div>
         <Months start={startOfCal} end={endOfCal} dateSet={dateSet} onClick={onClickDate} />
       </div>
       <Entries

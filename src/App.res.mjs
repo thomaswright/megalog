@@ -17,6 +17,47 @@ import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 import * as ExportFunctionsJs from "./exportFunctions.js";
 
+function App$ControlledInput(props) {
+  var __placeholder = props.placeholder;
+  var __className = props.className;
+  var onSave = props.onSave;
+  var initialValue = props.initialValue;
+  var className = __className !== undefined ? __className : "";
+  var placeholder = __placeholder !== undefined ? __placeholder : "Untitled";
+  var match = React.useState(function () {
+        return initialValue;
+      });
+  var setValue = match[1];
+  var value = match[0];
+  var inputRef = React.useRef(null);
+  return JsxRuntime.jsx("input", {
+              ref: Caml_option.some(inputRef),
+              className: className,
+              placeholder: placeholder,
+              type: "text",
+              value: value,
+              onKeyDown: (function (e) {
+                  var match = e.key;
+                  switch (match) {
+                    case "Enter" :
+                        return onSave(value);
+                    case "Escape" :
+                        return setValue(function (param) {
+                                    return initialValue;
+                                  });
+                    default:
+                      return ;
+                  }
+                }),
+              onBlur: (function (param) {
+                  onSave(value);
+                }),
+              onChange: (function (e) {
+                  setValue(e.target.value);
+                })
+            });
+}
+
 function App(props) {
   var match = Common.useLocalStorage("data", undefined);
   var getEntries = match[2];
@@ -40,8 +81,18 @@ function App(props) {
                 scrollToRef.current = undefined;
               }));
       });
-  var startOfCal = new Date(2010, 0, 1);
-  var endOfCal = new Date(2030, 0, 1);
+  var match$3 = React.useState(function () {
+        return 2010;
+      });
+  var setStartYear = match$3[1];
+  var startYear = match$3[0];
+  var match$4 = React.useState(function () {
+        return 2012;
+      });
+  var setEndYear = match$4[1];
+  var endYear = match$4[0];
+  var startOfCal = new Date(startYear, 0, 1);
+  var endOfCal = new Date(endYear + 1 | 0, 0, 1);
   var updateEntry = React.useCallback((function (id, f) {
           setEntries(function (v) {
                 return Core__Option.map(v, (function (v_) {
@@ -319,6 +370,41 @@ function App(props) {
                                     dateSet: dateSet,
                                     onClick: onClickDate,
                                     dateEntries: dateEntries
+                                  }),
+                              JsxRuntime.jsxs("div", {
+                                    children: [
+                                      JsxRuntime.jsx("div", {
+                                            children: JsxRuntime.jsx(App$ControlledInput, {
+                                                  initialValue: startYear.toString(),
+                                                  onSave: (function (v) {
+                                                      setStartYear(function (old) {
+                                                            return Core__Option.getOr(Core__Int.fromString(v, undefined), old);
+                                                          });
+                                                    }),
+                                                  className: "bg-inherit  w-full  text-center",
+                                                  placeholder: "start year"
+                                                }),
+                                            className: "flex-1 px-2 "
+                                          }),
+                                      JsxRuntime.jsx("div", {
+                                            children: "-",
+                                            className: "flex-none"
+                                          }),
+                                      JsxRuntime.jsx("div", {
+                                            children: JsxRuntime.jsx(App$ControlledInput, {
+                                                  initialValue: endYear.toString(),
+                                                  onSave: (function (v) {
+                                                      setEndYear(function (old) {
+                                                            return Core__Option.getOr(Core__Int.fromString(v, undefined), old);
+                                                          });
+                                                    }),
+                                                  className: "bg-inherit  w-full   text-center",
+                                                  placeholder: "end year"
+                                                }),
+                                            className: "flex-1 px-2"
+                                          })
+                                    ],
+                                    className: "flex flex-row justify-between w-full border-y border-[--foreground-500] text-xs py-1"
                                   }),
                               JsxRuntime.jsx(Months.make, {
                                     start: startOfCal,
