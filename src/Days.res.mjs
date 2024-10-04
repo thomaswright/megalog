@@ -78,12 +78,14 @@ function Days$Day(props) {
                                       background: monthColor
                                     }
                                   }),
-                              JsxRuntime.jsx("span", {
-                                    children: DateFns.format(d, "y-MM-dd eee"),
-                                    className: [
-                                        " px-2 flex-none",
-                                        isToday ? "border-r-4 border-white" : ""
-                                      ].join(" "),
+                              JsxRuntime.jsxs("span", {
+                                    children: [
+                                      isToday ? JsxRuntime.jsx("div", {
+                                              className: "absolute w-1 h-full  bg-[--foreground] left-0 rounded-r-full top-px"
+                                            }) : null,
+                                      DateFns.format(d, "y-MM-dd eee")
+                                    ],
+                                    className: ["relative px-2 flex-none"].join(" "),
                                     style: {
                                       color: Core__Option.isSome(entry) ? monthColor : monthDimColor
                                     }

@@ -58,9 +58,12 @@ module Day = {
             style={{
               color: entry->Option.isSome ? monthColor : monthDimColor,
             }}
-            className={[" px-2 flex-none", isToday ? "border-r-4 border-white" : ""]->Array.join(
-              " ",
-            )}>
+            className={["relative px-2 flex-none"]->Array.join(" ")}>
+            {isToday
+              ? <div
+                  className="absolute w-1 h-full  bg-[--foreground] left-0 rounded-r-full top-px"
+                />
+              : React.null}
             {d->DateFns.format("y-MM-dd eee")->React.string}
           </span>
           <span className="font-light text-white flex-none italic">

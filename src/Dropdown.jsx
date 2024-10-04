@@ -57,7 +57,10 @@ const Dropdown = ({
           </DropdownMenu.Item>
           <DropdownMenu.Item
             key={"theme"}
-            onSelect={(_) => setTheme((v) => (v == "dark" ? "light" : "dark"))}
+            onSelect={(event) => {
+              event.preventDefault();
+              setTheme((v) => (v == "dark" ? "light" : "dark"));
+            }}
             className="DropdownMenuItem"
           >
             {theme == "dark" ? (
