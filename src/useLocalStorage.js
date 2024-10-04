@@ -31,6 +31,16 @@ const getLocalStorageServerSnapshot = () => {
 export default function useLocalStorage(key, initialValue) {
   const getSnapshot = React.useCallback(() => getLocalStorageItem(key), [key]);
 
+  const getCurrentValue = React.useCallback(() => {
+    let val = getLocalStorageItem(key);
+
+    if (Boolean(val)) {
+      return JSON.parse(val);
+    } else {
+      return initialValue;
+    }
+  }, [key]);
+
   const store = React.useSyncExternalStore(
     useLocalStorageSubscribe,
     getSnapshot,
@@ -68,7 +78,7 @@ export default function useLocalStorage(key, initialValue) {
     }
   }, [key, initialValue]);
 
-  return [currentValue, setState];
+  return [currentValue, setState, getCurrentValue];
 }
 
 export function useLocalStorageListener(key, defaultValue) {

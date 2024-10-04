@@ -7,7 +7,7 @@ let concatArray = x => {
 @module("marked") external parseMd: string => string = "parse"
 
 @module("./useLocalStorage.js")
-external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit) = "default"
+external useLocalStorage: (string, 'a) => ('a, ('a => 'a) => unit, unit => 'a) = "default"
 
 @module("./useLocalStorage.js")
 external useLocalStorageListener: (string, 'a) => 'a = "useLocalStorageListener"

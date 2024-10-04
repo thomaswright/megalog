@@ -10,6 +10,7 @@ import * as Months from "./Months.res.mjs";
 import * as MenuBar from "./MenuBar.res.mjs";
 import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as Core__Int from "@rescript/core/src/Core__Int.res.mjs";
+import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
@@ -18,6 +19,7 @@ import * as ExportFunctionsJs from "./exportFunctions.js";
 
 function App(props) {
   var match = Common.useLocalStorage("data", undefined);
+  var getEntries = match[2];
   var setEntries = match[1];
   var entries = match[0];
   var match$1 = Common.useStateWithGetter(function () {
@@ -110,11 +112,36 @@ function App(props) {
                     behavior: "smooth",
                     block: "center"
                   });
+              return ;
+            } else if (withMetaKey) {
+              return Core__Option.mapOr(Belt_Array.reduce(Core__Option.getOr(getEntries(), []), undefined, (function (a, c) {
+                                var entryTime = Entry.getEntryDateDate(entryDate).getTime();
+                                var match = c.date;
+                                if (match === undefined) {
+                                  if (a !== undefined) {
+                                    return a;
+                                  } else {
+                                    return ;
+                                  }
+                                }
+                                if (a === undefined) {
+                                  return match;
+                                }
+                                var cTime = Entry.getEntryDateDate(match).getTime();
+                                var aTime = Entry.getEntryDateDate(a).getTime();
+                                return Math.abs(cTime - entryTime) < Math.abs(aTime - entryTime) ? match : a;
+                              })), undefined, (function (closestDate) {
+                            Core__Option.mapOr(Global.Derived.getElementByClassOp(Entry.entryClassNameId(closestDate)), undefined, (function (element) {
+                                    element.scrollIntoView({
+                                          behavior: "smooth",
+                                          block: "center"
+                                        });
+                                  }));
+                          }));
             } else {
-              if (!withMetaKey) {
-                makeNewEntry(entryDate);
-              }
+              makeNewEntry(entryDate);
               scrollToRef.current = Entry.entryClassNameId(entryDate);
+              return ;
             }
           })(Global.Derived.getElementByClassOp(Entry.entryClassNameId(entryDate))));
     var tmp;

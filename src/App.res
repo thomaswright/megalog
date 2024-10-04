@@ -10,6 +10,8 @@ let intMax = (a, b) => {
   a > b ? a : b
 }
 
+@val @scope("Math") external intAbs: (int, int) => int = "abs"
+
 let concatArray = x => {
   x->Array.reduce([], (a, c) => {
     Array.concat(a, c)
@@ -20,7 +22,7 @@ let concatArray = x => {
 let make = () => {
   // Theme.initiate()
 
-  let (entries, setEntries) = Common.useLocalStorage("data", None)
+  let (entries, setEntries, getEntries) = Common.useLocalStorage("data", None)
 
   let (entryToSet: option<string>, setEntryToSet, getEntryToSet) = Common.useStateWithGetter(() =>
     None
@@ -128,11 +130,46 @@ let make = () => {
                 "block": "center",
               })
 
-            | None => {
-                if !withMetaKey {
-                  makeNewEntry(entryDate)
-                }
+            | None =>
+              if !withMetaKey {
+                makeNewEntry(entryDate)
                 scrollToRef.current = entryDate->Some->entryClassNameId->Some
+              } else {
+                // scroll To closest date
+                getEntries()
+                ->Option.getOr([])
+                ->Belt.Array.reduce(None, (a, c) => {
+                  let entryTime = entryDate->getEntryDateDate->Date.getTime
+
+                  switch (c.date, a) {
+                  | (Some(cDate), Some(aDate)) => {
+                      let cTime = cDate->getEntryDateDate->Date.getTime
+                      let aTime = aDate->getEntryDateDate->Date.getTime
+
+                      (
+                        Math.abs(cTime -. entryTime) < Math.abs(aTime -. entryTime) ? cDate : aDate
+                      )->Some
+                    }
+                  | (Some(cDate), None) => Some(cDate)
+                  | (None, Some(aDate)) => Some(aDate)
+                  | (None, None) => None
+                  }
+                })
+                ->Option.mapOr((), closestDate => {
+                  closestDate
+                  ->Some
+                  ->entryClassNameId
+                  ->Global.Derived.getElementByClassOp
+                  ->Option.mapOr(
+                    (),
+                    element => {
+                      element->Global.scrollIntoView({
+                        "behavior": "smooth",
+                        "block": "center",
+                      })
+                    },
+                  )
+                })
               }
             }
         }

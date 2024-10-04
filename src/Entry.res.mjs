@@ -47,6 +47,22 @@ function entryClassNameId(entryDate) {
               }));
 }
 
+function getEntryDateDate(entryDate) {
+  switch (entryDate.TAG) {
+    case "Year" :
+        return new Date(entryDate._0, 0, 1);
+    case "Quarter" :
+        return new Date(entryDate._0, (entryDate._1 - 1 | 0) % 3, 1);
+    case "Month" :
+        return new Date(entryDate._0, entryDate._1 - 1 | 0, 1);
+    case "Week" :
+        return DateDerived.getDaysOfWeek(entryDate._0, entryDate._1)[0];
+    case "Date" :
+        return new Date(entryDate._0, entryDate._1 - 1 | 0, entryDate._2);
+    
+  }
+}
+
 var make = MonacoJsx;
 
 var Monaco = {
@@ -419,6 +435,7 @@ export {
   dateToEntryDate ,
   entryDateString ,
   entryClassNameId ,
+  getEntryDateDate ,
   Monaco ,
   TextareaAutosize ,
   TextArea ,

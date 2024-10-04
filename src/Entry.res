@@ -39,6 +39,16 @@ let entryClassNameId = entryDate => {
   })
 }
 
+let getEntryDateDate = (entryDate: entryDate) => {
+  switch entryDate {
+  | Year(y) => Date.makeWithYMD(~year=y, ~month=0, ~date=1)
+  | Quarter(y, q) => Date.makeWithYMD(~year=y, ~month=mod(q - 1, 3), ~date=1)
+  | Month(y, m) => Date.makeWithYMD(~year=y, ~month=m - 1, ~date=1)
+  | Week(y, w) => DateDerived.getDaysOfWeek(y, w)->Array.getUnsafe(0)
+  | Date(y, m, d) => Date.makeWithYMD(~year=y, ~month=m - 1, ~date=d)
+  }
+}
+
 module Monaco = {
   @react.component @module("./Monaco.jsx")
   external make: (~content: string) => React.element = "default"

@@ -156,7 +156,7 @@ let initiate = () => {
 }
 
 let useTheme = () => {
-  let (theme, setTheme) = Common.useLocalStorage("theme", Dark)
+  let (theme, setTheme, _getTheme) = Common.useLocalStorage("theme", Dark)
 
   React.useEffect1(() => {
     let (remove, add, _c1, _c2) =
