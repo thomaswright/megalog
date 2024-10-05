@@ -130,6 +130,9 @@ let make = () => {
     ->Array.map(((date, entry)) => (date->entryDateString, entry))
     ->Map.fromArray
 
+  let maxId = entries =>
+    entries->Array.reduce(0, (a, c) => intMax(a, c.id->Int.fromString->Option.getOr(0)))
+
   let makeNewEntry = entryDate => {
     setEntries(v => {
       v
@@ -138,10 +141,7 @@ let make = () => {
           entries,
           [
             {
-              id: (entries->Array.reduce(
-                0,
-                (a, c) => intMax(a, c.id->Int.fromString->Option.getOr(0)),
-              ) + 1)->Int.toString,
+              id: (maxId(entries) + 1)->Int.toString,
               date: entryDate->Some,
               title: "",
               content: "",
@@ -254,12 +254,42 @@ let make = () => {
   }
 
   let formatForJson = entries => {
-    entries->Array.map(entry => {
+    entries->Array.map((entry): entryObj => {
       {
         "title": entry.title,
         "date": entry.date->Option.mapOr("", x => x->entryDateString),
         "content": entry.content,
       }
+    })
+  }
+
+  let onImportJson = json => {
+    setEntries(entries => {
+      let maxId = entries->Option.getOr([])->maxId
+      let newEntries =
+        json
+        ->Array.filter(jsonEntry => {
+          entries
+          ->Option.getOr([])
+          ->Array.filter(
+            v => {
+              v.date->Option.mapOr("", entryDateString) == jsonEntry["date"] &&
+              v.title == jsonEntry["title"] &&
+              v.content == jsonEntry["content"]
+            },
+          )
+          ->Array.length == 0
+        })
+        ->Array.mapWithIndex((jsonEntry, i) => {
+          title: jsonEntry["title"],
+          date: jsonEntry["date"]->entryDateFromString,
+          content: jsonEntry["content"],
+          id: (maxId + i + 1)->Int.toString,
+          lock: false,
+          hide: false,
+        })
+
+      Array.concat(entries->Option.getOr([]), newEntries)->Some
     })
   }
 
@@ -333,6 +363,7 @@ let make = () => {
           onUnlock
           theme
           setTheme
+          onImportJson
         />
         <Days
           start={startOfCal} end={endOfCal} dateSet={dateSet} dateEntries onClick={onClickDate}

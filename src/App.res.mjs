@@ -136,18 +136,21 @@ function App(props) {
                     param[1]
                   ];
           }));
+  var maxId = function (entries) {
+    return Core__Array.reduce(entries, 0, (function (a, c) {
+                  var b = Core__Option.getOr(Core__Int.fromString(c.id, undefined), 0);
+                  if (Caml_obj.greaterthan(a, b)) {
+                    return a;
+                  } else {
+                    return b;
+                  }
+                }));
+  };
   var makeNewEntry = function (entryDate) {
     setEntries(function (v) {
           return sortEntries(Core__Option.map(v, (function (entries) {
                             return entries.concat([{
-                                          id: (Core__Array.reduce(entries, 0, (function (a, c) {
-                                                      var b = Core__Option.getOr(Core__Int.fromString(c.id, undefined), 0);
-                                                      if (Caml_obj.greaterthan(a, b)) {
-                                                        return a;
-                                                      } else {
-                                                        return b;
-                                                      }
-                                                    })) + 1 | 0).toString(),
+                                          id: (maxId(entries) + 1 | 0).toString(),
                                           date: entryDate,
                                           title: "",
                                           content: "",
@@ -268,6 +271,30 @@ function App(props) {
                       };
               });
   };
+  var onImportJson = function (json) {
+    setEntries(function (entries) {
+          var maxId$1 = maxId(Core__Option.getOr(entries, []));
+          var newEntries = json.filter(function (jsonEntry) {
+                  return Core__Option.getOr(entries, []).filter(function (v) {
+                              if (Core__Option.mapOr(v.date, "", Entry.entryDateString) === jsonEntry.date && v.title === jsonEntry.title) {
+                                return v.content === jsonEntry.content;
+                              } else {
+                                return false;
+                              }
+                            }).length === 0;
+                }).map(function (jsonEntry, i) {
+                return {
+                        id: ((maxId$1 + i | 0) + 1 | 0).toString(),
+                        date: Entry.entryDateFromString(jsonEntry.date),
+                        title: jsonEntry.title,
+                        content: jsonEntry.content,
+                        lock: false,
+                        hide: false
+                      };
+              });
+          return Core__Option.getOr(entries, []).concat(newEntries);
+        });
+  };
   var onSort = function () {
     setEntries(function (v) {
           return sortEntries(v);
@@ -375,6 +402,7 @@ function App(props) {
                                     onExportFile: onExportFile,
                                     onExportFolder: onExportFolder,
                                     onExportJson: onExportJson,
+                                    onImportJson: onImportJson,
                                     onShow: onShow,
                                     onHide: onHide,
                                     onLock: onLock,

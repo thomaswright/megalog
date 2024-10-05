@@ -6,6 +6,7 @@ import * as Common from "./Common.res.mjs";
 import * as Global from "./Global.res.mjs";
 import * as Caml_obj from "rescript/lib/es6/caml_obj.js";
 import * as DateFns from "date-fns";
+import * as Core__Int from "@rescript/core/src/Core__Int.res.mjs";
 import * as DateDerived from "./DateDerived.res.mjs";
 import MonacoJsx from "./Monaco.jsx";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
@@ -38,6 +39,96 @@ function entryDateString(date) {
     case "Date" :
         return DateFns.format(new Date(date._0, date._1 - 1 | 0, date._2), Common.standardDateFormat);
     
+  }
+}
+
+function entryDateFromString(s) {
+  if (s.includes("Q")) {
+    var split = s.split("-");
+    var y = Core__Option.flatMap(split[0], (function (sub) {
+            return Core__Int.fromString(sub, undefined);
+          }));
+    var q = Core__Option.flatMap(split[1], (function (sub) {
+            return Core__Int.fromString(sub.substring(1), undefined);
+          }));
+    if (y !== undefined && q !== undefined) {
+      return {
+              TAG: "Quarter",
+              _0: y,
+              _1: q
+            };
+    } else {
+      return ;
+    }
+  }
+  if (s.includes("W")) {
+    var split$1 = s.split("-");
+    var y$1 = Core__Option.flatMap(split$1[0], (function (sub) {
+            return Core__Int.fromString(sub, undefined);
+          }));
+    var w = Core__Option.flatMap(split$1[1], (function (sub) {
+            return Core__Int.fromString(sub.substring(1), undefined);
+          }));
+    if (y$1 !== undefined && w !== undefined) {
+      return {
+              TAG: "Week",
+              _0: y$1,
+              _1: w
+            };
+    } else {
+      return ;
+    }
+  }
+  var match = s.length;
+  switch (match) {
+    case 4 :
+        var y$2 = Core__Int.fromString(s, undefined);
+        return Core__Option.map(y$2, (function (y) {
+                      return {
+                              TAG: "Year",
+                              _0: y
+                            };
+                    }));
+    case 7 :
+        var split$2 = s.split("-");
+        var y$3 = Core__Option.flatMap(split$2[0], (function (sub) {
+                return Core__Int.fromString(sub, undefined);
+              }));
+        var m = Core__Option.flatMap(split$2[1], (function (sub) {
+                return Core__Int.fromString(sub, undefined);
+              }));
+        if (y$3 !== undefined && m !== undefined) {
+          return {
+                  TAG: "Month",
+                  _0: y$3,
+                  _1: m
+                };
+        } else {
+          return ;
+        }
+    case 10 :
+        var split$3 = s.split("-");
+        var y$4 = Core__Option.flatMap(split$3[0], (function (sub) {
+                return Core__Int.fromString(sub, undefined);
+              }));
+        var m$1 = Core__Option.flatMap(split$3[1], (function (sub) {
+                return Core__Int.fromString(sub, undefined);
+              }));
+        var d = Core__Option.flatMap(split$3[2], (function (sub) {
+                return Core__Int.fromString(sub, undefined);
+              }));
+        if (y$4 !== undefined && m$1 !== undefined && d !== undefined) {
+          return {
+                  TAG: "Date",
+                  _0: y$4,
+                  _1: m$1,
+                  _2: d
+                };
+        } else {
+          return ;
+        }
+    default:
+      return ;
   }
 }
 
@@ -434,6 +525,7 @@ var Editor;
 export {
   dateToEntryDate ,
   entryDateString ,
+  entryDateFromString ,
   entryClassNameId ,
   getEntryDateDate ,
   Monaco ,

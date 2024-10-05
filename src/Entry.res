@@ -14,6 +14,8 @@ type entry = {
   hide: bool,
 }
 
+type entryObj = {"title": string, "date": string, "content": string}
+
 let dateToEntryDate = d => {
   let year = d->Date.getFullYear
   let month = d->Date.getMonth + 1
@@ -32,6 +34,65 @@ let entryDateString = date =>
     y->Int.toString->String.padStart(4, "0") ++ "-" ++ m->Int.toString->String.padStart(2, "0")
   | Week(y, w) => y->Int.toString->String.padStart(4, "0") ++ "-W" ++ w->Int.toString
   }
+
+let entryDateFromString = s => {
+  if s->String.includes("Q") {
+    let split = s->String.split("-")
+    let y = split->Array.get(0)->Option.flatMap(sub => sub->Int.fromString)
+    let q =
+      split
+      ->Array.get(1)
+      ->Option.flatMap(sub => sub->String.substringToEnd(~start=1)->Int.fromString)
+
+    switch (y, q) {
+    | (Some(y), Some(q)) => Quarter(y, q)->Some
+    | _ => None
+    }
+  } else if s->String.includes("W") {
+    let split = s->String.split("-")
+
+    let y = split->Array.get(0)->Option.flatMap(sub => sub->Int.fromString)
+    let w =
+      split
+      ->Array.get(1)
+      ->Option.flatMap(sub => sub->String.substringToEnd(~start=1)->Int.fromString)
+    switch (y, w) {
+    | (Some(y), Some(w)) => Week(y, w)->Some
+    | _ => None
+    }
+  } else {
+    switch s->String.length {
+    | 4 => {
+        let y = s->Int.fromString
+
+        y->Option.map(y => Year(y))
+      }
+
+    | 7 => {
+        let split = s->String.split("-")
+        let y = split->Array.get(0)->Option.flatMap(sub => sub->Int.fromString)
+        let m = split->Array.get(1)->Option.flatMap(sub => sub->Int.fromString)
+        switch (y, m) {
+        | (Some(y), Some(m)) => Month(y, m)->Some
+        | _ => None
+        }
+      }
+
+    | 10 => {
+        let split = s->String.split("-")
+        let y = split->Array.get(0)->Option.flatMap(sub => sub->Int.fromString)
+        let m = split->Array.get(1)->Option.flatMap(sub => sub->Int.fromString)
+        let d = split->Array.get(2)->Option.flatMap(sub => sub->Int.fromString)
+        switch (y, m, d) {
+        | (Some(y), Some(m), Some(d)) => Date(y, m, d)->Some
+        | _ => None
+        }
+      }
+
+    | _ => None
+    }
+  }
+}
 
 let entryClassNameId = entryDate => {
   entryDate->Option.mapOr("", date => {
