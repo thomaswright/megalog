@@ -6,6 +6,9 @@ external exportToFolder: array<(string, string)> => unit = "exportToFolder"
 @module("./exportFunctions.js")
 external exportToFile: string => unit = "exportToFile"
 
+@module("./exportFunctions.js")
+external exportToJsonFile: string => unit = "exportToJsonFile"
+
 let intMax = (a, b) => {
   a > b ? a : b
 }
@@ -250,8 +253,27 @@ let make = () => {
     entry.content
   }
 
+  let formatForJson = entries => {
+    entries->Array.map(entry => {
+      {
+        "title": entry.title,
+        "date": entry.date->Option.mapOr("", x => x->entryDateString),
+        "content": entry.content,
+      }
+    })
+  }
+
   let onSort = () => {
     setEntries(v => v->sortEntries)
+  }
+
+  let onExportJson = () => {
+    entries->Option.mapOr((), entries => {
+      entries
+      ->formatForJson
+      ->Js.Json.stringifyAny
+      ->Option.mapOr((), exportToJsonFile)
+    })
   }
 
   let onExportFile = () => {
@@ -301,7 +323,16 @@ let make = () => {
     <div className="flex flex-row flex-1 overflow-hidden">
       <div className="flex flex-col h-full flex-none w-64 border-r-transparent">
         <MenuBar.SmallBar
-          onSort onExportFile onExportFolder onShow onHide onLock onUnlock theme setTheme
+          onSort
+          onExportFile
+          onExportFolder
+          onExportJson
+          onShow
+          onHide
+          onLock
+          onUnlock
+          theme
+          setTheme
         />
         <Days
           start={startOfCal} end={endOfCal} dateSet={dateSet} dateEntries onClick={onClickDate}

@@ -4,6 +4,7 @@ module Dropdown = {
     ~onSort: unit => unit,
     ~onExportFile: unit => unit,
     ~onExportFolder: unit => unit,
+    ~onExportJson: unit => unit,
     ~onShow: unit => unit,
     ~onHide: unit => unit,
     ~onLock: unit => unit,
@@ -19,6 +20,7 @@ module SmallBar = {
     ~onSort: unit => unit,
     ~onExportFile: unit => unit,
     ~onExportFolder: unit => unit,
+    ~onExportJson: unit => unit,
     ~onShow: unit => unit,
     ~onHide: unit => unit,
     ~onLock: unit => unit,
@@ -28,7 +30,9 @@ module SmallBar = {
   ) => {
     <div
       className="text-xs flex-none border-b border-[--foreground-300] flex flex-row items-center">
-      <Dropdown onSort onExportFile onExportFolder onShow onHide onLock onUnlock theme setTheme />
+      <Dropdown
+        onExportJson onSort onExportFile onExportFolder onShow onHide onLock onUnlock theme setTheme
+      />
     </div>
   }
 }

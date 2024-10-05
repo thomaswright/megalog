@@ -15,6 +15,7 @@ function MenuBar$SmallBar(props) {
                     onSort: props.onSort,
                     onExportFile: props.onExportFile,
                     onExportFolder: props.onExportFolder,
+                    onExportJson: props.onExportJson,
                     onShow: props.onShow,
                     onHide: props.onHide,
                     onLock: props.onLock,

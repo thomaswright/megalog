@@ -18,6 +18,10 @@ import * as Tb from "react-icons/tb";
 import * as JsxRuntime from "react/jsx-runtime";
 import * as ExportFunctionsJs from "./exportFunctions.js";
 
+function exportToJsonFile(prim) {
+  ExportFunctionsJs.exportToJsonFile(prim);
+}
+
 function App$ControlledInput(props) {
   var __placeholder = props.placeholder;
   var __className = props.className;
@@ -253,10 +257,26 @@ function App(props) {
                   return Entry.entryDateString(x);
                 })) + "\nTitle: " + entry.title + "\n\n" + entry.content;
   };
+  var formatForJson = function (entries) {
+    return entries.map(function (entry) {
+                return {
+                        title: entry.title,
+                        date: Core__Option.mapOr(entry.date, "", (function (x) {
+                                return Entry.entryDateString(x);
+                              })),
+                        content: entry.content
+                      };
+              });
+  };
   var onSort = function () {
     setEntries(function (v) {
           return sortEntries(v);
         });
+  };
+  var onExportJson = function () {
+    Core__Option.mapOr(entries, undefined, (function (entries) {
+            Core__Option.mapOr(JSON.stringify(formatForJson(entries)), undefined, exportToJsonFile);
+          }));
   };
   var onExportFile = function () {
     Core__Option.mapOr(entries, undefined, (function (entries) {
@@ -354,6 +374,7 @@ function App(props) {
                                     onSort: onSort,
                                     onExportFile: onExportFile,
                                     onExportFolder: onExportFolder,
+                                    onExportJson: onExportJson,
                                     onShow: onShow,
                                     onHide: onHide,
                                     onLock: onLock,

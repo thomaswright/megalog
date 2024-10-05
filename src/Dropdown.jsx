@@ -15,6 +15,7 @@ const Dropdown = ({
   onSort,
   onExportFile,
   onExportFolder,
+  onExportJson,
   onShow,
   onHide,
   onLock,
@@ -55,6 +56,14 @@ const Dropdown = ({
           >
             {"Export as Folder"}
           </DropdownMenu.Item>
+          <DropdownMenu.Item
+            key={"export_json"}
+            onSelect={(_) => onExportJson()}
+            className="DropdownMenuItem"
+          >
+            {"Export as JSON"}
+          </DropdownMenu.Item>
+
           <DropdownMenu.Item
             key={"theme"}
             onSelect={(event) => {
