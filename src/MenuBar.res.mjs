@@ -24,7 +24,7 @@ function MenuBar$SmallBar(props) {
                     theme: props.theme,
                     setTheme: props.setTheme
                   }),
-              className: "text-xs flex-none border-b border-[--foreground-300] flex flex-row items-center"
+              className: "flex-none border-b border-[--foreground-300] flex flex-row items-center"
             });
 }
 

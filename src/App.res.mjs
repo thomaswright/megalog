@@ -451,9 +451,9 @@ function App(props) {
                                                   className: "flex-none text-base -my-1 "
                                                 })
                                           ],
-                                          className: "flex flex-row justify-between w-full border-y border-[--foreground-500] text-xs py-1 items-center "
+                                          className: "flex flex-row justify-between w-full border-y border-[--foreground-500]  py-1 items-center "
                                         }),
-                                    className: "pr-3"
+                                    className: "pr-3 "
                                   }),
                               JsxRuntime.jsx(Months.make, {
                                     start: startOfCal,
@@ -462,7 +462,7 @@ function App(props) {
                                     onClick: onClickDate
                                   })
                             ],
-                            className: "flex flex-col h-full flex-none w-64 border-r-transparent"
+                            className: "flex-1 sm:flex-none flex flex-col sm:h-full  w-full sm:w-64 border-r-transparent overflow-hidden border-b sm:border-b-0 border-[--foreground]"
                           }),
                       JsxRuntime.jsx(Entry.Entries.make, {
                             entries: entries,
@@ -478,9 +478,9 @@ function App(props) {
                               })
                           })
                     ],
-                    className: "flex flex-row flex-1 overflow-hidden"
+                    className: "flex flex-col sm:flex-row flex-1 overflow-hidden"
                   }),
-              className: "relative font-mono h-dvh flex flex-col bg-[--background] text-[--foreground]"
+              className: "relative font-mono h-dvh flex flex-col bg-[--background] text-[--foreground] text-base sm:text-xs"
             });
 }
 

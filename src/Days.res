@@ -44,7 +44,7 @@ module Day = {
           </div>
         : React.null}
       <div
-        className="text-xs font-black flex flex-row items-center gap-1 h-5 whitespace-nowrap overflow-x-hidden">
+        className=" font-black flex flex-row items-center gap-1 h-5 whitespace-nowrap overflow-x-hidden">
         <button
           className={[
             "h-full flex-1 flex flex-row items-center whitespace-nowrap overflow-x-hidden",
@@ -87,7 +87,7 @@ module Day = {
 
 @react.component
 let make = (~start, ~end, ~dateSet, ~onClick, ~dateEntries) => {
-  <div className="w-full flex-2 overflow-y-scroll text-xs pr-3">
+  <div className="w-full flex-2 overflow-y-scroll pr-3">
     {DateDerived.allDays(start, end)
     ->Array.map(d => {
       <Day

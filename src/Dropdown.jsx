@@ -5,7 +5,7 @@ import {
   TbEye,
   TbEyeClosed,
   TbLock,
-  TbLockOpen,
+  TbLockOpen2,
   TbSun,
   TbMoon,
 } from "react-icons/tb";
@@ -150,7 +150,7 @@ const Dropdown = ({
               onSelect={(_) => onUnlock()}
               className="DropdownMenuItem"
             >
-              <TbLockOpen />
+              <TbLockOpen2 />
             </DropdownMenu.Item>
           </div>
 

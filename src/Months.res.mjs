@@ -197,7 +197,7 @@ function Months(props) {
                                                   }, monthNum);
                                       })
                                 ],
-                                className: "gap-px text-xs [&:first-child]:border-t border-b border-[--foreground-400]  text-[--foreground-300] py-1",
+                                className: "gap-px [&:first-child]:border-t border-b border-[--foreground-400]  text-[--foreground-300] py-1",
                                 style: {
                                   display: "grid",
                                   gridTemplateAreas: "\n                    \"year q1 m1 m2 m3\"\n                    \"year q2 m4 m5 m6\"\n                    \"year q3 m7 m8 m9\"\n                    \"year q4 m10 m11 m12\"\n                  \n                    ",

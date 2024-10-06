@@ -112,7 +112,7 @@ function Days$Day(props) {
                                     }, e.metaKey);
                               })
                           }),
-                      className: "text-xs font-black flex flex-row items-center gap-1 h-5 whitespace-nowrap overflow-x-hidden"
+                      className: " font-black flex flex-row items-center gap-1 h-5 whitespace-nowrap overflow-x-hidden"
                     })
               ]
             });
@@ -151,7 +151,7 @@ function Days(props) {
                                 entry: dateEntries.get(DateFns.format(d, Common.standardDateFormat))
                               }, d.toString());
                   }),
-              className: "w-full flex-2 overflow-y-scroll text-xs pr-3"
+              className: "w-full flex-2 overflow-y-scroll pr-3"
             });
 }
 

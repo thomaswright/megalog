@@ -330,9 +330,11 @@ let make = () => {
   //     <Dropdown onSort onExportFile onExportFolder onShow onHide onLock onUnlock />
   //   </div>
 
-  <div className="relative font-mono h-dvh flex flex-col bg-[--background] text-[--foreground]">
-    <div className="flex flex-row flex-1 overflow-hidden">
-      <div className="flex flex-col h-full flex-none w-64 border-r-transparent">
+  <div
+    className="relative font-mono h-dvh flex flex-col bg-[--background] text-[--foreground] text-base sm:text-xs">
+    <div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
+      <div
+        className="flex-1 sm:flex-none flex flex-col sm:h-full  w-full sm:w-64 border-r-transparent overflow-hidden border-b sm:border-b-0 border-[--foreground]">
         <MenuBar.SmallBar
           onSort
           onExportFile
@@ -349,9 +351,9 @@ let make = () => {
         <Days
           start={startOfCal} end={endOfCal} dateSet={dateSet} dateEntries onClick={onClickDate}
         />
-        <div className="pr-3">
+        <div className="pr-3 ">
           <div
-            className="flex flex-row justify-between w-full border-y border-[--foreground-500] text-xs py-1 items-center ">
+            className="flex flex-row justify-between w-full border-y border-[--foreground-500]  py-1 items-center ">
             <div className="flex-1 px-2 ">
               <ControlledInput
                 initialValue={startYear->Int.toString}

@@ -30,7 +30,7 @@ button {
 }
 
 .DropdownMenuItem {
-  @apply rounded-sm flex items-center relative h-6 select-none outline-none px-2;
+  @apply rounded-sm flex items-center relative h-7 select-none outline-none px-2;
   color: var(--foreground);
 }
 
@@ -57,7 +57,7 @@ button {
 }
 
 .IconButton {
-  @apply text-xs flex flex-row items-center justify-center p-1 px-2;
+  @apply text-inherit flex flex-row items-center justify-center py-1.5 px-3;
 }
 .IconButton:hover {
   background-color: var(--foreground-300);

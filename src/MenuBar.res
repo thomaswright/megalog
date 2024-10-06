@@ -30,8 +30,7 @@ module SmallBar = {
     ~theme,
     ~setTheme,
   ) => {
-    <div
-      className="text-xs flex-none border-b border-[--foreground-300] flex flex-row items-center">
+    <div className="flex-none border-b border-[--foreground-300] flex flex-row items-center">
       <Dropdown
         onImportJson
         onExportJson
