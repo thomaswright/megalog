@@ -59,7 +59,7 @@ module ControlledInput = {
 let make = () => {
   // Theme.initiate()
 
-  let (entries, setEntries, getEntries) = Common.useLocalStorage("data", None)
+  let (entries, setEntries, getEntries) = Common.useLocalStorage("data", [])
 
   let (entryToSet: option<string>, setEntryToSet, getEntryToSet) = Common.useStateWithGetter(() =>
     None
@@ -68,6 +68,11 @@ let make = () => {
   let (theme, setTheme) = Theme.useTheme()
 
   let scrollToRef = React.useRef(None)
+
+  // React.useEffect0(() => {
+  //   setEntries(v => None)
+  //   None
+  // })
 
   React.useEffectOnEveryRender(() => {
     scrollToRef.current
@@ -91,24 +96,16 @@ let make = () => {
   let endOfCal = Date.makeWithYMD(~year=endYear + 1, ~month=0, ~date=1)
 
   let updateEntry = React.useCallback0((id, f) => {
-    setEntries(v =>
-      v->Option.map(
-        v_ => {
-          v_->Array.map(entry => entry.id == id ? f(entry) : entry)
-        },
-      )
-    )
+    setEntries(v => v->Array.map(entry => entry.id == id ? f(entry) : entry))
   })
 
-  let sortEntries = data =>
-    data->Option.map(v =>
-      v->Array.toSorted((a, b) => {
-        String.localeCompare(
-          a.date->Option.mapOr("", x => x->entryDateString) ++ a.id,
-          b.date->Option.mapOr("", x => x->entryDateString) ++ b.id,
-        )
-      })
-    )
+  let sortEntries = v =>
+    v->Array.toSorted((a, b) => {
+      String.localeCompare(
+        a.date->Option.mapOr("", x => x->entryDateString) ++ a.id,
+        b.date->Option.mapOr("", x => x->entryDateString) ++ b.id,
+      )
+    })
   // React.useEffect0(() => {
   //   setImportData(v => v->sortEntries)
   //   None
@@ -116,7 +113,6 @@ let make = () => {
 
   let dateSet =
     entries
-    ->Option.getOr([])
     ->Array.map(entry => entry.date)
     ->Array.keepSome
     ->Array.map(date => date->entryDateString)
@@ -124,7 +120,6 @@ let make = () => {
 
   let dateEntries =
     entries
-    ->Option.getOr([])
     ->Array.map(entry => entry.date->Option.map(v => (v, entry)))
     ->Array.keepSome
     ->Array.map(((date, entry)) => (date->entryDateString, entry))
@@ -135,23 +130,17 @@ let make = () => {
 
   let makeNewEntry = entryDate => {
     setEntries(v => {
-      v
-      ->Option.map(entries =>
-        Array.concat(
-          entries,
-          [
-            {
-              id: (maxId(entries) + 1)->Int.toString,
-              date: entryDate->Some,
-              title: "",
-              content: "",
-              lock: false,
-              hide: false,
-            },
-          ],
-        )
-      )
-      ->sortEntries
+      [
+        ...v,
+        {
+          id: (maxId(v) + 1)->Int.toString,
+          date: entryDate->Some,
+          title: "",
+          content: "",
+          lock: false,
+          hide: false,
+        },
+      ]->sortEntries
     })
   }
 
@@ -179,7 +168,6 @@ let make = () => {
               } else {
                 // scroll To closest date
                 getEntries()
-                ->Option.getOr([])
                 ->Belt.Array.reduce(None, (a, c) => {
                   let entryTime = entryDate->getEntryDateDate->Date.getTime
 
@@ -265,12 +253,11 @@ let make = () => {
 
   let onImportJson = json => {
     setEntries(entries => {
-      let maxId = entries->Option.getOr([])->maxId
+      let maxId = entries->maxId
       let newEntries =
         json
         ->Array.filter(jsonEntry => {
           entries
-          ->Option.getOr([])
           ->Array.filter(
             v => {
               v.date->Option.mapOr("", entryDateString) == jsonEntry["date"] &&
@@ -289,7 +276,7 @@ let make = () => {
           hide: false,
         })
 
-      Array.concat(entries->Option.getOr([]), newEntries)->Some
+      Array.concat(entries, newEntries)
     })
   }
 
@@ -298,50 +285,44 @@ let make = () => {
   }
 
   let onExportJson = () => {
-    entries->Option.mapOr((), entries => {
-      entries
-      ->formatForJson
-      ->Js.Json.stringifyAny
-      ->Option.mapOr((), exportToJsonFile)
-    })
+    entries
+    ->formatForJson
+    ->Js.Json.stringifyAny
+    ->Option.mapOr((), exportToJsonFile)
   }
 
   let onExportFile = () => {
-    entries->Option.mapOr((), entries => {
-      entries
-      ->Array.map(v => v->formatContentForFile)
-      ->Array.join("\n\n")
-      ->exportToFile
-    })
+    entries
+    ->Array.map(v => v->formatContentForFile)
+    ->Array.join("\n\n")
+    ->exportToFile
   }
 
   let onExportFolder = () => {
-    entries->Option.mapOr((), entries => {
-      entries
-      ->Array.map(v => (
-        v.date->Option.mapOr("", x => x->entryDateString) ++
-        (v.date->Option.isSome && v.title != "" ? "_" : "") ++
-        v.title ++ ".txt",
-        v->formatContentForFile,
-      ))
-      ->exportToFolder
-    })
+    entries
+    ->Array.map(v => (
+      v.date->Option.mapOr("", x => x->entryDateString) ++
+      (v.date->Option.isSome && v.title != "" ? "_" : "") ++
+      v.title ++ ".txt",
+      v->formatContentForFile,
+    ))
+    ->exportToFolder
   }
 
   let onShow = () => {
-    setEntries(v => v->Option.map(entries => entries->Array.map(entry => {...entry, hide: false})))
+    setEntries(v => v->Array.map(entry => {...entry, hide: false}))
   }
 
   let onHide = () => {
-    setEntries(v => v->Option.map(entries => entries->Array.map(entry => {...entry, hide: true})))
+    setEntries(v => v->Array.map(entry => {...entry, hide: true}))
   }
 
   let onLock = () => {
-    setEntries(v => v->Option.map(entries => entries->Array.map(entry => {...entry, lock: true})))
+    setEntries(v => v->Array.map(entry => {...entry, lock: true}))
   }
 
   let onUnlock = () => {
-    setEntries(v => v->Option.map(entries => entries->Array.map(entry => {...entry, lock: false})))
+    setEntries(v => v->Array.map(entry => {...entry, lock: false}))
   }
 
   // let dropdown =
@@ -416,7 +397,7 @@ let make = () => {
         setEntryToSet
         entryToSet
         deleteEntry={id => {
-          setEntries(v => v->Option.map(entries => entries->Array.filter(entry => entry.id != id)))
+          setEntries(v => v->Array.filter(entry => entry.id != id))
         }}
       />
     </div>

@@ -15,6 +15,7 @@ function Days$Day(props) {
   var hasWeekEntry = props.hasWeekEntry;
   var onClick = props.onClick;
   var d = props.d;
+  console.log("render");
   var beginningOfWeek = d.getDay() === 0;
   var year = d.getFullYear();
   var month = d.getMonth() + 1 | 0;

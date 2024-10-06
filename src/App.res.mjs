@@ -64,7 +64,7 @@ function App$ControlledInput(props) {
 }
 
 function App(props) {
-  var match = Common.useLocalStorage("data", undefined);
+  var match = Common.useLocalStorage("data", []);
   var getEntries = match[2];
   var setEntries = match[1];
   var entries = match[0];
@@ -96,34 +96,30 @@ function App(props) {
   var endOfCal = new Date(endYear + 1 | 0, 0, 1);
   var updateEntry = React.useCallback((function (id, f) {
           setEntries(function (v) {
-                return Core__Option.map(v, (function (v_) {
-                              return v_.map(function (entry) {
-                                          if (entry.id === id) {
-                                            return f(entry);
-                                          } else {
-                                            return entry;
-                                          }
-                                        });
-                            }));
+                return v.map(function (entry) {
+                            if (entry.id === id) {
+                              return f(entry);
+                            } else {
+                              return entry;
+                            }
+                          });
               });
         }), []);
-  var sortEntries = function (data) {
-    return Core__Option.map(data, (function (v) {
-                  return v.toSorted(function (a, b) {
-                              return (Core__Option.mapOr(a.date, "", (function (x) {
-                                                return Entry.entryDateString(x);
-                                              })) + a.id).localeCompare(Core__Option.mapOr(b.date, "", (function (x) {
-                                                return Entry.entryDateString(x);
-                                              })) + b.id);
-                            });
-                }));
+  var sortEntries = function (v) {
+    return v.toSorted(function (a, b) {
+                return (Core__Option.mapOr(a.date, "", (function (x) {
+                                  return Entry.entryDateString(x);
+                                })) + a.id).localeCompare(Core__Option.mapOr(b.date, "", (function (x) {
+                                  return Entry.entryDateString(x);
+                                })) + b.id);
+              });
   };
-  var dateSet = new Set(Core__Array.keepSome(Core__Option.getOr(entries, []).map(function (entry) {
+  var dateSet = new Set(Core__Array.keepSome(entries.map(function (entry) {
                   return entry.date;
                 })).map(function (date) {
             return Entry.entryDateString(date);
           }));
-  var dateEntries = new Map(Core__Array.keepSome(Core__Option.getOr(entries, []).map(function (entry) {
+  var dateEntries = new Map(Core__Array.keepSome(entries.map(function (entry) {
                   return Core__Option.map(entry.date, (function (v) {
                                 return [
                                         v,
@@ -148,16 +144,17 @@ function App(props) {
   };
   var makeNewEntry = function (entryDate) {
     setEntries(function (v) {
-          return sortEntries(Core__Option.map(v, (function (entries) {
-                            return entries.concat([{
-                                          id: (maxId(entries) + 1 | 0).toString(),
-                                          date: entryDate,
-                                          title: "",
-                                          content: "",
-                                          lock: false,
-                                          hide: false
-                                        }]);
-                          })));
+          return sortEntries(Belt_Array.concatMany([
+                          v,
+                          [{
+                              id: (maxId(v) + 1 | 0).toString(),
+                              date: entryDate,
+                              title: "",
+                              content: "",
+                              lock: false,
+                              hide: false
+                            }]
+                        ]));
         });
   };
   var onClickDate = function (entryDate, withMetaKey) {
@@ -169,7 +166,7 @@ function App(props) {
                   });
               return ;
             } else if (withMetaKey) {
-              return Core__Option.mapOr(Belt_Array.reduce(Core__Option.getOr(getEntries(), []), undefined, (function (a, c) {
+              return Core__Option.mapOr(Belt_Array.reduce(getEntries(), undefined, (function (a, c) {
                                 var entryTime = Entry.getEntryDateDate(entryDate).getTime();
                                 var match = c.date;
                                 if (match === undefined) {
@@ -273,9 +270,9 @@ function App(props) {
   };
   var onImportJson = function (json) {
     setEntries(function (entries) {
-          var maxId$1 = maxId(Core__Option.getOr(entries, []));
+          var maxId$1 = maxId(entries);
           var newEntries = json.filter(function (jsonEntry) {
-                  return Core__Option.getOr(entries, []).filter(function (v) {
+                  return entries.filter(function (v) {
                               if (Core__Option.mapOr(v.date, "", Entry.entryDateString) === jsonEntry.date && v.title === jsonEntry.title) {
                                 return v.content === jsonEntry.content;
                               } else {
@@ -292,7 +289,7 @@ function App(props) {
                         hide: false
                       };
               });
-          return Core__Option.getOr(entries, []).concat(newEntries);
+          return entries.concat(newEntries);
         });
   };
   var onSort = function () {
@@ -301,95 +298,81 @@ function App(props) {
         });
   };
   var onExportJson = function () {
-    Core__Option.mapOr(entries, undefined, (function (entries) {
-            Core__Option.mapOr(JSON.stringify(formatForJson(entries)), undefined, exportToJsonFile);
-          }));
+    Core__Option.mapOr(JSON.stringify(formatForJson(entries)), undefined, exportToJsonFile);
   };
   var onExportFile = function () {
-    Core__Option.mapOr(entries, undefined, (function (entries) {
-            var prim = entries.map(function (v) {
-                    return formatContentForFile(v);
-                  }).join("\n\n");
-            ExportFunctionsJs.exportToFile(prim);
-          }));
+    var prim = entries.map(function (v) {
+            return formatContentForFile(v);
+          }).join("\n\n");
+    ExportFunctionsJs.exportToFile(prim);
   };
   var onExportFolder = function () {
-    Core__Option.mapOr(entries, undefined, (function (entries) {
-            var prim = entries.map(function (v) {
-                  return [
-                          Core__Option.mapOr(v.date, "", (function (x) {
-                                  return Entry.entryDateString(x);
-                                })) + (
-                            Core__Option.isSome(v.date) && v.title !== "" ? "_" : ""
-                          ) + v.title + ".txt",
-                          formatContentForFile(v)
-                        ];
-                });
-            ExportFunctionsJs.exportToFolder(prim);
-          }));
+    var prim = entries.map(function (v) {
+          return [
+                  Core__Option.mapOr(v.date, "", (function (x) {
+                          return Entry.entryDateString(x);
+                        })) + (
+                    Core__Option.isSome(v.date) && v.title !== "" ? "_" : ""
+                  ) + v.title + ".txt",
+                  formatContentForFile(v)
+                ];
+        });
+    ExportFunctionsJs.exportToFolder(prim);
   };
   var onShow = function () {
     setEntries(function (v) {
-          return Core__Option.map(v, (function (entries) {
-                        return entries.map(function (entry) {
-                                    return {
-                                            id: entry.id,
-                                            date: entry.date,
-                                            title: entry.title,
-                                            content: entry.content,
-                                            lock: entry.lock,
-                                            hide: false
-                                          };
-                                  });
-                      }));
+          return v.map(function (entry) {
+                      return {
+                              id: entry.id,
+                              date: entry.date,
+                              title: entry.title,
+                              content: entry.content,
+                              lock: entry.lock,
+                              hide: false
+                            };
+                    });
         });
   };
   var onHide = function () {
     setEntries(function (v) {
-          return Core__Option.map(v, (function (entries) {
-                        return entries.map(function (entry) {
-                                    return {
-                                            id: entry.id,
-                                            date: entry.date,
-                                            title: entry.title,
-                                            content: entry.content,
-                                            lock: entry.lock,
-                                            hide: true
-                                          };
-                                  });
-                      }));
+          return v.map(function (entry) {
+                      return {
+                              id: entry.id,
+                              date: entry.date,
+                              title: entry.title,
+                              content: entry.content,
+                              lock: entry.lock,
+                              hide: true
+                            };
+                    });
         });
   };
   var onLock = function () {
     setEntries(function (v) {
-          return Core__Option.map(v, (function (entries) {
-                        return entries.map(function (entry) {
-                                    return {
-                                            id: entry.id,
-                                            date: entry.date,
-                                            title: entry.title,
-                                            content: entry.content,
-                                            lock: true,
-                                            hide: entry.hide
-                                          };
-                                  });
-                      }));
+          return v.map(function (entry) {
+                      return {
+                              id: entry.id,
+                              date: entry.date,
+                              title: entry.title,
+                              content: entry.content,
+                              lock: true,
+                              hide: entry.hide
+                            };
+                    });
         });
   };
   var onUnlock = function () {
     setEntries(function (v) {
-          return Core__Option.map(v, (function (entries) {
-                        return entries.map(function (entry) {
-                                    return {
-                                            id: entry.id,
-                                            date: entry.date,
-                                            title: entry.title,
-                                            content: entry.content,
-                                            lock: false,
-                                            hide: entry.hide
-                                          };
-                                  });
-                      }));
+          return v.map(function (entry) {
+                      return {
+                              id: entry.id,
+                              date: entry.date,
+                              title: entry.title,
+                              content: entry.content,
+                              lock: false,
+                              hide: entry.hide
+                            };
+                    });
         });
   };
   return JsxRuntime.jsx("div", {
@@ -488,11 +471,9 @@ function App(props) {
                             entryToSet: match$1[0],
                             deleteEntry: (function (id) {
                                 setEntries(function (v) {
-                                      return Core__Option.map(v, (function (entries) {
-                                                    return entries.filter(function (entry) {
-                                                                return entry.id !== id;
-                                                              });
-                                                  }));
+                                      return v.filter(function (entry) {
+                                                  return entry.id !== id;
+                                                });
                                     });
                               })
                           })

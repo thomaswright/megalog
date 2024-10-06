@@ -333,22 +333,20 @@ module Entry = {
 module Entries = {
   @react.component
   let make = (
-    ~entries: option<array<entry>>,
+    ~entries: array<entry>,
     ~updateEntry: (string, entry => entry) => unit,
     ~setEntryToSet,
     ~entryToSet,
     ~deleteEntry,
   ) => {
     <div className="text-xs leading-none flex-1 h-full overflow-y-scroll max-w-xl">
-      {entries->Option.mapOr(React.null, entries_ => {
-        entries_
-        ->Array.map(entry => {
-          let isSelectedForSet = entryToSet->Option.mapOr(false, v => v == entry.id)
+      {entries
+      ->Array.map(entry => {
+        let isSelectedForSet = entryToSet->Option.mapOr(false, v => v == entry.id)
 
-          <Entry key={entry.id} entry updateEntry setEntryToSet isSelectedForSet deleteEntry />
-        })
-        ->React.array
-      })}
+        <Entry key={entry.id} entry updateEntry setEntryToSet isSelectedForSet deleteEntry />
+      })
+      ->React.array}
     </div>
   }
 }

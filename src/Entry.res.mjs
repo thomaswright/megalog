@@ -498,20 +498,18 @@ function Entry$Entries(props) {
   var setEntryToSet = props.setEntryToSet;
   var updateEntry = props.updateEntry;
   return JsxRuntime.jsx("div", {
-              children: Core__Option.mapOr(props.entries, null, (function (entries_) {
-                      return entries_.map(function (entry) {
-                                  var isSelectedForSet = Core__Option.mapOr(entryToSet, false, (function (v) {
-                                          return v === entry.id;
-                                        }));
-                                  return JsxRuntime.jsx(make$1, {
-                                              entry: entry,
-                                              updateEntry: updateEntry,
-                                              setEntryToSet: setEntryToSet,
-                                              isSelectedForSet: isSelectedForSet,
-                                              deleteEntry: deleteEntry
-                                            }, entry.id);
-                                });
-                    })),
+              children: props.entries.map(function (entry) {
+                    var isSelectedForSet = Core__Option.mapOr(entryToSet, false, (function (v) {
+                            return v === entry.id;
+                          }));
+                    return JsxRuntime.jsx(make$1, {
+                                entry: entry,
+                                updateEntry: updateEntry,
+                                setEntryToSet: setEntryToSet,
+                                isSelectedForSet: isSelectedForSet,
+                                deleteEntry: deleteEntry
+                              }, entry.id);
+                  }),
               className: "text-xs leading-none flex-1 h-full overflow-y-scroll max-w-xl"
             });
 }
