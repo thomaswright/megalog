@@ -339,7 +339,8 @@ module Entries = {
     ~entryToSet,
     ~deleteEntry,
   ) => {
-    <div className="leading-none flex-1 md:h-full p-3 sm:p-0 overflow-y-scroll max-w-xl">
+    <div
+      className="leading-none flex-1 md:h-full p-3 sm:p-0 sm:pb-80 pb-80 overflow-y-scroll max-w-xl">
       {entries
       ->Array.map(entry => {
         let isSelectedForSet = entryToSet->Option.mapOr(false, v => v == entry.id)

@@ -510,7 +510,7 @@ function Entry$Entries(props) {
                                 deleteEntry: deleteEntry
                               }, entry.id);
                   }),
-              className: "leading-none flex-1 md:h-full p-3 sm:p-0 overflow-y-scroll max-w-xl"
+              className: "leading-none flex-1 md:h-full p-3 sm:p-0 sm:pb-80 pb-80 overflow-y-scroll max-w-xl"
             });
 }
 
