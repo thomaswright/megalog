@@ -1,7 +1,6 @@
 module Day = {
   @react.component
   let make = (~d, ~onClick, ~hasWeekEntry, ~entry: option<Entry.entry>) => {
-    Console.log("render")
     let beginningOfWeek = d->Date.getDay == 0
 
     let year = d->Date.getFullYear

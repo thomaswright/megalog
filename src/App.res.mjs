@@ -158,6 +158,22 @@ function App(props) {
         });
   };
   var onClickDate = function (entryDate, withMetaKey) {
+    var entryId = getEntryToSet();
+    if (entryId !== undefined) {
+      updateEntry(entryId, (function (e) {
+              return {
+                      id: e.id,
+                      date: entryDate,
+                      title: e.title,
+                      content: e.content,
+                      lock: e.lock,
+                      hide: e.hide
+                    };
+            }));
+      return setEntryToSet(function (param) {
+                  
+                });
+    }
     ((function (x) {
             if (x !== undefined) {
               Caml_option.valFromOption(x).scrollIntoView({
@@ -231,24 +247,10 @@ function App(props) {
           break;
       
     }
-    Core__Option.mapOr(getEntryToSet(), Core__Option.mapOr(tmp, undefined, (function (element) {
-                element.scrollIntoView({
-                      behavior: "smooth",
-                      block: "center"
-                    });
-              })), (function (entryId) {
-            updateEntry(entryId, (function (e) {
-                    return {
-                            id: e.id,
-                            date: entryDate,
-                            title: e.title,
-                            content: e.content,
-                            lock: e.lock,
-                            hide: e.hide
-                          };
-                  }));
-            setEntryToSet(function (param) {
-                  
+    Core__Option.mapOr(tmp, undefined, (function (element) {
+            element.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center"
                 });
           }));
   };

@@ -145,8 +145,15 @@ let make = () => {
   }
 
   let onClickDate = (entryDate, withMetaKey) => {
-    getEntryToSet()->Option.mapOr(
-      {
+    switch getEntryToSet() {
+    | Some(entryId) => {
+        updateEntry(entryId, e => {
+          ...e,
+          date: Some(entryDate),
+        })
+        setEntryToSet(_ => None)
+      }
+    | None => {
         entryDate
         ->Some
         ->entryClassNameId
@@ -191,15 +198,12 @@ let make = () => {
                   ->Some
                   ->entryClassNameId
                   ->Global.Derived.getElementByClassOp
-                  ->Option.mapOr(
-                    (),
-                    element => {
-                      element->Global.scrollIntoView({
-                        "behavior": "smooth",
-                        "block": "center",
-                      })
-                    },
-                  )
+                  ->Option.mapOr((), element => {
+                    element->Global.scrollIntoView({
+                      "behavior": "smooth",
+                      "block": "center",
+                    })
+                  })
                 })
               }
             }
@@ -220,15 +224,8 @@ let make = () => {
             "block": "center",
           })
         })
-      },
-      entryId => {
-        updateEntry(entryId, e => {
-          ...e,
-          date: Some(entryDate),
-        })
-        setEntryToSet(_ => None)
-      },
-    )
+      }
+    }
   }
 
   let formatContentForFile = entry => {
