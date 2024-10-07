@@ -54,7 +54,7 @@ function Days$Day(props) {
                                               }, e.metaKey);
                                         })
                                     }),
-                                className: "absolute right-0 py-0.5 border-l border-b border-r",
+                                className: "absolute right-0 h-6 sm:h-5 border-l border-b border-r flex flex-row items-center justify-center",
                                 style: {
                                   borderColor: monthColor
                                 }
@@ -93,7 +93,7 @@ function Days$Day(props) {
                                   })
                             ],
                             className: [
-                                "h-full py-0.5 flex-1 flex flex-row items-center whitespace-nowrap overflow-x-hidden",
+                                "h-6 sm:h-5 flex-1 flex flex-row items-center whitespace-nowrap overflow-x-hidden",
                                 isToday ? "bg-[--foreground-200]" : ""
                               ].join(" "),
                             id: "dayview-" + Entry.entryDateString({

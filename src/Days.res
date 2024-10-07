@@ -26,7 +26,7 @@ module Day = {
               ->Int.fromString
               ->Option.mapOr(React.null, weekNum => {
                 <div
-                  className="absolute right-0 py-0.5 border-l border-b border-r"
+                  className="absolute right-0 h-6 sm:h-5 border-l border-b border-r flex flex-row items-center justify-center"
                   style={{borderColor: monthColor}}>
                   <button
                     id={` dayview-${Week(year, weekNum)->Entry.entryDateString}`}
@@ -46,7 +46,7 @@ module Day = {
         className=" font-black flex flex-row items-center gap-1 whitespace-nowrap overflow-x-hidden">
         <button
           className={[
-            "h-full py-0.5 flex-1 flex flex-row items-center whitespace-nowrap overflow-x-hidden",
+            "h-6 sm:h-5 flex-1 flex flex-row items-center whitespace-nowrap overflow-x-hidden",
             isToday ? "bg-[--foreground-200]" : "",
           ]->Array.join(" ")}
           onClick={e => onClick(Date(year, month, monthDay), e->ReactEvent.Mouse.metaKey)}
