@@ -55,6 +55,34 @@ module ControlledInput = {
   }
 }
 
+// let importPersonal = setEntries => {
+
+//   React.useEffect0(() => {
+//     Global.fetch("../testData/test.json")
+//     ->Promise.then(response => {
+//       Global.json(response)
+//     })
+//     ->Promise.then(json => {
+//       setEntries(
+//         _ =>
+//           json->Array.mapWithIndex(
+//             ((name, content), i) => {
+//               id: i->Int.toString,
+//               date: name->entryDateFromString,
+//               title: name,
+//               content,
+//               lock: true,
+//               hide: false,
+//             },
+//           ),
+//       )
+//       Promise.resolve()
+//     })
+//     ->ignore
+//     None
+//   })
+// }
+
 @react.component
 let make = () => {
   // Theme.initiate()
@@ -69,8 +97,21 @@ let make = () => {
 
   let scrollToRef = React.useRef(None)
 
+  // importPersonal(setEntries)
   // React.useEffect0(() => {
   //   setEntries(_ => [])
+  //   None
+  // })
+  // React.useEffect0(() => {
+  //   setEntries(v => {
+  //     v->Array.map(
+  //       v => {
+  //         ...v,
+  //         title: "",
+  //         content: v.content->String.trim,
+  //       },
+  //     )
+  //   })
   //   None
   // })
 
@@ -403,45 +444,3 @@ let make = () => {
     // <MenuBar onSort onExportFile onExportFolder onShow onHide onLock onUnlock theme setTheme />
   </div>
 }
-
-// let getDate = name => {
-//   let date =
-//     name
-//     ->String.substring(~start=0, ~end=10)
-//     ->DateFns.parse(standardDateFormat, 0)
-
-//   date->isInvalidDate
-//     ? None
-//     : switch (
-//         date->DateFns.format("y")->Int.fromString,
-//         date->DateFns.format("MM")->Int.fromString,
-//         date->DateFns.format("dd")->Int.fromString,
-//       ) {
-//       | (Some(y), Some(m), Some(d)) => Some(Date(y, m, d))
-//       | _ => None
-//       }
-// }
-
-// React.useEffect0(() => {
-//   fetch("../testData/test.json")
-//   ->Promise.then(response => {
-//     json(response)
-//   })
-//   ->Promise.then(json => {
-//     setImportData(
-//       _ => Some(
-//         json->Array.mapWithIndex(
-//           ((name, content), i) => {
-//             id: i->Int.toString,
-//             date: getDate(name),
-//             title: name,
-//             content,
-//           },
-//         ),
-//       ),
-//     )
-//     Promise.resolve()
-//   })
-//   ->ignore
-//   None
-// })
