@@ -70,7 +70,7 @@ let make = () => {
   let scrollToRef = React.useRef(None)
 
   // React.useEffect0(() => {
-  //   setEntries(v => None)
+  //   setEntries(_ => [])
   //   None
   // })
 
