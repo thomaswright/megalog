@@ -85,7 +85,7 @@ module ControlledInput = {
 
 @react.component
 let make = () => {
-  // Theme.initiate()
+  Theme.initiate()
 
   let (entries, setEntries, getEntries) = Common.useLocalStorage("data", [])
 

@@ -436,7 +436,7 @@ function Entry$Entry(props) {
                       ],
                       className: [
                           entryClassNameId(entry.date),
-                          "heading py-1 border-b flex flex-row items-center pr-4"
+                          "heading py-1 border-b flex flex-row items-center pr-4 "
                         ].join(" "),
                       style: {
                         borderColor: monthColor,

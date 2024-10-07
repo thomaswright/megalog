@@ -64,6 +64,7 @@ function App$ControlledInput(props) {
 }
 
 function App(props) {
+  Theme.initiate();
   var match = Common.useLocalStorage("data", []);
   var getEntries = match[2];
   var setEntries = match[1];

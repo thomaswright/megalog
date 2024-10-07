@@ -56,7 +56,7 @@ function weekColor(weekInt) {
 }
 
 function monthHue(monthInt) {
-  return 360 / 12 * Math.imul(monthInt - 3 | 0, 5) % 360.0;
+  return 360 / 12 * (11 - monthInt | 0) % 360.0;
 }
 
 var monthColors = Core__Array.make(12, false).map(function (param, i) {

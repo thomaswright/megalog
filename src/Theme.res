@@ -59,7 +59,7 @@ let weekColor = weekInt => {
 // }
 
 let monthHue = monthInt => {
-  Float.mod(360. /. 12. *. ((monthInt - 3) * 5)->Int.toFloat, 360.0)
+  Float.mod(360. /. 12. *. (11 - monthInt)->Int.toFloat, 360.0)
 }
 
 module Light = {

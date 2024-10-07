@@ -218,7 +218,7 @@ module Entry = {
       <div
         className={[
           entry.date->entryClassNameId,
-          "heading py-1 border-b flex flex-row items-center pr-4",
+          "heading py-1 border-b flex flex-row items-center pr-4 ",
         ]->Array.join(" ")}
         style={{
           color: monthColor,
