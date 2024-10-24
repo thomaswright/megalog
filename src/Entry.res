@@ -138,7 +138,7 @@ module TextArea = {
     <TextareaAutosize
       readOnly={readonly}
       disabled={disabled}
-      className={["w-full bg-transparent", className]->Array.join(" ")}
+      className={["w-full bg-transparent resize-none", className]->Array.join(" ")}
       value={content}
       onChange={e => {
         let value = (e->ReactEvent.Form.target)["value"]

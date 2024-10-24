@@ -173,7 +173,7 @@ function Entry$TextArea(props) {
   return JsxRuntime.jsx(ReactTextareaAutosize, {
               value: props.content,
               className: [
-                  "w-full bg-transparent",
+                  "w-full bg-transparent resize-none",
                   className
                 ].join(" "),
               onChange: (function (e) {
