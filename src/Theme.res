@@ -117,7 +117,7 @@ let monthDimVar = month => {
 }
 
 let getTheme = () => {
-  Common.useLocalStorageListener("theme", "light")
+  Common.useLocalStorageListener(StorageKeys.theme, Light)
 }
 
 let colorsByTheme = theme => {
@@ -156,7 +156,7 @@ let initiate = () => {
 }
 
 let useTheme = () => {
-  let (theme, setTheme, _getTheme) = Common.useLocalStorage("theme", Dark)
+  let (theme, setTheme, _getTheme) = Common.useLocalStorage(StorageKeys.theme, Dark)
 
   React.useEffect1(() => {
     let (remove, add, _c1, _c2) =

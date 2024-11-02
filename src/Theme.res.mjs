@@ -4,6 +4,7 @@ import * as React from "react";
 import * as Common from "./Common.res.mjs";
 import * as OtherJs from "./other.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
+import * as StorageKeys from "./StorageKeys.res.mjs";
 import * as Color from "@texel/color";
 
 function hsv(h, s, v) {
@@ -130,7 +131,7 @@ function monthDimVar(month) {
 }
 
 function getTheme() {
-  return Common.useLocalStorageListener("theme", "light");
+  return Common.useLocalStorageListener(StorageKeys.theme, "light");
 }
 
 function colorsByTheme(theme) {
@@ -191,7 +192,7 @@ function initiate() {
 }
 
 function useTheme() {
-  var match = Common.useLocalStorage("theme", "dark");
+  var match = Common.useLocalStorage(StorageKeys.theme, "dark");
   var theme = match[0];
   React.useEffect((function () {
           var match = theme === "dark" ? [

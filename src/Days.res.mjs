@@ -154,7 +154,18 @@ function Days(props) {
             });
 }
 
-var make$1 = Days;
+var make$1 = React.memo(Days, (function (a, b) {
+        var dateSetId = function (x) {
+          return Array.from(x.values()).toSorted(function (a, b) {
+                        return a.localeCompare(b);
+                      }).join("");
+        };
+        if (DateFns.format(a.start, Common.standardDateFormat) === DateFns.format(b.start, Common.standardDateFormat) && DateFns.format(a.end, Common.standardDateFormat) === DateFns.format(b.end, Common.standardDateFormat)) {
+          return dateSetId(a.dateSet) === dateSetId(b.dateSet);
+        } else {
+          return false;
+        }
+      }));
 
 export {
   Day ,

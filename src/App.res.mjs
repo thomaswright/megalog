@@ -13,6 +13,7 @@ import * as Core__Int from "@rescript/core/src/Core__Int.res.mjs";
 import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
+import * as StorageKeys from "./StorageKeys.res.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as Tb from "react-icons/tb";
 import * as JsxRuntime from "react/jsx-runtime";
@@ -65,7 +66,7 @@ function App$ControlledInput(props) {
 
 function App(props) {
   Theme.initiate();
-  var match = Common.useLocalStorage("data", []);
+  var match = Common.useLocalStorage(StorageKeys.data, []);
   var getEntries = match[2];
   var setEntries = match[1];
   var entries = match[0];
@@ -87,10 +88,10 @@ function App(props) {
                 scrollToRef.current = undefined;
               }));
       });
-  var match$3 = Common.useLocalStorage("start-year", 2020);
+  var match$3 = Common.useLocalStorage(StorageKeys.startYear, 2020);
   var setStartYear = match$3[1];
   var startYear = match$3[0];
-  var match$4 = Common.useLocalStorage("end-year", 2030);
+  var match$4 = Common.useLocalStorage(StorageKeys.endYear, 2030);
   var setEndYear = match$4[1];
   var endYear = match$4[0];
   var startOfCal = new Date(startYear, 0, 1);

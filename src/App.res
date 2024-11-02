@@ -87,7 +87,7 @@ module ControlledInput = {
 let make = () => {
   Theme.initiate()
 
-  let (entries, setEntries, getEntries) = Common.useLocalStorage("data", [])
+  let (entries, setEntries, getEntries) = Common.useLocalStorage(StorageKeys.data, [])
 
   let (entryToSet: option<string>, setEntryToSet, getEntryToSet) = Common.useStateWithGetter(() =>
     None
@@ -130,8 +130,8 @@ let make = () => {
     None
   })
 
-  let (startYear, setStartYear, _) = Common.useLocalStorage("start-year", 2020)
-  let (endYear, setEndYear, _) = Common.useLocalStorage("end-year", 2030)
+  let (startYear, setStartYear, _) = Common.useLocalStorage(StorageKeys.startYear, 2020)
+  let (endYear, setEndYear, _) = Common.useLocalStorage(StorageKeys.endYear, 2030)
 
   let startOfCal = Date.makeWithYMD(~year=startYear, ~month=0, ~date=1)
   let endOfCal = Date.makeWithYMD(~year=endYear + 1, ~month=0, ~date=1)

@@ -101,15 +101,17 @@ let make = (~start, ~end, ~dateSet, ~onClick, ~dateEntries) => {
   </div>
 }
 
-// let make = React.memoCustomCompareProps(make, (a, b) => {
-//   let dateSetId = x =>
-//     x
-//     ->Set.values
-//     ->Iterator.toArray
-//     ->Array.toSorted((a, b) => String.localeCompare(a, b))
-//     ->Array.join("")
+let make = React.memoCustomCompareProps(make, (a, b) => {
+  let dateSetId = x =>
+    x
+    ->Set.values
+    ->Iterator.toArray
+    ->Array.toSorted((a, b) => String.localeCompare(a, b))
+    ->Array.join("")
 
-//   a.start->format(standardDateFormat) == b.start->format(standardDateFormat) &&
-//   a.end->format(standardDateFormat) == b.end->format(standardDateFormat) &&
-//   a.dateSet->dateSetId == b.dateSet->dateSetId
-// })
+  a.start->DateFns.format(Common.standardDateFormat) ==
+    b.start->DateFns.format(Common.standardDateFormat) &&
+  a.end->DateFns.format(Common.standardDateFormat) ==
+    b.end->DateFns.format(Common.standardDateFormat) &&
+  a.dateSet->dateSetId == b.dateSet->dateSetId
+})
